@@ -997,7 +997,7 @@
       container.innerHTML = data.map(account => {
         const id = account.user_id || account.id;
         const email = account.email || "Keine E-Mail";
-        const currentRole = account.role || "member";
+        const currentRole = account.user_role || account.role || "member";
 
         if (!id) return "";
 
