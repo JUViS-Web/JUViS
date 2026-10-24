@@ -255,6 +255,52 @@
           </div>
         `).join("") ||
       '<p class="muted">Keine Mitglieder gefunden.</p>';
+    
+    const awardMember = $("awardMember");
+
+    if (awardMember) {
+      const selectedMember = awardMember.value;
+
+      awardMember.innerHTML =
+        '<option value="">Mitglied auswählen …</option>' +
+        cache.members.map(member => `
+          <option value="${esc(member.id)}">
+            ${esc(member.first_name)} ${esc(member.last_name)}
+          </option>
+        `).join("");
+
+      awardMember.value = selectedMember;
+    }
+
+    $("awardList").innerHTML =
+      (cache.awards || []).map(award => {
+        const member = cache.members.find(
+          item => String(item.id) === String(award.member_id)
+        );
+
+        return `
+          <div class="entry">
+            <div class="icon">★</div>
+            <div class="grow">
+              <b>${esc(award.title)}</b>
+              <small>
+                Mitglied: ${member
+                  ? esc(member.first_name + " " + member.last_name)
+                  : "Unbekannt"}
+                <br>
+                Datum: ${award.awarded_on
+                  ? new Date(award.awarded_on + "T00:00:00").toLocaleDateString("de-DE")
+                  : "–"}
+                ${award.notes
+                  ? "<br>Notiz: " + esc(award.notes)
+                  : ""}
+              </small>
+            </div>
+            ${removeButton("member_awards", award.id)}
+          </div>
+        `;
+      }).join("") ||
+      '<p class="muted">Noch keine Auszeichnungen eingetragen.</p>';
 
     $("eventList").innerHTML =
       cache.events.map(event => `
