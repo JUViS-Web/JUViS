@@ -27,7 +27,45 @@
  <main><div class="mainhead"><div><h1 id="pageTitle">Übersicht</h1><div class="muted tiny" id="welcome"></div></div></div><div id="message" class="status hidden"></div>
  <section id="home" class="page"><div class="stats"><div class="stat">Mitglieder<b id="countMembers">–</b><span class="muted tiny">Datensätze</span></div><div class="stat">Dienste<b id="countEvents">–</b><span class="muted tiny">geplant</span></div><div class="stat">Bekleidung<b id="countClothing">–</b><span class="muted tiny">Einträge</span></div><div class="stat">Übungen<b id="countExercises">–</b><span class="muted tiny">geplant</span></div></div><div class="panel" style="margin-top:12px"><h2>Nächste Dienste</h2><div id="upcoming"></div></div><div class="panel"><h2>Systemstatus</h2><p class="muted">JUVIS ist mit Supabase verbunden, sobald du die Zugangsdaten in <code>config.js</code> einträgst und das Datenbankschema ausführst.</p></div></section>
  <section id="members" class="page hidden"><div class="panel"><h2>Mitglied hinzufügen</h2><form id="memberForm"><div class="row"><div><label>Vorname</label><input name="first_name" required></div><div><label>Nachname</label><input name="last_name" required></div></div><label>E-Mail (optional)</label><input name="email" type="email"><label>Notiz (keine sensiblen Daten)</label><input name="notes"><button>Mitglied speichern</button></form></div><div class="panel"><h2>Mitgliederliste</h2><input id="memberSearch" placeholder="Mitglied suchen …"><div id="memberList"></div></div></section>
- <section id="events" class="page hidden"><div class="panel"><h2>Dienst planen</h2><form id="eventForm"><label>Diensttitel</label><input name="title" required><div class="row"><div><label>Datum und Uhrzeit</label><input name="starts_at" type="datetime-local" required></div><div><label>Ort</label><input name="location"></div></div><label>Beschreibung</label><textarea name="description" rows="2"></textarea><button>Dienst speichern</button></form></div><div class="panel"><h2>Dienstplan</h2><div id="eventList"></div></div></section>
+<section id="events" class="page hidden">
+  <div class="panel">
+    <h2>Dienst planen</h2>
+    <form id="eventForm">
+      <label>Diensttitel</label>
+      <input name="title" required>
+      <div class="row">
+        <div>
+          <label>Datum und Uhrzeit</label>
+          <input name="starts_at" type="datetime-local" required>
+        </div>
+        <div>
+          <label>Ort</label>
+          <input name="location">
+        </div>
+      </div>
+      <label>Beschreibung</label>
+      <textarea name="description" rows="2"></textarea>
+      <button>Dienst speichern</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Dienstplan</h2>
+    <div id="eventList"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Anwesenheit erfassen</h2>
+    <p class="muted">Wähle einen Dienst aus, um die Anwesenheit der Mitglieder zu verwalten.</p>
+    <label for="attendanceEvent">Dienst auswählen</label>
+    <select id="attendanceEvent">
+      <option value="">Bitte Dienst auswählen</option>
+    </select>
+    <div id="attendanceList"></div>
+    <button type="button" id="saveAttendance">Anwesenheit speichern</button>
+    <p id="attendanceMessage" class="muted"></p>
+  </div>
+</section>
  <section id="exercises" class="page hidden"><div class="panel"><h2>Übung planen</h2><form id="exerciseForm"><label>Thema</label><input name="title" required><label>Lernziele und Ablauf</label><textarea name="notes" rows="3"></textarea><label>Datum (optional)</label><input name="planned_date" type="date"><button>Übung speichern</button></form></div><div class="panel"><h2>Übungsübersicht</h2><div id="exerciseList"></div></div></section>
  <section id="clothing" class="page hidden"><div class="panel"><h2>Bekleidung / Spind erfassen</h2><form id="clothingForm"><label>Mitglied</label><select name="member_id" id="clothingMember"><option value="">Nicht zugeordnet</option></select><div class="row"><div><label>Artikel</label><input name="item" required placeholder="z. B. JF-Jacke"></div><div><label>Größe</label><input name="size"></div></div><label>Spindnummer</label><input name="locker_number"><button>Eintrag speichern</button></form></div>
 <div class="panel">
