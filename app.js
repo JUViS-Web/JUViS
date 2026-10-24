@@ -109,7 +109,46 @@ sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);const {d
 async function signedIn(u){user=u;const {data:p}=await sb.from("profiles").select("*").eq("id",u.id).maybeSingle();profile=p||{role:"member"};$("authView").classList.add("hidden");$("appView").classList.remove("hidden");$("welcome").textContent=(u.email||"Angemeldet")+" · Rolle: "+({admin:"Administration",leader:"Betreuung",member:"Mitglied"}[role()]||"Mitglied");$("connection").textContent="Angemeldet";document.querySelectorAll("#nav button[data-page]").forEach(b=>b.classList.toggle("hidden",b.dataset.page==="members"||b.dataset.page==="clothing"||b.dataset.page==="docs"?false:false));await load()}
 function signedOut(){$("appView").classList.add("hidden");$("authView").classList.remove("hidden");user=null;profile=null}
 $("toggleAuth").onclick=()=>{authMode=authMode==="login"?"signup":"login";$("authTitle").textContent=authMode==="login"?"Anmelden":"Konto erstellen";$("authSubmit").textContent=authMode==="login"?"Anmelden":"Registrieren";$("toggleAuth").textContent=authMode==="login"?"Neues Konto registrieren":"Zur Anmeldung wechseln";clearMsg(true)};
-$("authSubmit").onclick=async()=>{if(!sb)return;clearMsg(true);const email=$("email").value.trim(),password=$("password").value;if(!email||password.length<8){msg("Bitte E-Mail und ein Passwort mit mindestens 8 Zeichen eingeben.",true);return}const r=authMode==="login"?await sb.auth.signInWithPassword({email,password}):await sb.auth.signUp({email,password});if(r.error)msg(r.error.message,true);else if(authMode==="signup"&&!r.data.session)msg("Konto erstellt.\nPrüfe dein E-Mail-Postfach zur Bestätigung.",true)};
+$("authSubmit").onclick = async (e) => {
+  e.preventDefault();
+  clearMsg(true);
+
+  try {
+    if (!sb) {
+      msg("Verbindung zu Supabase fehlt. Bitte Konfiguration prüfen.", true);
+      return;
+    }
+
+    const email = $("email").value.trim();
+    const password = $("password").value;
+
+    if (!email || password.length < 8) {
+      msg("Bitte E-Mail und ein Passwort mit mindestens 8 Zeichen eingeben.", true);
+      return;
+    }
+
+    $("authSubmit").disabled = true;
+    $("authSubmit").textContent = "Bitte warten …";
+
+    const result = authMode === "login"
+      ? await sb.auth.signInWithPassword({ email, password })
+      : await sb.auth.signUp({ email, password });
+
+    if (result.error) {
+      msg("Anmeldung fehlgeschlagen: " + result.error.message, true);
+    } else if (authMode === "signup" && !result.data.session) {
+      msg("Konto erstellt. Bitte prüfe dein E-Mail-Postfach zur Bestätigung.", true);
+    } else if (authMode === "login" && !result.data.session) {
+      msg("Es wurde keine aktive Sitzung erstellt.", true);
+    }
+  } catch (error) {
+    msg("Fehler bei der Anmeldung: " + (error.message || String(error)), true);
+  } finally {
+    $("authSubmit").disabled = false;
+    $("authSubmit").textContent =
+      authMode === "login" ? "Anmelden" : "Registrieren";
+  }
+};
 $("logout").onclick=()=>sb.auth.signOut();$("nav").onclick=e=>{const b=e.target.closest("[data-page]");if(b)showPage(b.dataset.page)};
 $("memberSearch").oninput=render;
 $("attendanceEvent").onchange = () => render();
