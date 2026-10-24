@@ -243,7 +243,19 @@
             <div class="icon">♙</div>
             <div class="grow">
               <b>${esc(member.first_name)} ${esc(member.last_name)}</b>
-              <small>${esc(member.email || "Keine E-Mail hinterlegt")}</small>
+              <small>
+                Geburtstag: ${member.birth_date ? new Date(member.birth_date + "T00:00:00").toLocaleDateString("de-DE") : "–"}
+                <br>
+                Eintritt: ${member.join_date ? new Date(member.join_date + "T00:00:00").toLocaleDateString("de-DE") : "–"}
+                <br>
+                Austritt: ${member.leave_date ? new Date(member.leave_date + "T00:00:00").toLocaleDateString("de-DE") : "–"}
+                <br>
+                Einsatzposition: ${esc(member.known_position || "Keine angegeben")}
+                <br>
+                Spindnummer: ${esc(member.locker_number || "Keine angegeben")}
+                <br>
+                E-Mail: ${esc(member.email || "Keine hinterlegt")}
+              </small>
             </div>
             ${removeButton("members", member.id)}
           </div>
@@ -843,6 +855,11 @@ $("navToggle").addEventListener("click", () => {
     const saved = await add("members", {
       first_name: data.first_name.trim(),
       last_name: data.last_name.trim(),
+      birth_date: data.birth_date || null,
+      join_date: data.join_date || null,
+      leave_date: data.leave_date || null,
+      known_position: data.known_position.trim() || null,
+      locker_number: data.locker_number.trim() || null,
       email: data.email || null,
       notes: data.notes || null
     });
