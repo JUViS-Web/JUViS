@@ -202,7 +202,61 @@
     </div>
     <div id="message" class="status hidden"></div>
  <section id="home" class="page"><div class="stats"><div class="stat">Mitglieder<b id="countMembers">–</b><span class="muted tiny">Datensätze</span></div><div class="stat">Dienste<b id="countEvents">–</b><span class="muted tiny">geplant</span></div><div class="stat">Bekleidung<b id="countClothing">–</b><span class="muted tiny">Einträge</span></div><div class="stat">Übungen<b id="countExercises">–</b><span class="muted tiny">geplant</span></div></div><div class="panel" style="margin-top:12px"><h2>Nächste Dienste</h2><div id="upcoming"></div></div><div class="panel"><h2>Systemstatus</h2><p class="muted">JUVIS ist mit Supabase verbunden, sobald du die Zugangsdaten in <code>config.js</code> einträgst und das Datenbankschema ausführst.</p></div></section>
- <section id="members" class="page hidden"><div class="panel"><h2>Mitglied hinzufügen</h2><form id="memberForm"><div class="row"><div><label>Vorname</label><input name="first_name" required></div><div><label>Nachname</label><input name="last_name" required></div></div><label>E-Mail (optional)</label><input name="email" type="email"><label>Notiz (keine sensiblen Daten)</label><input name="notes"><button>Mitglied speichern</button></form></div><div class="panel"><h2>Mitgliederliste</h2><input id="memberSearch" placeholder="Mitglied suchen …"><div id="memberList"></div></div></section>
+<section id="members" class="page hidden">
+  <div class="panel">
+    <h2>Mitglied hinzufügen</h2>
+
+    <form id="memberForm">
+      <div class="row">
+        <div>
+          <label>Vorname</label>
+          <input name="first_name" required>
+        </div>
+        <div>
+          <label>Nachname</label>
+          <input name="last_name" required>
+        </div>
+      </div>
+
+      <label>Geburtsdatum</label>
+      <input name="birth_date" type="date">
+
+      <div class="row">
+        <div>
+          <label>Eintrittsdatum</label>
+          <input name="join_date" type="date">
+        </div>
+        <div>
+          <label>Austrittsdatum (optional)</label>
+          <input name="leave_date" type="date">
+        </div>
+      </div>
+
+      <label>Bekannte Einsatzposition</label>
+      <input
+        name="known_position"
+        placeholder="z. B. Angriffstruppführer (bei Übungen)"
+      >
+
+      <label>Spindnummer</label>
+      <input name="locker_number" placeholder="z. B. 12">
+
+      <label>E-Mail (optional)</label>
+      <input name="email" type="email">
+
+      <label>Notiz (keine sensiblen Daten)</label>
+      <textarea name="notes" rows="2"></textarea>
+
+      <button type="submit">Mitglied speichern</button>
+    </form>
+  </div>
+
+  <div class="panel">
+    <h2>Mitgliederliste</h2>
+    <input id="memberSearch" placeholder="Mitglied suchen …">
+    <div id="memberList"></div>
+  </div>
+</section>
 <section id="events" class="page hidden">
   <div class="panel">
     <h2>Dienst planen</h2>
