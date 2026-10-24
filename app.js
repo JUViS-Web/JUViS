@@ -172,7 +172,7 @@
       button.disabled = false;
     }
   }
-
+  
   async function load() {
     try {
       [
@@ -180,13 +180,15 @@
         cache.events,
         cache.exercises,
         cache.clothing,
-        cache.docs
+        cache.docs,
+        cache.awards
       ] = await Promise.all([
         db("members"),
         db("events"),
         db("exercises"),
         db("clothing"),
-        db("documents")
+        db("documents"),
+        db("member_awards")
       ]);
 
       if (admin()) {
@@ -199,14 +201,6 @@
     } catch (error) {
       msg("Daten konnten nicht geladen werden: " + error.message);
     }
-  }
-
-  function removeButton(table, id) {
-    return admin()
-      ? `<button type="button" class="danger tiny"
-           data-delete="${esc(table)}"
-           data-id="${esc(id)}">Löschen</button>`
-      : "";
   }
 
   function render() {
