@@ -108,6 +108,7 @@ $("toggleAuth").onclick=()=>{authMode=authMode==="login"?"signup":"login";$("aut
 $("authSubmit").onclick=async()=>{if(!sb)return;clearMsg(true);const email=$("email").value.trim(),password=$("password").value;if(!email||password.length<8){msg("Bitte E-Mail und ein Passwort mit mindestens 8 Zeichen eingeben.",true);return}const r=authMode==="login"?await sb.auth.signInWithPassword({email,password}):await sb.auth.signUp({email,password});if(r.error)msg(r.error.message,true);else if(authMode==="signup"&&!r.data.session)msg("Konto erstellt.\nPrüfe dein E-Mail-Postfach zur Bestätigung.",true)};
 $("logout").onclick=()=>sb.auth.signOut();$("nav").onclick=e=>{const b=e.target.closest("[data-page]");if(b)showPage(b.dataset.page)};
 $("memberSearch").oninput=render;
+$("attendanceEvent").onchange = () => render();
   
 $("attendanceEvent").onchange = () => render();
 
