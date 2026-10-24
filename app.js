@@ -31,20 +31,48 @@ $("authSubmit").onclick=async()=>{if(!sb)return;clearMsg(true);const email=$("em
 $("logout").onclick=()=>sb.auth.signOut();$("nav").onclick=e=>{const b=e.target.closest("[data-page]");if(b)showPage(b.dataset.page)};
 $("memberSearch").oninput=render;
 $("printClothing").onclick=()=>{
-  const w=window.open("","_blank");
-  if(!w){msg("Druckansicht blockiert. Erlaube Pop-ups für JUVIS.");return}
   const rows=cache.clothing.map(c=>{
     const m=cache.members.find(x=>x.id===c.member_id);
-    const qr=c.qr_code?`<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(c.qr_code)}" alt="QR-Code">`:"<p>Kein QR-Code</p>";
-    return `<article><div><h2>${esc(c.item)}</h2><p>Mitglied: ${m?esc(m.first_name+" "+m.last_name):"Nicht zugeordnet"}</p><p>Größe: ${esc(c.size||"–")}</p><p>Spind: ${esc(c.locker_number||"–")}</p><p>Code: ${esc(c.qr_code||"–")}</p></div>${qr}</article>`;
+    const qr=c.qr_code
+      ?`<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(c.qr_code)}" alt="QR-Code">`
+      :"<p>Kein QR-Code vorhanden</p>";
+
+    return `<article>
+      <div>
+        <h2>${esc(c.item)}</h2>
+        <p>Mitglied: ${m?esc(m.first_name+" "+m.last_name):"Nicht zugeordnet"}</p>
+        <p>Größe: ${esc(c.size||"–")}</p>
+        <p>Spind: ${esc(c.locker_number||"–")}</p>
+        <p>Code: ${esc(c.qr_code||"–")}</p>
+      </div>${qr}
+    </article>`;
   }).join("");
-  w.document.write(`<!doctype html><html lang="de"><head><meta charset="utf-8"><title>JUVIS – Bekleidung</title><style>
+
+  const html=`<!doctype html>
+  <html lang="de"><head><meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>JUVIS – Bekleidungsübersicht</title>
+  <style>
   body{font:14px Arial,sans-serif;margin:20px;color:#111}
-  h1{font-size:22px}article{display:flex;align-items:center;justify-content:space-between;gap:20px;border:1px solid #aaa;padding:12px;margin:0 0 12px;break-inside:avoid}
-  article img{width:130px;height:130px}p{margin:5px 0}
+  h1{font-size:22px}
+  article{display:flex;align-items:center;justify-content:space-between;gap:20px;border:1px solid #aaa;padding:12px;margin-bottom:12px;break-inside:avoid}
+  article img{width:130px;height:130px}
+  p{margin:5px 0}
   @media print{button{display:none}body{margin:10mm}}
-  </style></head><body><h1>JUVIS – Bekleidungsübersicht</h1>${rows}<button onclick="window.print()">Drucken</button></body></html>`);
-  w.document.close();
+  </style></head><body>
+  <h1>JUVIS – Bekleidungsübersicht</h1>
+  ${rows}
+  <button onclick="window.print()">Drucken</button>
+  </body></html>`;
+
+  const blob=new Blob([html],{type:"text/html"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.target="_blank";
+  a.rel="noopener";
+  a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),60000);
 };
 $("memberForm").onsubmit=e=>{e.preventDefault();const d=formObj(e.target);add("members",{first_name:d.first_name.trim(),last_name:d.last_name.trim(),email:d.email||null,notes:d.notes||null});e.target.reset()};
 $("eventForm").onsubmit=e=>{e.preventDefault();const d=formObj(e.target);add("events",{title:d.title,starts_at:new Date(d.starts_at).toISOString(),location:d.location||null,description:d.description||null});e.target.reset()};
