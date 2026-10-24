@@ -196,68 +196,8 @@ document.querySelectorAll("[data-delete]").forEach(b=>b.onclick=async()=>{if(!ad
 async function add(table,data){clearMsg();if(!admin()){msg("Du hast keine Berechtigung, Daten anzulegen. Bitte wende dich an die Administration.");return}const {error}=await sb.from(table).insert({...data,created_by:user.id});if(error)msg("Speichern fehlgeschlagen: "+error.message);else{msg("Gespeichert.");await load()}}
 async function boot(){if(!configured||!window.supabase){$("authView").classList.remove("hidden");$("authMessage").textContent="Noch nicht konfiguriert: Öffne config.js und trage die Supabase-Projekt-URL sowie den anon/public key ein. Danach schema.sql im Supabase SQL Editor ausführen."; $("authMessage").classList.remove("hidden");$("authSubmit").disabled=true;return}
 sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);const {data:{session}}=await sb.auth.getSession();if(session)await signedIn(session.user);sb.auth.onAuthStateChange((_event,session)=>{if(session) setTimeout(()=>signedIn(session.user),0);else signedOut()})}
-async function saveMaintenanceSettings() {
-  const select = $("maintenanceToggle");
-  const output = $("adminMessage");
-  const button = $("saveMaintenance");
-
-  if (!select || !output || !isAdmin()) return;
-
-  button.disabled = true;
-  output.textContent = "Wird gespeichert …";
-
-  try {
-    const { error } = await sb
-      .from("app_settings")
-      .update({
-        maintenance_mode: select.value === "true",
-        updated_at: new Date().toISOString(),
-        updated_by: user.id
-      })
-      .eq("id", true);
-
-    if (error) throw error;
-
-    output.textContent = "Einstellung erfolgreich gespeichert.";
-  } catch (error) {
-    output.textContent =
-      "Speichern fehlgeschlagen: " + error.message;
-  } finally {
-    button.disabled = false;
-  }
-}
 
 
-async function saveMaintenanceSettings() {
-  const select = $("maintenanceToggle");
-  const output = $("adminMessage");
-  const button = $("saveMaintenance");
-
-  if (!select || !output || !button || !isAdmin()) return;
-
-  button.disabled = true;
-  output.textContent = "Wird gespeichert …";
-
-  try {
-    const { error } = await sb
-      .from("app_settings")
-      .update({
-        maintenance_mode: select.value === "true",
-        updated_at: new Date().toISOString(),
-        updated_by: user.id
-      })
-      .eq("id", true);
-
-    if (error) throw error;
-
-    output.textContent = "Einstellung erfolgreich gespeichert.";
-  } catch (error) {
-    output.textContent =
-      "Speichern fehlgeschlagen: " + error.message;
-  } finally {
-    button.disabled = false;
-  }
-}
 
 $("logout").onclick=()=>sb.auth.signOut();$("nav").onclick=e=>{const b=e.target.closest("[data-page]");if(b)showPage(b.dataset.page)};
 $("memberSearch").oninput=render;
