@@ -209,6 +209,17 @@
     }
   }
 
+  function removeButton(table, id) {
+    return `
+      <button
+        type="button"
+        class="tiny"
+        data-delete="${esc(table)}"
+        data-id="${esc(id)}"
+      >Löschen</button>
+    `;
+  }
+
   function render() {
     $("countMembers").textContent = cache.members.length;
     $("countEvents").textContent = cache.events.length;
