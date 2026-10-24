@@ -16,19 +16,27 @@ async function load(){
       cache.events,
       cache.exercises,
       cache.clothing,
-      cache.docs,
-      cache.attendance
+      cache.docs
     ] = await Promise.all([
       db("members"),
       db("events"),
       db("exercises"),
       db("clothing"),
-      db("documents"),
-      db("attendance")
+      db("documents")
     ]);
+
+    if (admin()) {
+      cache.attendance = await db("attendance");
+    } else {
+      cache.attendance = [];
+    }
 
     render();
   }catch(e){
+    msg("Daten konnten nicht geladen werden: "+e.message);
+  }
+}
+catch(e){
     msg("Daten konnten nicht geladen werden: "+e.message);
   }
 }
