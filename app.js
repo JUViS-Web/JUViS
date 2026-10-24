@@ -402,11 +402,9 @@ $("startScan").onclick=async()=>{
 
     await scan.start(
       {facingMode:"environment"},
-
-$("saveMaintenance")?.addEventListener("click", () => {
-  alert("Der Speichern-Button funktioniert.");
-  saveMaintenanceSettings();
-});      lookup(text);
+      {fps:10, qrbox:250},
+      (text)=>{
+        lookup(text);
         scan.stop().catch(()=>{});
       },
       ()=>{}
@@ -416,11 +414,10 @@ $("saveMaintenance")?.addEventListener("click", () => {
   }
 };
 
-$("stopScan").onclick=()=>scan?.stop().catch(()=>{});
-document.querySelectorAll("#nav button[data-page]").forEach(b=>b.addEventListener("click",()=>clearMsg()));
 $("saveMaintenance")?.addEventListener(
   "click",
   saveMaintenanceSettings
 );
+
 boot();
 })();
