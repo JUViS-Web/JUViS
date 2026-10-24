@@ -80,7 +80,8 @@
 <div id="appView" class="app hidden">
  <header class="top"><div class="logo">✚</div><div><div class="brand">JUVIS</div><div class="sub">JUGENDFEUERWEHR · VERWALTUNG</div></div><div class="pill" id="connection">Verbunden</div></header>
  <div class="layout"><nav class="nav" id="nav">
- <button data-page="home" class="active">▦ Übersicht</button><button data-page="members">♙ Mitglieder</button><button data-page="events">▣ Dienstplan</button><button data-page="exercises">☷ Übungen</button><button data-page="clothing">♧ Bekleidung & Spinde</button><button data-page="docs">▤ Dokumente & Links</button><button data-page="scanner">⌗ QR-Scanner</button><section id="scanner" class="page hidden"><button data-page="admin" id="adminNav" class="hidden">⚙ Administration</button>
+ <button data-page="home" class="active">▦ Übersicht</button><button data-page="members">♙ Mitglieder</button><button data-page="events">▣ Dienstplan</button><button data-page="exercises">☷ Übungen</button><button data-page="clothing">♧ Bekleidung & Spinde</button><button data-page="docs">▤ Dokumente & Links</button><button data-page="scanner">⌗ QR-Scanner</button>
+   <button data-page="admin" id="adminNav" class="hidden">⚙ Administration</button> 
  <button id="logout" class="secondary">Abmelden</button></nav>
  <main><div class="mainhead"><div><h1 id="pageTitle">Übersicht</h1><div class="muted tiny" id="welcome"></div></div></div><div id="message" class="status hidden"></div>
  <section id="home" class="page"><div class="stats"><div class="stat">Mitglieder<b id="countMembers">–</b><span class="muted tiny">Datensätze</span></div><div class="stat">Dienste<b id="countEvents">–</b><span class="muted tiny">geplant</span></div><div class="stat">Bekleidung<b id="countClothing">–</b><span class="muted tiny">Einträge</span></div><div class="stat">Übungen<b id="countExercises">–</b><span class="muted tiny">geplant</span></div></div><div class="panel" style="margin-top:12px"><h2>Nächste Dienste</h2><div id="upcoming"></div></div><div class="panel"><h2>Systemstatus</h2><p class="muted">JUVIS ist mit Supabase verbunden, sobald du die Zugangsdaten in <code>config.js</code> einträgst und das Datenbankschema ausführst.</p></div></section>
@@ -149,6 +150,33 @@
 <h2>Dokumentenverzeichnis</h2>
 <div id="docList"></div>
 </div>
+</section>
+
+<section id="admin" class="page hidden">
+  <div class="panel">
+    <h2>Benutzerverwaltung</h2>
+    <p class="muted">Verwalte die Konten und Berechtigungen der JUVIS-Benutzer.</p>
+    <div id="adminUsers">
+      <p class="muted">Benutzerliste wird geladen …</p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Wartungsmodus</h2>
+    <p class="muted">
+      Während der Wartung werden neue Registrierungen sowie Anmeldungen
+      für Mitglieder und Betreuer blockiert. Administratoren behalten ihren Zugang.
+    </p>
+
+    <label for="maintenanceToggle">Wartungsmodus</label>
+    <select id="maintenanceToggle">
+      <option value="false">Deaktiviert</option>
+      <option value="true">Aktiviert</option>
+    </select>
+
+    <button type="button" id="saveMaintenance">Einstellung speichern</button>
+    <p id="adminMessage" class="muted"></p>
+  </div>
 </section>
 
  <section id="scanner" class="page hidden"><div class="panel"><h2>QR-Code-Scanner</h2><p class="muted">Erlaube den Kamerazugriff, um einen QR-Code zu lesen. Die App sucht danach in der Inventar-/Bekleidungsliste.</p><div id="qr-reader" style="max-width:420px"></div><button id="startScan">Scanner starten</button><button id="stopScan" class="secondary">Scanner stoppen</button><label style="display:block;margin-top:12px">Alternativ Code manuell eingeben</label><div class="row"><input id="manualCode" placeholder="Code / Inventarnummer"><button id="lookupCode">Suchen</button></div><div id="scanResult" class="status hidden"></div></div></section>
