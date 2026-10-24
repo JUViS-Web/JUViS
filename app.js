@@ -403,10 +403,10 @@ $("startScan").onclick=async()=>{
     await scan.start(
       {facingMode:"environment"},
 
-      {fps:10,qrbox:{width:230,height:230}},
-      text=>{
-        $("manualCode").value=text;
-        lookup(text);
+$("saveMaintenance")?.addEventListener("click", () => {
+  alert("Der Speichern-Button funktioniert.");
+  saveMaintenanceSettings();
+});      lookup(text);
         scan.stop().catch(()=>{});
       },
       ()=>{}
