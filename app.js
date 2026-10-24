@@ -16,7 +16,7 @@ $("upcoming").innerHTML=cache.events.slice(0,5).map(e=>`<div class="entry"><div 
 const q=($("memberSearch").value||"").toLowerCase();$("memberList").innerHTML=cache.members.filter(m=>(m.first_name+" "+m.last_name).toLowerCase().includes(q)).map(m=>`<div class="entry"><div class="icon">♙</div><div class="grow"><b>${esc(m.first_name)} ${esc(m.last_name)}</b><small>${esc(m.email||"Keine E-Mail hinterlegt")}</small></div>${removeButton("members",m.id)}</div>`).join("")||'<p class="muted">Keine Mitglieder gefunden.</p>';
 $("eventList").innerHTML=cache.events.map(e=>`<div class="entry"><div class="icon">▣</div><div class="grow"><b>${esc(e.title)}</b><small>${esc(new Date(e.starts_at).toLocaleString("de-DE"))} ${e.location?"· "+esc(e.location):""}<br>${esc(e.description||"")}</small></div>${removeButton("events",e.id)}</div>`).join("")||'<p class="muted">Keine Dienste vorhanden.</p>';
 $("exerciseList").innerHTML=cache.exercises.map(e=>`<div class="entry"><div class="icon">☷</div><div class="grow"><b>${esc(e.title)}</b><small>${esc(e.planned_date||"Kein Datum")}<br>${esc(e.notes||"")}</small></div>${removeButton("exercises",e.id)}</div>`).join("")||'<p class="muted">Keine Übungen vorhanden.</p>';
-$("clothingMember").innerHTML='<option value="">Nicht zugeordnet</option>'+cache.members.map(m=>`<option value="${esc(m.id)}">${esc(m.first_name)} ${esc(m.last_name)}</option>`).join("");
+$("clothingList").innerHTML=cache.clothing.map(c=>{let m=cache.members.find(x=>x.id===c.member_id);let qr=c.qr_code?`<div><img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(c.qr_code)}" alt="QR-Code" width="120" height="120"><br><small>Code: ${esc(c.qr_code)}</small></div>`:"<small>Kein QR-Code vorhanden</small>";return `<div class="entry"><div class="icon">♧</div><div class="grow"><b>${esc(c.item)}</b><small>${m?esc(m.first_name+" "+m.last_name):"Nicht zugeordnet"} · Größe ${esc(c.size||"–")} · Spind ${esc(c.locker_number||"–")}</small>${qr}</div>${removeButton("clothing",c.id)}</div>`}).join("")||'<p class="muted">Keine Bekleidungseinträge.</p>';
 $("clothingList").innerHTML=cache.clothing.map(c=>{let m=cache.members.find(x=>x.id===c.member_id);let qr=c.qr_code?`<div class="qr"><img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(c.qr_code)}" alt="QR-Code für ${esc(c.item)}" width="160" height="160"><br><small>QR-Code: ${esc(c.qr_code)}</small></div>`:"";return `<div class="entry"><div class="icon">♧</div><div class="grow"><b>${esc(c.item)}</b><small>${m?esc(m.first_name+" "+m.last_name):"Nicht zugeordnet"} · Größe ${esc(c.size||"–")} · Spind ${esc(c.locker_number||"–")} · Code ${esc(c.qr_code||"–")}</small>${qr}</div>${removeButton("clothing",c.id)}</div>`}).join("")||'<p class="muted">Keine Bekleidungseinträge.</p>';
 $("docList").innerHTML=cache.docs.map(d=>`<div class="entry"><div class="icon">▤</div><div class="grow"><b>${esc(d.title)}</b><small>${esc(d.description||"")}</small>${d.url?`<br><a href="${esc(d.url)}" target="_blank" rel="noopener noreferrer">Link öffnen ↗</a>`:""}</div>${removeButton("documents",d.id)}</div>`).join("")||'<p class="muted">Keine Dokumente oder Links vorhanden.</p>';
 document.querySelectorAll("[data-delete]").forEach(b=>b.onclick=async()=>{if(!admin()){msg("Nur Jugendfeuerwehrwart oder berechtigte Betreuer dürfen Einträge löschen.");return}if(!confirm("Eintrag wirklich löschen?"))return;const {error}=await sb.from(b.dataset.delete).delete().eq("id",b.dataset.id);if(error)msg(error.message);else{msg("Eintrag gelöscht.");await load()}});
@@ -30,6 +30,22 @@ $("toggleAuth").onclick=()=>{authMode=authMode==="login"?"signup":"login";$("aut
 $("authSubmit").onclick=async()=>{if(!sb)return;clearMsg(true);const email=$("email").value.trim(),password=$("password").value;if(!email||password.length<8){msg("Bitte E-Mail und ein Passwort mit mindestens 8 Zeichen eingeben.",true);return}const r=authMode==="login"?await sb.auth.signInWithPassword({email,password}):await sb.auth.signUp({email,password});if(r.error)msg(r.error.message,true);else if(authMode==="signup"&&!r.data.session)msg("Konto erstellt. Prüfe dein E-Mail-Postfach zur Bestätigung.",true)};
 $("logout").onclick=()=>sb.auth.signOut();$("nav").onclick=e=>{const b=e.target.closest("[data-page]");if(b)showPage(b.dataset.page)};
 $("memberSearch").oninput=render;
+$("printClothing").onclick=()=>{
+  const w=window.open("","_blank");
+  if(!w){msg("Druckansicht blockiert. Erlaube Pop-ups für JUVIS.");return}
+  const rows=cache.clothing.map(c=>{
+    const m=cache.members.find(x=>x.id===c.member_id);
+    const qr=c.qr_code?`<img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(c.qr_code)}" alt="QR-Code">`:"<p>Kein QR-Code</p>";
+    return `<article><div><h2>${esc(c.item)}</h2><p>Mitglied: ${m?esc(m.first_name+" "+m.last_name):"Nicht zugeordnet"}</p><p>Größe: ${esc(c.size||"–")}</p><p>Spind: ${esc(c.locker_number||"–")}</p><p>Code: ${esc(c.qr_code||"–")}</p></div>${qr}</article>`;
+  }).join("");
+  w.document.write(`<!doctype html><html lang="de"><head><meta charset="utf-8"><title>JUVIS – Bekleidung</title><style>
+  body{font:14px Arial,sans-serif;margin:20px;color:#111}
+  h1{font-size:22px}article{display:flex;align-items:center;justify-content:space-between;gap:20px;border:1px solid #aaa;padding:12px;margin:0 0 12px;break-inside:avoid}
+  article img{width:130px;height:130px}p{margin:5px 0}
+  @media print{button{display:none}body{margin:10mm}}
+  </style></head><body><h1>JUVIS – Bekleidungsübersicht</h1>${rows}<button onclick="window.print()">Drucken</button></body></html>`);
+  w.document.close();
+};
 $("memberForm").onsubmit=e=>{e.preventDefault();const d=formObj(e.target);add("members",{first_name:d.first_name.trim(),last_name:d.last_name.trim(),email:d.email||null,notes:d.notes||null});e.target.reset()};
 $("eventForm").onsubmit=e=>{e.preventDefault();const d=formObj(e.target);add("events",{title:d.title,starts_at:new Date(d.starts_at).toISOString(),location:d.location||null,description:d.description||null});e.target.reset()};
 $("exerciseForm").onsubmit=e=>{e.preventDefault();const d=formObj(e.target);add("exercises",{title:d.title,notes:d.notes||null,planned_date:d.planned_date||null});e.target.reset()};
