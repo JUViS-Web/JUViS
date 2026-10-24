@@ -71,30 +71,37 @@ if (attendanceList) {
     if (attendanceSave) attendanceSave.hidden = true;
   } else if (!selectedEventId) {
     attendanceList.innerHTML =
-      '<p class="muted">Bitte zuerst einen Dienst auswählen.</p>';
     if (attendanceSave) attendanceSave.hidden = false;
   } else {
     if (attendanceSave) attendanceSave.hidden = false;
+    
+attendanceList.innerHTML = cache.members.map(m => {
+  const record = cache.attendance.find(a =>
+    a.event_id === selectedEventId && a.member_id === m.id
+  );
+  const status = record?.status || "";
 
-    attendanceList.innerHTML = cache.members.map(m => {
-      const record = cache.attendance.find(a =>
-        a.event_id === selectedEventId && a.member_id === m.id
-      );
-      const status = record?.status || "";
-
-      return `<div class="entry">
-        <div class="grow">
-          <b>${esc(m.first_name)} ${esc(m.last_name)}</b>
-        </div>
-        <select data-attendance-member="${esc(m.id)}">
-          <option value="" ${status === "" ? "selected" : ""}>Noch nicht erfasst</option>
-          <option value="present" ${status === "present" ? "selected" : ""}>Anwesend</option>
-          <option value="absent" ${status === "absent" ? "selected" : ""}>Abwesend</option>
-          <option value="excused" ${status === "excused" ? "selected" : ""}>Entschuldigt</option>
-        </select>
-      </div>`;
-    }).join("") ||
-      '<p class="muted">Keine Mitglieder vorhanden.</p>';
+  return `<div class="entry attendance-entry">
+    <div class="icon">♙</div>
+    <div class="grow attendance-member">
+      <strong class="attendance-name">
+        ${esc(m.first_name)} ${esc(m.last_name)}
+      </strong>
+      <small class="attendance-subtitle">Jugendfeuerwehrmitglied</small>
+    </div>
+    <div class="attendance-status">
+      <label for="attendance-${esc(m.id)}">Anwesenheit</label>
+      <select id="attendance-${esc(m.id)}"
+        data-attendance-member="${esc(m.id)}">
+        <option value="" ${status === "" ? "selected" : ""}>Noch nicht erfasst</option>
+        <option value="present" ${status === "present" ? "selected" : ""}>Anwesend</option>
+        <option value="absent" ${status === "absent" ? "selected" : ""}>Abwesend</option>
+        <option value="excused" ${status === "excused" ? "selected" : ""}>Entschuldigt</option>
+      </select>
+    </div>
+  </div>`;
+}).join("") ||
+  '<p class="muted">Keine Mitglieder vorhanden.</p>';
   }
 }
 document.querySelectorAll("[data-delete]").forEach(b=>b.onclick=async()=>{if(!admin()){msg("Nur Jugendfeuerwehrwart oder berechtigte Betreuer dürfen Einträge löschen.");return}if(!confirm("Eintrag wirklich löschen?"))return;const {error}=await sb.from(b.dataset.delete).delete().eq("id",b.dataset.id);if(error)msg(error.message);else{msg("Eintrag gelöscht.");await load()}});
