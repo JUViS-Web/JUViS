@@ -153,11 +153,25 @@
     align-items: center;
   }
 }
+.beta-badge {
+  display: inline-block;
+  vertical-align: middle;
+  margin-left: 8px;
+  padding: 3px 7px;
+  border: 1px solid #765c25;
+  border-radius: 6px;
+  background: #302716;
+  color: #ffd477;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 1px;
+  line-height: 1.4;
+}
 </style>
 </head>
 <body>
 <div id="authView" class="app auth">
- <div class="top"><div class="logo">✚</div><div><div class="brand">JUVIS</div><div class="sub">JUGENDFEUERWEHR · VERWALTUNG</div></div></div>
+ <div class="top"><div class="logo">✚</div><div><div class="brand">JUVIS <span class="beta-badge">BETA</span></div><div class="sub">JUGENDFEUERWEHR · VERWALTUNG</div></div></div>
  <div class="panel"><h1 id="authTitle">Anmelden</h1><p class="muted">Melde dich mit deinem persönlichen Konto an.</p><div id="authMessage" class="status hidden"></div>
  <label>E-Mail</label><input id="email" type="email" autocomplete="email" placeholder="name@example.de">
  <label>Passwort</label><input id="password" type="password" autocomplete="current-password" placeholder="Passwort">
@@ -165,7 +179,7 @@
  <p class="muted tiny">Registrierung kann eine Bestätigung per E-Mail erfordern. Konten erhalten zunächst die Rolle „Mitglied“; eine autorisierte Administration muss weitere Rollen in der Datenbank vergeben.</p></div>
 </div>
 <div id="appView" class="app hidden">
- <header class="top"><div class="logo">✚</div><div><div class="brand">JUVIS</div><div class="sub">JUGENDFEUERWEHR · VERWALTUNG</div></div><div class="pill" id="connection">Verbunden</div></header>
+ <header class="top"><div class="logo">✚</div><div><div class="brand">JUVIS <span class="beta-badges">BETA</span></div><div class="sub">JUGENDFEUERWEHR · VERWALTUNG</div></div><div class="pill" id="connection">Verbunden</div></header>
 <div class="layout" id="appLayout">
   <nav class="nav" id="nav">
     <button data-page="home" class="active"><span class="nav-icon">▦</span><span class="nav-label">Übersicht</span></button>
