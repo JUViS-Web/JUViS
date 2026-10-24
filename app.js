@@ -50,6 +50,20 @@ async function saveMaintenanceSettings() {
         updated_at: new Date().toISOString(),
         updated_by: user.id
       })
+    
+$("adminUsers")?.addEventListener("click", async e => {
+  const button = e.target.closest("[data-save-role]");
+  if (!button) return;
+
+  const userId = button.dataset.saveRole;
+  const select = $("adminUsers").querySelector(
+    `[data-role-user="${CSS.escape(userId)}"]`
+  );
+
+  if (!select) return;
+
+  await saveUserRole(userId, select.value, button);
+});
       .eq("id", true);
 
     if (error) throw error;
@@ -185,7 +199,13 @@ sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);const {d
 async function signedIn(u){user=u;const {data:p}=await sb.from("profiles").select("*").eq("id",u.id).maybeSingle();
 profile = p || {role:"member"};
 $("adminNav")?.classList.toggle("hidden", profile.role !== "admin");
-$("authView").classList.add("hidden");$("appView").classList.remove("hidden");$("welcome").textContent=(u.email||"Angemeldet")+" · Rolle: "+({admin:"Administration",leader:"Betreuung",member:"Mitglied"}[role()]||"Mitglied");$("connection").textContent="Angemeldet";document.querySelectorAll("#nav button[data-page]").forEach(b=>b.classList.toggle("hidden",b.dataset.page==="members"||b.dataset.page==="clothing"||b.dataset.page==="docs"?false:false));await load(); await loadMaintenanceSettings()}
+$("authView").classList.add("hidden");$("appView").classList.remove("hidden");$("welcome").textContent=(u.email||"Angemeldet")+" · Rolle: "+({admin:"Administration",leader:"Betreuung",member:"Mitglied"}[role()]||"Mitglied");$("connection").textContent="Angemeldet";document.querySelectorAll("#nav button[data-page]").forEach(b=>b.classList.toggle("hidden",b.dataset.page==="members"||b.dataset.page==="clothing"||b.dataset.page==="docs"?false:false));await load();
+await loadMaintenanceSettings();
+
+if (isAdmin()) {
+  await loadAdminUsers();
+}
+}
 function signedOut(){$("appView").classList.add("hidden");$("authView").classList.remove("hidden");user=null;profile=null}
 $("toggleAuth").onclick=()=>{authMode=authMode==="login"?"signup":"login";$("authTitle").textContent=authMode==="login"?"Anmelden":"Konto erstellen";$("authSubmit").textContent=authMode==="login"?"Anmelden":"Registrieren";$("toggleAuth").textContent=authMode==="login"?"Neues Konto registrieren":"Zur Anmeldung wechseln";clearMsg(true)};
 $("authSubmit").onclick = async (e) => {
@@ -393,7 +413,6 @@ $("lookupCode").onclick=()=>{
   const c=$("manualCode").value.trim();
   if(c) lookup(c);
 };
-
 
 $("startScan").onclick=async()=>{
   if(!window.Html5Qrcode){
