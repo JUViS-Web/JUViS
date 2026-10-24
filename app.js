@@ -80,9 +80,80 @@ $("exerciseForm").onsubmit=e=>{e.preventDefault();const d=formObj(e.target);add(
 $("clothingForm").onsubmit=e=>{e.preventDefault();const d=formObj(e.target);const code="JUV-"+crypto.randomUUID().replace(/-/g,"").slice(0,8).toUpperCase();add("clothing",{member_id:d.member_id||null,item:d.item,size:d.size||null,locker_number:d.locker_number||null,qr_code:code});e.target.reset()};
 $("docForm").onsubmit=e=>{e.preventDefault();const d=formObj(e.target);add("documents",{title:d.title,url:d.url||null,description:d.description||null});e.target.reset()};
 $("memberSearch").value="";
-async function lookup(code){const res=$("scanResult");res.classList.remove("hidden");const found=cache.clothing.filter(c=>(c.qr_code||"").toLowerCase()===code.toLowerCase()||String(c.id)===code);res.textContent=found.length?found.map(c=>{const m=cache.members.find(x=>x.id===c.member_id);return `${c.item} · ${m?m.first_name+" "+m.last_name:"Nicht zugeordnet"} · Größe ${c.size||"–"} · Spind ${c.locker_number||"–"}`}).join("\n"):"Kein passender Bekleidungs-/Inventareintrag gefunden. Der Code muss zuerst einem Datensatz zugeordnet werden."}
-$("lookupCode").onclick=()=>{const c=$("manualCode").value.trim();if(c)lookup(c)};
-$("startScan").onclick=async()=>{if(!window.Html5Qrcode){msg("QR-Bibliothek nicht geladen.");return}try{if(!scan)scan=new Html5Qrcode("qr-reader");await scan.start({facingMode:"environment"},{fps:10,qrbox:{width:230,height:230}},text=>{ $("manualCode").value=text;lookup(text);scan.stop().catch(()=>{})},()=>{});}catch(e){msg("Kamera konnte nicht gestartet werden: "+e.message)}};
+async function lookup(code){
+  const res=$("scanResult");
+  res.classList.remove("hidden");
+
+  const found=cache.clothing.filter(c=>
+    (c.qr_code||"").toLowerCase()===code.trim().toLowerCase() ||
+    String(c.id)===code.trim()
+  );
+
+  if(!found.length){
+    res.textContent="Kein passender Bekleidungs-/Inventareintrag gefunden. Der Code muss zuerst einem Datensatz zugeordnet werden.";
+    return;
+  }
+
+  const c=found[0];
+  const m=cache.members.find(x=>x.id===c.member_id);
+
+  res.textContent=
+    `Gefunden: ${c.item} · ${m?m.first_name+" "+m.last_name:"Nicht zugeordnet"} · Größe ${c.size||"–"} · Spind ${c.locker_number||"–"}`;
+
+  $("clothing").classList.remove("hidden");
+
+  document.querySelectorAll(".page").forEach(p=>{
+    if(p.id!=="clothing") p.classList.add("hidden");
+  });
+
+  document.querySelectorAll(".nav button").forEach(b=>{
+    b.classList.toggle("active",b.dataset.page==="clothing");
+  });
+
+  const entry=document.getElementById("clothing-"+c.id);
+
+  if(entry){
+    entry.scrollIntoView({behavior:"smooth",block:"center"});
+    entry.style.outline="3px solid #d97706";
+    entry.style.borderRadius="8px";
+    setTimeout(()=>{
+      entry.style.outline="";
+      entry.style.borderRadius="";
+    },5000);
+  }else{
+    msg("Eintrag gefunden, aber nicht in der Liste sichtbar. Bitte lade die Bekleidungsliste neu.");
+  }
+}
+
+$("lookupCode").onclick=()=>{
+  const c=$("manualCode").value.trim();
+  if(c) lookup(c);
+};
+
+$("startScan").onclick=async()=>{
+  if(!window.Html5Qrcode){
+    msg("QR-Bibliothek nicht geladen.");
+    return;
+  }
+
+  try{
+    if(!scan) scan=new Html5Qrcode("qr-reader");
+
+    await scan.start(
+      {facingMode:"environment"},
+      {fps:10,qrbox:{width:230,height:230}},
+      text=>{
+        $("manualCode").value=text;
+        lookup(text);
+        scan.stop().catch(()=>{});
+      },
+      ()=>{}
+    );
+  }catch(e){
+    msg("Kamera konnte nicht gestartet werden: "+e.message);
+  }
+};
+
 $("stopScan").onclick=()=>scan?.stop().catch(()=>{});
 document.querySelectorAll("#nav button[data-page]").forEach(b=>b.addEventListener("click",()=>clearMsg()));
 boot();
