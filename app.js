@@ -436,6 +436,92 @@ $("startScan").onclick=async()=>{
     msg("Kamera konnte nicht gestartet werden: "+e.message);
   }
 };
+
+async function loadAdminUsers() {
+  const container = $("adminUsers");
+  if (!container || !isAdmin()) return;
+
+  container.innerHTML = '<p class="muted">Benutzer werden geladen …</p>';
+
+  try {
+    const { data, error } = await sb.rpc("juvis_admin_list_users");
+
+    if (error) throw error;
+
+    if (!Array.isArray(data) || data.length === 0) {
+      container.innerHTML = '<p class="muted">Keine Benutzer gefunden.</p>';
+      return;
+    }
+
+    container.innerHTML = data.map(u => {
+      const id = u.user_id || u.id;
+      const email = u.email || "Keine E-Mail";
+      const currentRole = u.role || "member";
+
+      if (!id) return "";
+
+      return `
+        <div class="entry">
+          <div class="grow">
+            <b>${esc(email)}</b>
+            <small>Benutzerrolle</small>
+          </div>
+          <select data-role-user="${esc(id)}">
+            <option value="member" ${currentRole === "member" ? "selected" : ""}>Mitglied</option>
+            <option value="leader" ${currentRole === "leader" ? "selected" : ""}>Betreuer</option>
+            <option value="admin" ${currentRole === "admin" ? "selected" : ""}>Administrator</option>
+          </select>
+          <button type="button" class="tiny" data-save-role="${esc(id)}">Rolle speichern</button>
+        </div>`;
+    }).join("");
+  } catch (error) {
+    container.innerHTML =
+      '<p class="muted">Fehler beim Laden: ' + esc(error.message) + '</p>';
+  }
+}
+
+$("adminUsers")?.addEventListener("click", async e => {
+  const button = e.target.closest("[data-save-role]");
+  if (!button) return;
+
+  const id = button.dataset.saveRole;
+  const select = $("adminUsers").querySelector(
+    `[data-role-user="${CSS.escape(id)}"]`
+  );
+
+  if (!select) return;
+
+  if (id === user.id && select.value !== "admin") {
+    $("adminMessage").textContent =
+      "Du kannst dir selbst nicht die Administratorrolle entziehen.";
+    await loadAdminUsers();
+    return;
+  }
+
+  if (!confirm("Benutzerrolle wirklich ändern?")) {
+    await loadAdminUsers();
+    return;
+  }
+
+  button.disabled = true;
+
+  try {
+    const { error } = await sb.rpc("juvis_admin_set_role", {
+      target_user_id: id,
+      new_role: select.value
+    });
+
+    if (error) throw error;
+
+    $("adminMessage").textContent = "Benutzerrolle erfolgreich geändert.";
+    await loadAdminUsers();
+  } catch (error) {
+    $("adminMessage").textContent =
+      "Rollenänderung fehlgeschlagen: " + error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
 $("saveMaintenance")?.addEventListener("click", () => {
   saveMaintenanceSettings();
 });
