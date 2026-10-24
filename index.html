@@ -65,6 +65,93 @@
   .attendance-status {
     width: 100%;
   }
+}  
+/* Einklappbare Navigation */
+.layout {
+  transition: grid-template-columns .18s ease;
+}
+
+.nav button {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.nav-icon {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 22px;
+  font-size: 18px;
+}
+
+.nav-label {
+  overflow-wrap: anywhere;
+}
+
+.mainhead {
+  justify-content: flex-start;
+}
+
+.nav-toggle {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.page-heading {
+  min-width: 0;
+}
+
+.layout.nav-collapsed {
+  grid-template-columns: 62px minmax(0, 1fr);
+}
+
+.layout.nav-collapsed .nav button {
+  justify-content: center;
+  padding: 11px 8px;
+}
+
+.layout.nav-collapsed .nav-label {
+  display: none;
+}
+
+@media (max-width: 720px) {
+  .layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .layout .nav {
+    display: none;
+  }
+
+  .layout.nav-open .nav {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    margin-bottom: 10px;
+  }
+
+  .layout.nav-open .nav button {
+    padding: 10px;
+    justify-content: flex-start;
+    font-size: 13px;
+  }
+
+  .layout.nav-open .nav-label {
+    display: inline;
+  }
+
+  .layout.nav-collapsed {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .layout.nav-collapsed .nav {
+    display: none;
+  }
+
+  .mainhead {
+    align-items: center;
+  }
 }
 </style>
 </head>
@@ -79,10 +166,27 @@
 </div>
 <div id="appView" class="app hidden">
  <header class="top"><div class="logo">✚</div><div><div class="brand">JUVIS</div><div class="sub">JUGENDFEUERWEHR · VERWALTUNG</div></div><div class="pill" id="connection">Verbunden</div></header>
- <div class="layout"><nav class="nav" id="nav">
- <button data-page="home" class="active">▦ Übersicht</button><button data-page="members">♙ Mitglieder</button><button data-page="events">▣ Dienstplan</button><button data-page="exercises">☷ Übungen</button><button data-page="clothing">♧ Bekleidung & Spinde</button><button data-page="docs">▤ Dokumente & Links</button><button data-page="scanner">⌗ QR-Scanner</button>
-   <button data-page="admin" id="adminNav" class="hidden">⚙ Administration</button> 
- <button id="logout" class="secondary">Abmelden</button></nav>
+<div class="layout" id="appLayout">
+  <nav class="nav" id="nav">
+    <button data-page="home" class="active"><span class="nav-icon">▦</span><span class="nav-label">Übersicht</span></button>
+    <button data-page="members"><span class="nav-icon">♙</span><span class="nav-label">Mitglieder</span></button>
+    <button data-page="events"><span class="nav-icon">▣</span><span class="nav-label">Dienstplan</span></button>
+    <button data-page="exercises"><span class="nav-icon">☷</span><span class="nav-label">Übungen</span></button>
+    <button data-page="clothing"><span class="nav-icon">♧</span><span class="nav-label">Bekleidung & Spinde</span></button>
+    <button data-page="docs"><span class="nav-icon">▤</span><span class="nav-label">Dokumente & Links</span></button>
+    <button data-page="scanner"><span class="nav-icon">⌗</span><span class="nav-label">QR-Scanner</span></button>
+    <button data-page="admin" id="adminNav" class="hidden"><span class="nav-icon">⚙</span><span class="nav-label">Administration</span></button>
+    <button id="logout" class="secondary"><span class="nav-icon">↪</span><span class="nav-label">Abmelden</span></button>
+  </nav>
+  <main>
+    <div class="mainhead">
+      <button type="button" id="navToggle" class="secondary nav-toggle" aria-expanded="false" aria-controls="nav" aria-label="Navigationsmenü öffnen">☰ Menü</button>
+      <div class="page-heading">
+        <h1 id="pageTitle">Übersicht</h1>
+        <div class="muted tiny" id="welcome"></div>
+      </div>
+    </div>
+    <div id="message" class="status hidden"></div>
  <main><div class="mainhead"><div><h1 id="pageTitle">Übersicht</h1><div class="muted tiny" id="welcome"></div></div></div><div id="message" class="status hidden"></div>
  <section id="home" class="page"><div class="stats"><div class="stat">Mitglieder<b id="countMembers">–</b><span class="muted tiny">Datensätze</span></div><div class="stat">Dienste<b id="countEvents">–</b><span class="muted tiny">geplant</span></div><div class="stat">Bekleidung<b id="countClothing">–</b><span class="muted tiny">Einträge</span></div><div class="stat">Übungen<b id="countExercises">–</b><span class="muted tiny">geplant</span></div></div><div class="panel" style="margin-top:12px"><h2>Nächste Dienste</h2><div id="upcoming"></div></div><div class="panel"><h2>Systemstatus</h2><p class="muted">JUVIS ist mit Supabase verbunden, sobald du die Zugangsdaten in <code>config.js</code> einträgst und das Datenbankschema ausführst.</p></div></section>
  <section id="members" class="page hidden"><div class="panel"><h2>Mitglied hinzufügen</h2><form id="memberForm"><div class="row"><div><label>Vorname</label><input name="first_name" required></div><div><label>Nachname</label><input name="last_name" required></div></div><label>E-Mail (optional)</label><input name="email" type="email"><label>Notiz (keine sensiblen Daten)</label><input name="notes"><button>Mitglied speichern</button></form></div><div class="panel"><h2>Mitgliederliste</h2><input id="memberSearch" placeholder="Mitglied suchen …"><div id="memberList"></div></div></section>
