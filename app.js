@@ -8,6 +8,57 @@ function role(){return profile?.role||"member"} function admin(){return ["admin"
   function isAdmin(){
   return role() === "admin";
 }
+  
+async function loadMaintenanceSettings() {
+  const select = $("maintenanceToggle");
+  const output = $("adminMessage");
+
+  if (!select || !isAdmin()) return;
+
+  const { data, error } = await sb
+    .from("app_settings")
+    .select("maintenance_mode")
+    .eq("id", true)
+    .single();
+
+  if (error) {
+    if (output) output.textContent =
+      "Einstellung konnte nicht geladen werden: " + error.message;
+    return;
+  }
+
+  select.value = String(data.maintenance_mode);
+}
+async function saveMaintenanceSettings() {
+  const select = $("maintenanceToggle");
+  const output = $("adminMessage");
+  const button = $("saveMaintenance");
+
+  if (!select || !output || !isAdmin()) return;
+
+  button.disabled = true;
+  output.textContent = "Wird gespeichert …";
+
+  try {
+    const { error } = await sb
+      .from("app_settings")
+      .update({
+        maintenance_mode: select.value === "true",
+        updated_at: new Date().toISOString(),
+        updated_by: user.id
+      })
+      .eq("id", true);
+
+    if (error) throw error;
+
+    output.textContent = "Einstellung erfolgreich gespeichert.";
+  } catch (error) {
+    output.textContent =
+      "Speichern fehlgeschlagen: " + error.message;
+  } finally {
+    button.disabled = false;
+  }
+}
 function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
 function formObj(form){return Object.fromEntries(new FormData(form).entries())}
 function showPage(p) {
@@ -131,7 +182,7 @@ sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);const {d
 async function signedIn(u){user=u;const {data:p}=await sb.from("profiles").select("*").eq("id",u.id).maybeSingle();
 profile = p || {role:"member"};
 $("adminNav")?.classList.toggle("hidden", profile.role !== "admin");
-$("authView").classList.add("hidden");$("appView").classList.remove("hidden");$("welcome").textContent=(u.email||"Angemeldet")+" · Rolle: "+({admin:"Administration",leader:"Betreuung",member:"Mitglied"}[role()]||"Mitglied");$("connection").textContent="Angemeldet";document.querySelectorAll("#nav button[data-page]").forEach(b=>b.classList.toggle("hidden",b.dataset.page==="members"||b.dataset.page==="clothing"||b.dataset.page==="docs"?false:false));await load()}
+$("authView").classList.add("hidden");$("appView").classList.remove("hidden");$("welcome").textContent=(u.email||"Angemeldet")+" · Rolle: "+({admin:"Administration",leader:"Betreuung",member:"Mitglied"}[role()]||"Mitglied");$("connection").textContent="Angemeldet";document.querySelectorAll("#nav button[data-page]").forEach(b=>b.classList.toggle("hidden",b.dataset.page==="members"||b.dataset.page==="clothing"||b.dataset.page==="docs"?false:false));await load(); await loadMaintenanceSettings()}
 function signedOut(){$("appView").classList.add("hidden");$("authView").classList.remove("hidden");user=null;profile=null}
 $("toggleAuth").onclick=()=>{authMode=authMode==="login"?"signup":"login";$("authTitle").textContent=authMode==="login"?"Anmelden":"Konto erstellen";$("authSubmit").textContent=authMode==="login"?"Anmelden":"Registrieren";$("toggleAuth").textContent=authMode==="login"?"Neues Konto registrieren":"Zur Anmeldung wechseln";clearMsg(true)};
 $("authSubmit").onclick = async (e) => {
@@ -351,6 +402,7 @@ $("startScan").onclick=async()=>{
 
     await scan.start(
       {facingMode:"environment"},
+
       {fps:10,qrbox:{width:230,height:230}},
       text=>{
         $("manualCode").value=text;
@@ -366,5 +418,9 @@ $("startScan").onclick=async()=>{
 
 $("stopScan").onclick=()=>scan?.stop().catch(()=>{});
 document.querySelectorAll("#nav button[data-page]").forEach(b=>b.addEventListener("click",()=>clearMsg()));
+$("saveMaintenance")?.addEventListener(
+  "click",
+  saveMaintenanceSettings
+);
 boot();
 })();
