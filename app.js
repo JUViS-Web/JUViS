@@ -13,14 +13,15 @@
   let profile = null;
   let scan = null;
   let authMode = "login";
-
+  
   const cache = {
     members: [],
     events: [],
     exercises: [],
     clothing: [],
     docs: [],
-    attendance: []
+    attendance: [],
+    awards: []
   };
 
   const labels = {
