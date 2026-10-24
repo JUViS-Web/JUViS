@@ -100,6 +100,69 @@ $("toggleAuth").onclick=()=>{authMode=authMode==="login"?"signup":"login";$("aut
 $("authSubmit").onclick=async()=>{if(!sb)return;clearMsg(true);const email=$("email").value.trim(),password=$("password").value;if(!email||password.length<8){msg("Bitte E-Mail und ein Passwort mit mindestens 8 Zeichen eingeben.",true);return}const r=authMode==="login"?await sb.auth.signInWithPassword({email,password}):await sb.auth.signUp({email,password});if(r.error)msg(r.error.message,true);else if(authMode==="signup"&&!r.data.session)msg("Konto erstellt.\nPrüfe dein E-Mail-Postfach zur Bestätigung.",true)};
 $("logout").onclick=()=>sb.auth.signOut();$("nav").onclick=e=>{const b=e.target.closest("[data-page]");if(b)showPage(b.dataset.page)};
 $("memberSearch").oninput=render;
+  
+$("attendanceEvent").onchange = () => render();
+
+$("saveAttendance").onclick = async () => {
+  if (!admin()) {
+    msg("Nur Betreuer und Administratoren dürfen Anwesenheit speichern.");
+    return;
+  }
+
+  const eventId = $("attendanceEvent").value;
+  if (!eventId) {
+    $("attendanceMessage").textContent = "Bitte zuerst einen Dienst auswählen.";
+    return;
+  }
+
+  const selects = [
+    ...document.querySelectorAll("[data-attendance-member]")
+  ];
+
+  if (!selects.length) {
+    $("attendanceMessage").textContent = "Keine Mitglieder zum Speichern gefunden.";
+    return;
+  }
+
+  $("saveAttendance").disabled = true;
+  $("attendanceMessage").textContent = "Anwesenheit wird gespeichert …";
+
+  try {
+    for (const select of selects) {
+      const memberId = select.dataset.attendanceMember;
+      const status = select.value;
+
+      if (!status) {
+        const { error } = await sb.from("attendance")
+          .delete()
+          .eq("event_id", eventId)
+          .eq("member_id", memberId);
+
+        if (error) throw error;
+        continue;
+      }
+
+      const { error } = await sb.from("attendance").upsert({
+        event_id: eventId,
+        member_id: memberId,
+        status: status,
+        recorded_by: user.id
+      }, {
+        onConflict: "event_id,member_id"
+      });
+
+      if (error) throw error;
+    }
+
+    await load();
+    $("attendanceMessage").textContent = "Anwesenheit erfolgreich gespeichert.";
+  } catch (e) {
+    $("attendanceMessage").textContent =
+      "Fehler beim Speichern: " + e.message;
+  } finally {
+    $("saveAttendance").disabled = false;
+  }
+};
 $("printClothing").onclick=()=>{
   const rows=cache.clothing.map(c=>{
     const m=cache.members.find(x=>x.id===c.member_id);
