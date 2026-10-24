@@ -196,88 +196,69 @@ document.querySelectorAll("[data-delete]").forEach(b=>b.onclick=async()=>{if(!ad
 async function add(table,data){clearMsg();if(!admin()){msg("Du hast keine Berechtigung, Daten anzulegen. Bitte wende dich an die Administration.");return}const {error}=await sb.from(table).insert({...data,created_by:user.id});if(error)msg("Speichern fehlgeschlagen: "+error.message);else{msg("Gespeichert.");await load()}}
 async function boot(){if(!configured||!window.supabase){$("authView").classList.remove("hidden");$("authMessage").textContent="Noch nicht konfiguriert: Öffne config.js und trage die Supabase-Projekt-URL sowie den anon/public key ein. Danach schema.sql im Supabase SQL Editor ausführen."; $("authMessage").classList.remove("hidden");$("authSubmit").disabled=true;return}
 sb=window.supabase.createClient(cfg.SUPABASE_URL,cfg.SUPABASE_ANON_KEY);const {data:{session}}=await sb.auth.getSession();if(session)await signedIn(session.user);sb.auth.onAuthStateChange((_event,session)=>{if(session) setTimeout(()=>signedIn(session.user),0);else signedOut()})}
+async function saveMaintenanceSettings() {
+  const select = $("maintenanceToggle");
+  const output = $("adminMessage");
+  const button = $("saveMaintenance");
 
-async function signedIn(u) {
-  user = u;
+  if (!select || !output || !isAdmin()) return;
 
-  const { data: p } = await sb
-    .from("profiles")
-    .select("*")
-    .eq("id", u.id)
-    .maybeSingle();
-
-  profile = p || { role: "member" };
-
-  $("adminNav")?.classList.toggle(
-    "hidden",
-    profile.role !== "admin"
-  );
-
-  $("authView").classList.add("hidden");
-  $("appView").classList.remove("hidden");
-
-  $("welcome").textContent =
-    (u.email || "Angemeldet") +
-    " · Rolle: " +
-    ({
-      admin: "Administration",
-      leader: "Betreuung",
-      member: "Mitglied"
-    }[role()] || "Mitglied");
-
-  $("connection").textContent = "Angemeldet";
-
-  await load();
-  await loadMaintenanceSettings();
-
-  if (isAdmin()) {
-    await loadAdminUsers();
-  }
-}
-}
-}
-function signedOut(){$("appView").classList.add("hidden");$("authView").classList.remove("hidden");user=null;profile=null}
-$("toggleAuth").onclick=()=>{authMode=authMode==="login"?"signup":"login";$("authTitle").textContent=authMode==="login"?"Anmelden":"Konto erstellen";$("authSubmit").textContent=authMode==="login"?"Anmelden":"Registrieren";$("toggleAuth").textContent=authMode==="login"?"Neues Konto registrieren":"Zur Anmeldung wechseln";clearMsg(true)};
-$("authSubmit").onclick = async (e) => {
-  e.preventDefault();
-  clearMsg(true);
+  button.disabled = true;
+  output.textContent = "Wird gespeichert …";
 
   try {
-    if (!sb) {
-      msg("Verbindung zu Supabase fehlt. Bitte Konfiguration prüfen.", true);
-      return;
-    }
+    const { error } = await sb
+      .from("app_settings")
+      .update({
+        maintenance_mode: select.value === "true",
+        updated_at: new Date().toISOString(),
+        updated_by: user.id
+      })
+      .eq("id", true);
 
-    const email = $("email").value.trim();
-    const password = $("password").value;
+    if (error) throw error;
 
-    if (!email || password.length < 8) {
-      msg("Bitte E-Mail und ein Passwort mit mindestens 8 Zeichen eingeben.", true);
-      return;
-    }
-
-    $("authSubmit").disabled = true;
-    $("authSubmit").textContent = "Bitte warten …";
-
-    const result = authMode === "login"
-      ? await sb.auth.signInWithPassword({ email, password })
-      : await sb.auth.signUp({ email, password });
-
-    if (result.error) {
-      msg("Anmeldung fehlgeschlagen: " + result.error.message, true);
-    } else if (authMode === "signup" && !result.data.session) {
-      msg("Konto erstellt. Bitte prüfe dein E-Mail-Postfach zur Bestätigung.", true);
-    } else if (authMode === "login" && !result.data.session) {
-      msg("Es wurde keine aktive Sitzung erstellt.", true);
-    }
+    output.textContent = "Einstellung erfolgreich gespeichert.";
   } catch (error) {
-    msg("Fehler bei der Anmeldung: " + (error.message || String(error)), true);
+    output.textContent =
+      "Speichern fehlgeschlagen: " + error.message;
   } finally {
-    $("authSubmit").disabled = false;
-    $("authSubmit").textContent =
-      authMode === "login" ? "Anmelden" : "Registrieren";
+    button.disabled = false;
   }
-};
+}
+
+
+async function saveMaintenanceSettings() {
+  const select = $("maintenanceToggle");
+  const output = $("adminMessage");
+  const button = $("saveMaintenance");
+
+  if (!select || !output || !button || !isAdmin()) return;
+
+  button.disabled = true;
+  output.textContent = "Wird gespeichert …";
+
+  try {
+    const { error } = await sb
+      .from("app_settings")
+      .update({
+        maintenance_mode: select.value === "true",
+        updated_at: new Date().toISOString(),
+        updated_by: user.id
+      })
+      .eq("id", true);
+
+    if (error) throw error;
+
+    output.textContent = "Einstellung erfolgreich gespeichert.";
+  } catch (error) {
+    output.textContent =
+      "Speichern fehlgeschlagen: " + error.message;
+  } finally {
+    button.disabled = false;
+  }
+}
+
 $("logout").onclick=()=>sb.auth.signOut();$("nav").onclick=e=>{const b=e.target.closest("[data-page]");if(b)showPage(b.dataset.page)};
 $("memberSearch").oninput=render;
 $("attendanceEvent").onchange = () => render();
