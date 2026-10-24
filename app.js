@@ -866,6 +866,22 @@ $("navToggle").addEventListener("click", () => {
 
     if (saved) form.reset();
   };
+  
+  $("awardForm").onsubmit = async event => {
+    event.preventDefault();
+
+    const form = event.target;
+    const data = formObj(form);
+
+    const saved = await add("member_awards", {
+      member_id: data.member_id,
+      title: data.title.trim(),
+      awarded_on: data.awarded_on || null,
+      notes: data.notes || null
+    });
+
+    if (saved) form.reset();
+  };
 
   $("eventForm").onsubmit = async event => {
     event.preventDefault();
