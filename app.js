@@ -206,6 +206,11 @@ if (isAdmin()) {
   await loadAdminUsers();
 }
 }
+
+if (isAdmin()) {
+  await loadAdminUsers();
+}
+}
 function signedOut(){$("appView").classList.add("hidden");$("authView").classList.remove("hidden");user=null;profile=null}
 $("toggleAuth").onclick=()=>{authMode=authMode==="login"?"signup":"login";$("authTitle").textContent=authMode==="login"?"Anmelden":"Konto erstellen";$("authSubmit").textContent=authMode==="login"?"Anmelden":"Registrieren";$("toggleAuth").textContent=authMode==="login"?"Neues Konto registrieren":"Zur Anmeldung wechseln";clearMsg(true)};
 $("authSubmit").onclick = async (e) => {
