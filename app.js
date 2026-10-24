@@ -658,10 +658,46 @@
     }
   };
 
-  $("nav").onclick = event => {
-    const button = event.target.closest("[data-page]");
-    if (button) showPage(button.dataset.page);
-  };
+
+$("nav").onclick = event => {
+  const button = event.target.closest("[data-page]");
+  if (button) {
+    showPage(button.dataset.page);
+
+    if (window.matchMedia("(max-width: 720px)").matches) {
+      $("appLayout").classList.remove("nav-open");
+      $("navToggle").setAttribute("aria-expanded", "false");
+      $("navToggle").setAttribute("aria-label", "Navigationsmenü öffnen");
+      $("navToggle").textContent = "☰ Menü";
+    }
+  }
+};
+
+$("navToggle").addEventListener("click", () => {
+  const layout = $("appLayout");
+  const mobile = window.matchMedia("(max-width: 720px)").matches;
+
+  if (mobile) {
+    const open = layout.classList.toggle("nav-open");
+
+    $("navToggle").setAttribute("aria-expanded", String(open));
+    $("navToggle").setAttribute(
+      "aria-label",
+      open ? "Navigationsmenü schließen" : "Navigationsmenü öffnen"
+    );
+    $("navToggle").textContent = open ? "✕ Menü schließen" : "☰ Menü";
+  } else {
+    const collapsed = layout.classList.toggle("nav-collapsed");
+
+    $("navToggle").setAttribute("aria-expanded", String(!collapsed));
+    $("navToggle").setAttribute(
+      "aria-label",
+      collapsed ? "Navigation ausklappen" : "Navigation einklappen"
+    );
+    $("navToggle").textContent = collapsed ? "☰" : "☰ Menü";
+  }
+});
+
 
   // Suche und Anwesenheit
   $("memberSearch").oninput = render;
