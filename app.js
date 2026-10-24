@@ -173,7 +173,7 @@
       button.disabled = false;
     }
   }
-  
+    
   async function load() {
     try {
       [
@@ -181,21 +181,26 @@
         cache.events,
         cache.exercises,
         cache.clothing,
-        cache.docs,
-        cache.awards
+        cache.docs
       ] = await Promise.all([
         db("members"),
         db("events"),
         db("exercises"),
         db("clothing"),
-        db("documents"),
-        db("member_awards")
+        db("documents")
       ]);
 
       if (admin()) {
         cache.attendance = await db("attendance");
       } else {
         cache.attendance = [];
+      }
+
+      try {
+        cache.awards = await db("member_awards");
+      } catch (error) {
+        cache.awards = [];
+        console.error("Auszeichnungen konnten nicht geladen werden:", error);
       }
 
       render();
