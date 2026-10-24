@@ -9,7 +9,29 @@ function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&l
 function formObj(form){return Object.fromEntries(new FormData(form).entries())}
 function showPage(p){document.querySelectorAll(".page").forEach(x=>x.classList.toggle("hidden",x.id!==p));document.querySelectorAll("#nav button[data-page]").forEach(b=>b.classList.toggle("active",b.dataset.page===p));$("pageTitle").textContent=labels[p]||p; if(p==="scanner"&&!window.Html5Qrcode)msg("QR-Bibliothek konnte nicht geladen werden. Prüfe die Internetverbindung.");}
 async function db(table){const {data,error}=await sb.from(table).select("*").order(table==="events"?"starts_at":table==="exercises"?"planned_date":"created_at",{ascending:true,nullsFirst:false});if(error)throw error;return data||[]}
-async function load(){try{[cache.members,cache.events,cache.exercises,cache.clothing,cache.docs]=await Promise.all([db("members"),db("events"),db("exercises"),db("clothing"),db("documents")]);render();}catch(e){msg("Daten konnten nicht geladen werden: "+e.message)}}
+async function load(){
+  try{
+    [
+      cache.members,
+      cache.events,
+      cache.exercises,
+      cache.clothing,
+      cache.docs,
+      cache.attendance
+    ] = await Promise.all([
+      db("members"),
+      db("events"),
+      db("exercises"),
+      db("clothing"),
+      db("documents"),
+      db("attendance")
+    ]);
+
+    render();
+  }catch(e){
+    msg("Daten konnten nicht geladen werden: "+e.message);
+  }
+}
 function removeButton(table,id){return admin()?`<button class="danger tiny" data-delete="${table}" data-id="${esc(id)}">Löschen</button>`:""}
 function render(){ $("countMembers").textContent=cache.members.length;$("countEvents").textContent=cache.events.length;$("countClothing").textContent=cache.clothing.length;$("countExercises").textContent=cache.exercises.length;
 $("upcoming").innerHTML=cache.events.slice(0,5).map(e=>`<div class="entry"><div class="icon">▣</div><div class="grow"><b>${esc(e.title)}</b><small>${esc(new Date(e.starts_at).toLocaleString("de-DE"))} ${e.location?"· "+esc(e.location):""}</small></div></div>`).join("")||'<p class="muted">Noch keine Dienste angelegt.</p>';
