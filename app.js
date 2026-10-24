@@ -427,36 +427,7 @@ async function loadAdminUsers() {
     }).join("");
   } catch (error) {
     container.innerHTML =
-      '<p class="muted">Fehler beim Laden: ' + esc(error.message) + '</p>';
-  }
-}
-
-$("adminUsers")?.addEventListener("click", async e => {
-  const button = e.target.closest("[data-save-role]");
-  if (!button) return;
-
-  const id = button.dataset.saveRole;
-  const select = $("adminUsers").querySelector(
-    `[data-role-user="${CSS.escape(id)}"]`
-  );
-
-  if (!select) return;
-
-  if (id === user.id && select.value !== "admin") {
-    $("adminMessage").textContent =
-      "Du kannst dir selbst nicht die Administratorrolle entziehen.";
-    await loadAdminUsers();
-    return;
-  }
-
-  if (!confirm("Benutzerrolle wirklich ändern?")) {
-    await loadAdminUsers();
-    return;
-  }
-
-  button.disabled = true;
-
-  try {
+ 
     const { error } = await sb.rpc("juvis_admin_set_role", {
       target_user_id: id,
       new_role: select.value
