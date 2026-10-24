@@ -51,6 +51,44 @@ $("exerciseList").innerHTML=cache.exercises.map(e=>`<div class="entry"><div clas
 $("clothingList").innerHTML=cache.clothing.map(c=>{let m=cache.members.find(x=>x.id===c.member_id);let qr=c.qr_code?`<div><img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(c.qr_code)}" alt="QR-Code" width="120" height="120"><br><small>Code: ${esc(c.qr_code)}</small></div>`:"<small>Kein QR-Code vorhanden</small>";return `<div class="entry"><div class="icon">♧</div><div class="grow"><b>${esc(c.item)}</b><small>${m?esc(m.first_name+" "+m.last_name):"Nicht zugeordnet"} · Größe ${esc(c.size||"–")} · Spind ${esc(c.locker_number||"–")}</small>${qr}</div>${removeButton("clothing",c.id)}</div>`}).join("")||'<p class="muted">Keine Bekleidungseinträge.</p>';
 $("clothingList").innerHTML=cache.clothing.map(c=>{let m=cache.members.find(x=>x.id===c.member_id);let qr=c.qr_code?`<div class="qr"><img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(c.qr_code)}" alt="QR-Code für ${esc(c.item)}" width="160" height="160"><br><small>QR-Code: ${esc(c.qr_code)}</small></div>`:"";return `<div class="entry" id="clothing-${esc(c.id)}"><div class="icon">♧</div><div class="grow"><b>${esc(c.item)}</b><small>${m?esc(m.first_name+" "+m.last_name):"Nicht zugeordnet"} · Größe ${esc(c.size||"–")} · Spind ${esc(c.locker_number||"–")} · Code ${esc(c.qr_code||"–")}</small>${qr}</div>${removeButton("clothing",c.id)}</div>`}).join("")||'<p class="muted">Keine Bekleidungseinträge.</p>';
 $("docList").innerHTML=cache.docs.map(d=>`<div class="entry"><div class="icon">▤</div><div class="grow"><b>${esc(d.title)}</b><small>${esc(d.description||"")}</small>${d.url?`<br><a href="${esc(d.url)}" target="_blank" rel="noopener noreferrer">Link öffnen ↗</a>`:""}</div>${removeButton("documents",d.id)}</div>`).join("")||'<p class="muted">Keine Dokumente oder Links vorhanden.</p>';
+
+const attendanceList = $("attendanceList");
+const attendanceSave = $("saveAttendance");
+const selectedEventId = $("attendanceEvent")?.value;
+
+if (attendanceList) {
+  if (!admin()) {
+    attendanceList.innerHTML =
+      '<p class="muted">Die Anwesenheitserfassung ist nur für Betreuer und Administratoren verfügbar.</p>';
+    if (attendanceSave) attendanceSave.hidden = true;
+  } else if (!selectedEventId) {
+    attendanceList.innerHTML =
+      '<p class="muted">Bitte zuerst einen Dienst auswählen.</p>';
+    if (attendanceSave) attendanceSave.hidden = false;
+  } else {
+    if (attendanceSave) attendanceSave.hidden = false;
+
+    attendanceList.innerHTML = cache.members.map(m => {
+      const record = cache.attendance.find(a =>
+        a.event_id === selectedEventId && a.member_id === m.id
+      );
+      const status = record?.status || "";
+
+      return `<div class="entry">
+        <div class="grow">
+          <b>${esc(m.first_name)} ${esc(m.last_name)}</b>
+        </div>
+        <select data-attendance-member="${esc(m.id)}">
+          <option value="" ${status === "" ? "selected" : ""}>Noch nicht erfasst</option>
+          <option value="present" ${status === "present" ? "selected" : ""}>Anwesend</option>
+          <option value="absent" ${status === "absent" ? "selected" : ""}>Abwesend</option>
+          <option value="excused" ${status === "excused" ? "selected" : ""}>Entschuldigt</option>
+        </select>
+      </div>`;
+    }).join("") ||
+      '<p class="muted">Keine Mitglieder vorhanden.</p>';
+  }
+}
 document.querySelectorAll("[data-delete]").forEach(b=>b.onclick=async()=>{if(!admin()){msg("Nur Jugendfeuerwehrwart oder berechtigte Betreuer dürfen Einträge löschen.");return}if(!confirm("Eintrag wirklich löschen?"))return;const {error}=await sb.from(b.dataset.delete).delete().eq("id",b.dataset.id);if(error)msg(error.message);else{msg("Eintrag gelöscht.");await load()}});
 }
 async function add(table,data){clearMsg();if(!admin()){msg("Du hast keine Berechtigung, Daten anzulegen. Bitte wende dich an die Administration.");return}const {error}=await sb.from(table).insert({...data,created_by:user.id});if(error)msg("Speichern fehlgeschlagen: "+error.message);else{msg("Gespeichert.");await load()}}
