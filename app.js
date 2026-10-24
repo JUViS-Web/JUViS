@@ -1,6 +1,9 @@
 (() => {
 const cfg=window.JUVIS_CONFIG||{}, configured=cfg.SUPABASE_URL?.includes("supabase.co")&&!cfg.SUPABASE_URL.includes("DEIN-PROJEKT")&&cfg.SUPABASE_ANON_KEY&&!cfg.SUPABASE_ANON_KEY.includes("DEIN_");
 const $=id=>document.getElementById(id); let sb=null,user=null,profile=null,scan=null,authMode="login",cache={members:[],events:[],exercises:[],clothing:[],docs:[],attendance:[]};
+  window.addEventListener("error", e => {
+  alert("JUVIS-Fehler: " + e.message + " | Zeile: " + e.lineno);
+});
 const labels={home:"Übersicht",members:"Mitglieder",events:"Dienstplan",exercises:"Übungen",clothing:"Bekleidung & Spinde",docs:"Dokumente & Links",scanner:"QR-Scanner", admin:"Administration",};
 function msg(t,auth=false){const el=$(auth?"authMessage":"message");el.textContent=t;el.classList.remove("hidden")}
 function clearMsg(auth=false){$(auth?"authMessage":"message").classList.add("hidden")}
