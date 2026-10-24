@@ -32,10 +32,7 @@ async function load(){
     }
 
     render();
-  }catch(e){
-    msg("Daten konnten nicht geladen werden: "+e.message);
   }
-}
 catch(e){
     msg("Daten konnten nicht geladen werden: "+e.message);
   }
@@ -68,10 +65,11 @@ if (attendanceList) {
   if (!admin()) {
     attendanceList.innerHTML =
       '<p class="muted">Die Anwesenheitserfassung ist nur für Betreuer und Administratoren verfügbar.</p>';
-    if (attendanceSave) attendanceSave.hidden = true;
-  } else if (!selectedEventId) {
-    attendanceList.innerHTML =
-    if (attendanceSave) attendanceSave.hidden = false;
+    if (attendanceSave) attendanceSave.hidden = true;  
+} else if (!selectedEventId) {
+  attendanceList.innerHTML =
+    '<p class="muted">Bitte zuerst einen Dienst auswählen.</p>';
+  if (attendanceSave) attendanceSave.hidden = false;
   } else {
     if (attendanceSave) attendanceSave.hidden = false;
     
