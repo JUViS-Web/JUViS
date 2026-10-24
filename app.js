@@ -391,6 +391,7 @@ $("lookupCode").onclick=()=>{
   if(c) lookup(c);
 };
 
+
 $("startScan").onclick=async()=>{
   if(!window.Html5Qrcode){
     msg("QR-Bibliothek nicht geladen.");
@@ -413,11 +414,9 @@ $("startScan").onclick=async()=>{
     msg("Kamera konnte nicht gestartet werden: "+e.message);
   }
 };
-
-$("saveMaintenance")?.addEventListener(
-  "click",
-  saveMaintenanceSettings
-);
+$("saveMaintenance")?.addEventListener("click", () => {
+  saveMaintenanceSettings();
+});
 
 boot();
 })();
