@@ -481,7 +481,7 @@ function bindEditClothingButtons() {
 
       const form = $("clothingForm");
       form.elements.member_id.value = item.member_id || "";
-      form.elements.namedItem("item").value = item.item || "";
+      form.querySelector('[name="item"]').value = item.item || "";
       form.elements.size.value = item.size || "";
       form.elements.locker_number.value = item.locker_number || "";
 
