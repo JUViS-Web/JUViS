@@ -236,6 +236,130 @@ async function load() {
     `;
   }
 
+function renderFegedienst() {
+  const eventSelect = $("fegedienstEvent");
+  const memberList = $("fegedienstMemberList");
+  const history = $("fegedienstHistory");
+  const stats = $("fegedienstStats");
+
+  if (!eventSelect || !memberList || !history || !stats) return;
+
+  const previousEventId = eventSelect.value;
+
+  eventSelect.innerHTML =
+    '<option value="">Bitte Dienst auswählen</option>' +
+    cache.events
+      .slice()
+      .sort((a, b) => new Date(b.starts_at) - new Date(a.starts_at))
+      .map(event => {
+        const date = event.starts_at
+          ? new Date(event.starts_at).toLocaleDateString("de-DE")
+          : "Ohne Datum";
+
+        return `<option value="${esc(event.id)}">${esc(date)} – ${esc(event.title)}</option>`;
+      })
+      .join("");
+
+  if (cache.events.some(event => event.id === previousEventId)) {
+    eventSelect.value = previousEventId;
+  }
+
+  memberList.innerHTML = cache.members
+    .filter(member => !member.leave_date)
+    .slice()
+    .sort((a, b) =>
+      `${a.last_name} ${a.first_name}`.localeCompare(
+        `${b.last_name} ${b.first_name}`,
+        "de"
+      )
+    )
+    .map(member => `
+      <label class="fegedienst-member">
+        <input type="checkbox" name="fegedienst_member" value="${esc(member.id)}">
+        ${esc(member.first_name)} ${esc(member.last_name)}
+      </label>
+    `)
+    .join("") || '<p class="muted">Keine Mitglieder vorhanden.</p>';
+
+  history.innerHTML = cache.fegedienstRecords
+    .slice()
+    .sort((a, b) => {
+      const eventA = cache.events.find(e => e.id === a.event_id);
+      const eventB = cache.events.find(e => e.id === b.event_id);
+      return new Date(eventB?.starts_at || 0) - new Date(eventA?.starts_at || 0);
+    })
+    .map(record => {
+      const event = cache.events.find(e => e.id === record.event_id);
+      const assigned = cache.fegedienstMembers
+        .filter(item => item.record_id === record.id)
+        .map(item => cache.members.find(member => member.id === item.member_id))
+        .filter(Boolean);
+
+      const names = record.nobody_swept
+        ? "Niemand hat gefegt"
+        : assigned.map(member =>
+            `${esc(member.first_name)} ${esc(member.last_name)}`
+          ).join(", ") || "Keine Mitglieder eingetragen";
+
+      return `
+        <div class="entry">
+          <div class="icon">✓</div>
+          <div class="grow">
+            <b>${esc(event?.title || "Unbekannter Dienst")}</b>
+            <small>
+              ${event?.starts_at ? esc(new Date(event.starts_at).toLocaleDateString("de-DE")) : "Ohne Datum"}
+              <br>${names}
+              ${record.notes ? `<br>${esc(record.notes)}` : ""}
+            </small>
+          </div>
+        </div>
+      `;
+    })
+    .join("") || '<p class="muted">Noch keine Fegedienste erfasst.</p>';
+
+  const counts = cache.members
+    .filter(member => !member.leave_date)
+    .map(member => {
+      const memberRecords = cache.fegedienstMembers.filter(item => {
+        const record = cache.fegedienstRecords.find(r => r.id === item.record_id);
+        return item.member_id === member.id && record && !record.nobody_swept;
+      });
+
+      const dates = memberRecords
+        .map(item => {
+          const record = cache.fegedienstRecords.find(r => r.id === item.record_id);
+          const event = cache.events.find(e => e.id === record?.event_id);
+          return event?.starts_at ? new Date(event.starts_at) : null;
+        })
+        .filter(Boolean)
+        .sort((a, b) => b - a);
+
+      return {
+        name: `${member.first_name} ${member.last_name}`,
+        count: memberRecords.length,
+        lastDate: dates[0] || null
+      };
+    })
+    .sort((a, b) =>
+      a.count - b.count ||
+      (a.lastDate?.getTime() || 0) - (b.lastDate?.getTime() || 0) ||
+      a.name.localeCompare(b.name, "de")
+    );
+
+  stats.innerHTML = counts.map(item => `
+    <div class="entry">
+      <div class="icon">#</div>
+      <div class="grow">
+        <b>${esc(item.name)}</b>
+        <small>
+          ${item.count} ${item.count === 1 ? "Fegedienst" : "Fegedienste"}
+          <br>Zuletzt: ${item.lastDate ? esc(item.lastDate.toLocaleDateString("de-DE")) : "Noch nie"}
+        </small>
+      </div>
+    </div>
+  `).join("") || '<p class="muted">Keine Mitglieder vorhanden.</p>';
+}
+
   function render() {
     $("countMembers").textContent = cache.members.length;
     $("countEvents").textContent = cache.events.length;
