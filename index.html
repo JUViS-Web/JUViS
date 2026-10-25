@@ -289,6 +289,30 @@ textarea {
     max-width: 100%;
   }
 }
+  
+/* iOS Safari: native Datumsfelder begrenzen */
+input[type="date"],
+input[type="datetime-local"],
+input[type="time"] {
+  box-sizing: border-box !important;
+  display: block;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: 100% !important;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+@media (max-width: 720px) {
+  form input[type="date"],
+  form input[type="datetime-local"],
+  form input[type="time"] {
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    padding: 12px 8px;
+  }
+}
 </style>
 </head>
 <body>
