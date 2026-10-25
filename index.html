@@ -313,6 +313,21 @@ input[type="time"] {
     padding: 12px 8px;
   }
 }
+/* Einheitliche Höhe für Eingabefelder auf iPhone und Desktop */
+input,
+select {
+  min-height: 48px;
+}
+
+/* Datumsfelder: ausreichende Höhe und Innenabstand */
+input[type="date"],
+input[type="datetime-local"],
+input[type="time"] {
+  min-height: 48px !important;
+  height: 48px;
+  padding: 10px 12px !important;
+  line-height: normal;
+}
 </style>
 </head>
 <body>
