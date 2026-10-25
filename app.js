@@ -430,10 +430,12 @@ if (clothingMember) {
                 · Spind ${esc(item.locker_number || "–")}
                 · Code ${esc(item.qr_code || "–")}
               </small>
-              ${qr}
-            </div>
+                          ${qr}
+          </div>
+          <div class="clothing-actions">
             <button type="button" class="secondary" data-edit-clothing="${esc(item.id)}">Bearbeiten</button>
             ${removeButton("clothing", item.id)}
+          </div>
           </div>
         `;
       }).join("") ||
