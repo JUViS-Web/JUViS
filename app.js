@@ -941,7 +941,7 @@ $("navToggle").addEventListener("click", () => {
     const form = event.target;
     const data = formObj(form);
 
-    const saved = await add("members", {
+    const memberData = {
       first_name: data.first_name.trim(),
       last_name: data.last_name.trim(),
       birth_date: data.birth_date || null,
@@ -951,9 +951,34 @@ $("navToggle").addEventListener("click", () => {
       locker_number: data.locker_number.trim() || null,
       email: data.email || null,
       notes: data.notes || null
-    });
+    };
 
-    if (saved) form.reset();
+    try {
+      const editingId = window.editingMemberId;
+
+      if (editingId) {
+        const { error } = await sb
+          .from("members")
+          .update(memberData)
+          .eq("id", editingId);
+
+        if (error) throw error;
+
+        window.editingMemberId = null;
+        msg("Mitglied erfolgreich aktualisiert.");
+      } else {
+        const saved = await add("members", memberData);
+
+        if (!saved) return;
+
+        msg("Mitglied erfolgreich angelegt.");
+      }
+
+      form.reset();
+      await load();
+    } catch (error) {
+      msg("Speichern fehlgeschlagen: " + error.message);
+    }
   };
   
   $("awardForm").onsubmit = async event => {
