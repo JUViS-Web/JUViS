@@ -603,6 +603,7 @@ if (clothingMember) {
     bindDeleteButtons();
     bindEditMemberButtons();
     bindEditClothingButtons();
+    renderFegedienst();
   }
 
 function setupClothingSizes() {
