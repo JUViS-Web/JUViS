@@ -289,6 +289,22 @@
 
       awardMember.value = selectedMember;
     }
+    
+const clothingMember = $("clothingMember");
+
+if (clothingMember) {
+  const selectedMember = clothingMember.value;
+
+  clothingMember.innerHTML =
+    '<option value="">Mitglied auswählen …</option>' +
+    cache.members.map(member => `
+      <option value="${esc(member.id)}">
+        ${esc(member.first_name)} ${esc(member.last_name)}
+      </option>
+    `).join("");
+
+  clothingMember.value = selectedMember;
+}
 
     $("awardList").innerHTML =
       (cache.awards || []).map(award => {
