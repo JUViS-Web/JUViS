@@ -465,6 +465,77 @@ if (clothingMember) {
     bindEditClothingButtons();
   }
   
+function setupClothingSizes() {
+  const itemSelect = $("clothingItem");
+  const sizeSelect = $("clothingSize");
+
+  if (!itemSelect || !sizeSelect) return;
+
+  const clothingSizes = [
+    "104", "110", "116", "122", "128", "134", "140",
+    "146", "152", "158", "164", "170", "176",
+    "2XS", "3XS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"
+  ];
+
+  const jacketAndTrouserSizes = [
+    "104", "110", "116", "122", "128", "134", "140",
+    "146", "152", "158", "164", "170", "176",
+    "2XS", "3XS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"
+  ];
+
+  const shoeSizes = [
+    "28", "29", "30", "31", "32", "33", "34", "35",
+    "36", "37", "38", "39", "40", "41", "42", "43",
+    "44", "45", "46", "47", "48"
+  ];
+
+  const gloveSizes = [
+    "3", "4", "5", "6", "7", "8", "9", "10", "11", "12"
+  ];
+
+  const oneSize = ["Einheitsgröße"];
+
+  function getSizes(item) {
+    if (item === "JF-Jacke" || item === "JF-Hose") {
+      return jacketAndTrouserSizes;
+    }
+
+    if (item === "JF-Sicherheitsstiefel") return shoeSizes;
+    if (item === "JF-Handschuhe") return gloveSizes;
+
+    if (
+      item === "JF-Helm" ||
+      item === "JF-Schutzbrille" ||
+      item === "JF-Cap" ||
+      item === "JF-Mütze"
+    ) {
+      return oneSize;
+    }
+
+    return clothingSizes;
+  }
+
+  function updateSizes(selectedSize = "") {
+    const item = itemSelect.value;
+
+    sizeSelect.innerHTML =
+      '<option value="">Größe auswählen …</option>' +
+      getSizes(item).map(size =>
+        `<option value="${size}">${size}</option>`
+      ).join("");
+
+    if (getSizes(item).includes(selectedSize)) {
+      sizeSelect.value = selectedSize;
+    }
+  }
+
+  itemSelect.addEventListener("change", () => updateSizes());
+
+  updateSizes();
+
+  window.updateClothingSizes = updateSizes;
+}
+
 function bindEditClothingButtons() {
   document.querySelectorAll("[data-edit-clothing]").forEach(button => {
     button.onclick = () => {
