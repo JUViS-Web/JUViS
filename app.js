@@ -510,7 +510,8 @@ function bindEditMemberButtons() {
         msg("Mitglied konnte nicht gefunden werden.");
         return;
       }
-
+      window.editingMemberId = member.id;
+      
       const form = $("memberForm");
 
       form.elements.first_name.value = member.first_name || "";
