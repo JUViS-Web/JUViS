@@ -497,7 +497,37 @@
     }).join("") ||
     '<p class="muted">Keine Mitglieder vorhanden.</p>';
   }
+  
+function bindEditMemberButtons() {
+  document.querySelectorAll("[data-edit-member]").forEach(button => {
+    button.onclick = () => {
+      const member = cache.members.find(
+        item => String(item.id) === button.dataset.editMember
+      );
 
+      if (!member) {
+        msg("Mitglied konnte nicht gefunden werden.");
+        return;
+      }
+
+      const form = $("memberForm");
+
+      form.elements.first_name.value = member.first_name || "";
+      form.elements.last_name.value = member.last_name || "";
+      form.elements.birth_date.value = member.birth_date || "";
+      form.elements.join_date.value = member.join_date || "";
+      form.elements.leave_date.value = member.leave_date || "";
+      form.elements.known_position.value = member.known_position || "";
+      form.elements.locker_number.value = member.locker_number || "";
+      form.elements.email.value = member.email || "";
+      form.elements.notes.value = member.notes || "";
+
+      form.scrollIntoView({ behavior: "smooth", block: "start" });
+      msg("Mitglied geladen. Änderungen sind noch nicht gespeichert.");
+    };
+  });
+}
+  
   function bindDeleteButtons() {
     document.querySelectorAll("[data-delete]").forEach(button => {
       button.onclick = async () => {
