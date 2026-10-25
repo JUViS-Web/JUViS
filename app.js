@@ -15,14 +15,16 @@
   let authMode = "login";
   
   const cache = {
-    members: [],
-    events: [],
-    exercises: [],
-    clothing: [],
-    docs: [],
-    attendance: [],
-    awards: []
-  };
+  members: [],
+  events: [],
+  exercises: [],
+  clothing: [],
+  docs: [],
+  attendance: [],
+  awards: [],
+  fegedienstRecords: [],
+  fegedienstMembers: []
+};
 
   const labels = {
     home: "Übersicht",
