@@ -1301,7 +1301,47 @@ $("cancelMemberEdit").onclick = () => {
 
     if (saved) form.reset();
   };
-  
+
+function setupFegedienstForm() {
+  const nobody = $("fegedienstNobody");
+  const form = $("fegedienstForm");
+  const memberList = $("fegedienstMemberList");
+
+  if (!nobody || !form || !memberList) return;
+
+  nobody.onchange = () => {
+    const checkboxes = memberList.querySelectorAll(
+      'input[name="fegedienst_member"]'
+    );
+
+    checkboxes.forEach(checkbox => {
+      checkbox.disabled = nobody.checked;
+
+      if (nobody.checked) {
+        checkbox.checked = false;
+      }
+    });
+  };
+
+  memberList.onchange = event => {
+    if (event.target.matches('input[name="fegedienst_member"]')) {
+      if (event.target.checked) {
+        nobody.checked = false;
+      }
+    }
+  };
+
+  const allowed = admin();
+
+  form.querySelectorAll("input, select, textarea, button").forEach(control => {
+    control.disabled = !allowed;
+  });
+
+  memberList.querySelectorAll('input[name="fegedienst_member"]').forEach(control => {
+    control.disabled = !allowed || nobody.checked;
+  });
+}
+
 $("fegedienstForm").onsubmit = async event => {
   event.preventDefault();
 
