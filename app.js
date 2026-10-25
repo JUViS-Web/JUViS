@@ -268,6 +268,7 @@
                 E-Mail: ${esc(member.email || "Keine hinterlegt")}
               </small>
             </div>
+            <button type="button" class="tiny" data-edit-member="${esc(member.id)}">Bearbeiten</button>
             ${removeButton("members", member.id)}
           </div>
         `).join("") ||
