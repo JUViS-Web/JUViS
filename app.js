@@ -476,6 +476,7 @@ function bindEditClothingButtons() {
       }
 
       window.editingClothingId = item.id;
+      msg("Bearbeitungsmodus aktiv: " + window.editingClothingId);
       $("cancelClothingEdit").hidden = false;
 
       const form = $("clothingForm");
