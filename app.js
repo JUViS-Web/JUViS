@@ -460,6 +460,7 @@ if (clothingMember) {
     renderAttendance();
     bindDeleteButtons();
     bindEditMemberButtons();
+    bindEditClothingButtons();
   }
   
 function bindEditClothingButtons() {
