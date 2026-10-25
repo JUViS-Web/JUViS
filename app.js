@@ -30,7 +30,7 @@
     home: "Übersicht",
     members: "Mitglieder",
     events: "Dienstplan",
-    exercises: "Übungen",
+    fegedienst: "Fegedienst",
     clothing: "Bekleidung",
     docs: "Dokumente & Links",
     scanner: "QR-Scanner",
