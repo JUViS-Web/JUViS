@@ -432,6 +432,7 @@ if (clothingMember) {
               </small>
               ${qr}
             </div>
+            <button type="button" class="secondary" data-edit-clothing="${esc(item.id)}">Bearbeiten</button>
             ${removeButton("clothing", item.id)}
           </div>
         `;
