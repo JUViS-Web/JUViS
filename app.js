@@ -1098,9 +1098,12 @@ $("cancelMemberEdit").onclick = () => {
 
 $("cancelClothingEdit").onclick = () => {
   window.editingClothingId = null;
-  $("clothingForm").reset();
+
+  const form = $("clothingForm");
+  form.reset();
+
   $("cancelClothingEdit").hidden = true;
-  msg("Bearbeitung abgebrochen.");
+  msg("Bearbeitung abgebrochen. Du kannst einen neuen Eintrag erstellen.");
 };
 
 $("clothingForm").onsubmit = async event => {
