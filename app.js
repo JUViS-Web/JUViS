@@ -29,7 +29,7 @@
     members: "Mitglieder",
     events: "Dienstplan",
     exercises: "Übungen",
-    clothing: "Bekleidung & Spinde",
+    clothing: "Bekleidung",
     docs: "Dokumente & Links",
     scanner: "QR-Scanner",
     admin: "Administration"
