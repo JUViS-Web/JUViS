@@ -427,6 +427,7 @@
       '<p class="muted">Keine Dokumente oder Links vorhanden.</p>';
 
     renderAttendance();
+    bindEditMemberButtons();
     bindDeleteButtons();
   }
 
