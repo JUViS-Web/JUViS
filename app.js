@@ -936,6 +936,12 @@ $("navToggle").addEventListener("click", () => {
   };
 
   // Formulare
+$("cancelMemberEdit").onclick = () => {
+  window.editingMemberId = null;
+  $("memberForm").reset();
+  $("cancelMemberEdit").hidden = true;
+  msg("Bearbeitung abgebrochen.");
+};
   $("memberForm").onsubmit = async event => {
     event.preventDefault();
 
