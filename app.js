@@ -982,7 +982,7 @@ $("cancelMemberEdit").onclick = () => {
         msg("Mitglied erfolgreich angelegt.");
       }
 
-      form.reset();
+      form.reset(); $("cancelMemberEdit").hidden = true;
       await load();
     } catch (error) {
       msg("Speichern fehlgeschlagen: " + error.message);
