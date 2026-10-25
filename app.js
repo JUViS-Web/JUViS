@@ -464,7 +464,7 @@ if (clothingMember) {
     bindEditMemberButtons();
     bindEditClothingButtons();
   }
-  
+
 function setupClothingSizes() {
   const itemSelect = $("clothingItem");
   const sizeSelect = $("clothingSize");
@@ -474,13 +474,13 @@ function setupClothingSizes() {
   const clothingSizes = [
     "104", "110", "116", "122", "128", "134", "140",
     "146", "152", "158", "164", "170", "176",
-    "2XS", "3XS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"
+    "XS", "S", "M", "L", "XL", "XXL", "XXXL"
   ];
 
   const jacketAndTrouserSizes = [
-    "104", "110", "116", "122", "128", "134", "140",
-    "146", "152", "158", "164", "170", "176",
-    "2XS", "3XS", "XS", "S", "M", "L", "XL", "XXL", "XXXL"
+    ...clothingSizes.slice(0, 13),
+    "2XS", "3XS",
+    ...clothingSizes.slice(13)
   ];
 
   const shoeSizes = [
@@ -517,15 +517,16 @@ function setupClothingSizes() {
 
   function updateSizes(selectedSize = "") {
     const item = itemSelect.value;
+    const sizes = item ? getSizes(item) : [];
 
     sizeSelect.innerHTML =
       '<option value="">Größe auswählen …</option>' +
-      getSizes(item).map(size =>
+      sizes.map(size =>
         `<option value="${size}">${size}</option>`
       ).join("");
 
-    if (getSizes(item).includes(selectedSize)) {
-      sizeSelect.value = selectedSize;
+    if (sizes.includes(String(selectedSize))) {
+      sizeSelect.value = String(selectedSize);
     }
   }
 
