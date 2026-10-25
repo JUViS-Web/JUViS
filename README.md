@@ -2,6 +2,9 @@
 
 iPad-freundliches Web-App-Grundgerüst mit Anmeldung, Supabase-Datenbankanbindung und QR-Scanner.
 
+## Web-Link
+https://juvis-web.github.io/JUViS/
+
 ## Enthalten
 - Anmeldung / Registrierung über Supabase Auth
 - Rollenmodell `admin`, `leader`, `member`
