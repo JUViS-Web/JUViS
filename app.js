@@ -262,6 +262,8 @@ function renderFegedienst() {
 
   if (cache.events.some(event => event.id === previousEventId)) {
     eventSelect.value = previousEventId;
+
+    setupFegedienstForm();
   }
 
   memberList.innerHTML = cache.members
