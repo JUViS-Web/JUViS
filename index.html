@@ -167,6 +167,79 @@
   letter-spacing: 1px;
   line-height: 1.4;
 }
+  
+/* Mobile Layout: Eingabefelder im Bildschirm halten */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+.app,
+.layout,
+.layout > *,
+.panel,
+.card,
+form,
+.grid2,
+.row {
+  min-width: 0;
+  max-width: 100%;
+}
+
+input,
+select,
+textarea {
+  display: block;
+  min-width: 0;
+  max-width: 100%;
+}
+
+/* Lange Inhalte und Formularbereiche dürfen nicht überlaufen */
+.panel,
+.card {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 720px) {
+  .app {
+    width: 100%;
+    max-width: 100%;
+    padding: 10px;
+  }
+
+  .panel,
+  .card {
+    padding: 12px;
+  }
+
+  .row {
+    flex-wrap: wrap;
+  }
+
+  .row > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .entry {
+    flex-wrap: wrap;
+  }
+
+  .entry > button {
+    max-width: 100%;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    font-size: 16px;
+  }
+
+  button {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+}
 </style>
 </head>
 <body>
