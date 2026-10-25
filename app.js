@@ -1095,26 +1095,68 @@ $("cancelMemberEdit").onclick = () => {
     if (saved) form.reset();
   };
 
-  $("clothingForm").onsubmit = async event => {
-    event.preventDefault();
+$("cancelClothingEdit").onclick = () => {
+  window.editingClothingId = null;
+  $("clothingForm").reset();
+  $("cancelClothingEdit").hidden = true;
+  msg("Bearbeitung abgebrochen.");
+};
 
-    const form = event.target;
-    const data = formObj(form);
+$("clothingForm").onsubmit = async event => {
+  event.preventDefault();
 
-    const code =
-      "JUV-" +
-      crypto.randomUUID().replace(/-/g, "").slice(0, 8).toUpperCase();
+  const form = event.target;
+  const data = formObj(form);
+  const editingId = window.editingClothingId;
 
-    const saved = await add("clothing", {
-      member_id: data.member_id || null,
-      item: data.item,
-      size: data.size || null,
-      locker_number: data.locker_number || null,
-      qr_code: code
-    });
-
-    if (saved) form.reset();
+  const clothingData = {
+    member_id: data.member_id || null,
+    item: data.item.trim(),
+    size: data.size || null,
+    locker_number: data.locker_number || null
   };
+
+  try {
+    if (!admin()) {
+      msg("Du hast keine Berechtigung, Bekleidung zu speichern.");
+      return;
+    }
+
+    if (editingId) {
+      const { error } = await sb
+        .from("clothing")
+        .update(clothingData)
+        .eq("id", editingId);
+
+      if (error) throw error;
+
+      window.editingClothingId = null;
+      msg("Bekleidungseintrag erfolgreich aktualisiert.");
+    } else {
+      const code =
+        "JUV-" +
+        crypto.randomUUID().replace(/-/g, "").slice(0, 8).toUpperCase();
+
+      const { error } = await sb
+        .from("clothing")
+        .insert({
+          ...clothingData,
+          qr_code: code,
+          created_by: user.id
+        });
+
+      if (error) throw error;
+
+      msg("Bekleidungseintrag erfolgreich angelegt.");
+    }
+
+    form.reset();
+    $("cancelClothingEdit").hidden = true;
+    await load();
+  } catch (error) {
+    msg("Speichern fehlgeschlagen: " + error.message);
+  }
+};
 
   $("docForm").onsubmit = async event => {
     event.preventDefault();
