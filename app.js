@@ -554,10 +554,16 @@ function bindEditClothingButtons() {
       $("cancelClothingEdit").hidden = false;
 
       const form = $("clothingForm");
-      form.elements.member_id.value = item.member_id || "";
-      form.querySelector('[name="item"]').value = item.item || "";
-      form.elements.size.value = item.size || "";
-      form.elements.locker_number.value = item.locker_number || "";
+      
+form.elements.member_id.value = item.member_id || "";
+
+form.querySelector('[name="item"]').value = item.item || "";
+
+if (window.updateClothingSizes) {
+  window.updateClothingSizes(item.size || "");
+}
+
+form.elements.locker_number.value = item.locker_number || "";
 
       form.scrollIntoView({ behavior: "smooth", block: "start" });
       msg("Bekleidung geladen. Änderungen sind noch nicht gespeichert.");
