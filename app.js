@@ -1112,7 +1112,7 @@ $("clothingForm").onsubmit = async event => {
 
   const clothingData = {
     member_id: data.member_id || null,
-    item: data.item.trim(),
+    item: form.elements.namedItem("item").value.trim(),
     size: data.size || null,
     locker_number: data.locker_number || null
   };
