@@ -176,40 +176,54 @@
     }
   }
     
-  async function load() {
-    try {
-      [
-        cache.members,
-        cache.events,
-        cache.exercises,
-        cache.clothing,
-        cache.docs
-      ] = await Promise.all([
-        db("members"),
-        db("events"),
-        db("exercises"),
-        db("clothing"),
-        db("documents")
+  
+async function load() {
+  try {
+    [
+      cache.members,
+      cache.events,
+      cache.exercises,
+      cache.clothing,
+      cache.docs
+    ] = await Promise.all([
+      db("members"),
+      db("events"),
+      db("exercises"),
+      db("clothing"),
+      db("documents")
+    ]);
+
+    if (admin()) {
+      cache.attendance = await db("attendance");
+
+      const [records, members] = await Promise.all([
+        db("fegedienst_records"),
+        db("fegedienst_members")
       ]);
 
-      if (admin()) {
-        cache.attendance = await db("attendance");
-      } else {
-        cache.attendance = [];
-      }
-
-      try {
-        cache.awards = await db("member_awards");
-      } catch (error) {
-        cache.awards = [];
-        console.error("Auszeichnungen konnten nicht geladen werden:", error);
-      }
-
-      render();
-    } catch (error) {
-      msg("Daten konnten nicht geladen werden: " + error.message);
+      cache.fegedienstRecords = records;
+      cache.fegedienstMembers = members;
+    } else {
+      cache.attendance = [];
+      cache.fegedienstRecords = [];
+      cache.fegedienstMembers = [];
     }
+
+    try {
+      cache.awards = await db("member_awards");
+    } catch (error) {
+      cache.awards = [];
+      console.error(
+        "Auszeichnungen konnten nicht geladen werden:",
+        error
+      );
+    }
+
+    render();
+  } catch (error) {
+    msg("Daten konnten nicht geladen werden: " + error.message);
   }
+}
 
   function removeButton(table, id) {
     return `
