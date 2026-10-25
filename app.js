@@ -461,7 +461,34 @@ if (clothingMember) {
     bindDeleteButtons();
     bindEditMemberButtons();
   }
+  
+function bindEditClothingButtons() {
+  document.querySelectorAll("[data-edit-clothing]").forEach(button => {
+    button.onclick = () => {
+      const item = cache.clothing.find(
+        entry => String(entry.id) === button.dataset.editClothing
+      );
 
+      if (!item) {
+        msg("Bekleidungseintrag konnte nicht gefunden werden.");
+        return;
+      }
+
+      window.editingClothingId = item.id;
+      $("cancelClothingEdit").hidden = false;
+
+      const form = $("clothingForm");
+      form.elements.member_id.value = item.member_id || "";
+      form.elements.item.value = item.item || "";
+      form.elements.size.value = item.size || "";
+      form.elements.locker_number.value = item.locker_number || "";
+
+      form.scrollIntoView({ behavior: "smooth", block: "start" });
+      msg("Bekleidung geladen. Änderungen sind noch nicht gespeichert.");
+    };
+  });
+}
+  
   function renderAttendance() {
     const list = $("attendanceList");
     const saveButton = $("saveAttendance");
