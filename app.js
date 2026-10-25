@@ -1458,10 +1458,11 @@ $("clothingForm").onsubmit = async event => {
     }
   });
 
-  $("saveMaintenance").addEventListener(
+    $("saveMaintenance").addEventListener(
     "click",
     saveMaintenanceSettings
   );
 
+  setupClothingSizes();
   boot();
 })();
