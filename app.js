@@ -306,6 +306,20 @@ if (clothingMember) {
   clothingMember.value = selectedMember;
 }
 
+if (clothingMember) {
+  clothingMember.onchange = () => {
+    const selectedMember = cache.members.find(
+      member => String(member.id) === clothingMember.value
+    );
+
+    const lockerInput = $("clothingForm").elements.locker_number;
+
+    if (selectedMember && lockerInput) {
+      lockerInput.value = selectedMember.locker_number || "";
+    }
+  };
+}
+
     $("awardList").innerHTML =
       (cache.awards || []).map(award => {
         const member = cache.members.find(
