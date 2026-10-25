@@ -1301,21 +1301,106 @@ $("cancelMemberEdit").onclick = () => {
 
     if (saved) form.reset();
   };
+  
+$("fegedienstForm").onsubmit = async event => {
+  event.preventDefault();
 
-  $("exerciseForm").onsubmit = async event => {
-    event.preventDefault();
+  if (!admin()) {
+    msg("Keine Berechtigung für den Fegedienst.");
+    return;
+  }
 
-    const form = event.target;
-    const data = formObj(form);
+  const form = event.target;
+  const eventId = form.event_id.value;
+  const nobodySwept = $("fegedienstNobody").checked;
+  const notes = $("fegedienstNotes").value.trim();
 
-    const saved = await add("exercises", {
-      title: data.title,
-      notes: data.notes || null,
-      planned_date: data.planned_date || null
-    });
+  const selectedMembers = [
+    ...form.querySelectorAll('input[name="fegedienst_member"]:checked')
+  ].map(input => input.value);
 
-    if (saved) form.reset();
-  };
+  if (!eventId) {
+    msg("Bitte wähle einen Dienst aus.");
+    return;
+  }
+
+  if (nobodySwept && selectedMembers.length > 0) {
+    msg("Wähle entweder Mitglieder oder „Niemand hat gefegt“.");
+    return;
+  }
+
+  if (!nobodySwept && selectedMembers.length === 0) {
+    msg("Wähle mindestens ein Mitglied oder „Niemand hat gefegt“.");
+    return;
+  }
+
+  try {
+    const { data: existing, error: findError } = await sb
+      .from("fegedienst_records")
+      .select("id")
+      .eq("event_id", eventId)
+      .maybeSingle();
+
+    if (findError) throw findError;
+
+    let recordId;
+
+    if (existing) {
+      const { error: updateError } = await sb
+        .from("fegedienst_records")
+        .update({
+          nobody_swept: nobodySwept,
+          notes: notes || null,
+          recorded_by: user.id,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", existing.id);
+
+      if (updateError) throw updateError;
+      recordId = existing.id;
+
+      const { error: deleteError } = await sb
+        .from("fegedienst_members")
+        .delete()
+        .eq("record_id", recordId);
+
+      if (deleteError) throw deleteError;
+    } else {
+      const { data: inserted, error: insertError } = await sb
+        .from("fegedienst_records")
+        .insert({
+          event_id: eventId,
+          nobody_swept: nobodySwept,
+          notes: notes || null,
+          recorded_by: user.id
+        })
+        .select("id")
+        .single();
+
+      if (insertError) throw insertError;
+      recordId = inserted.id;
+    }
+
+    if (selectedMembers.length > 0) {
+      const rows = selectedMembers.map(memberId => ({
+        record_id: recordId,
+        member_id: memberId
+      }));
+
+      const { error: membersError } = await sb
+        .from("fegedienst_members")
+        .insert(rows);
+
+      if (membersError) throw membersError;
+    }
+
+    msg("Fegedienst wurde gespeichert.");
+    form.reset();
+    await load();
+  } catch (error) {
+    msg("Fegedienst konnte nicht gespeichert werden: " + error.message);
+  }
+};
 
 $("cancelClothingEdit").onclick = () => {
   window.editingClothingId = null;
