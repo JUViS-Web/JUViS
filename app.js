@@ -511,6 +511,7 @@ function bindEditMemberButtons() {
         return;
       }
       window.editingMemberId = member.id;
+      $("cancelMemberEdit").hidden = false;
       
       const form = $("memberForm");
 
