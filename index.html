@@ -567,8 +567,33 @@ input[type="time"] {
     <div id="message" class="status hidden"></div>
  <section id="home" class="page"><div class="stats"><div class="stat">Mitglieder<b id="countMembers">–</b><span class="muted tiny">Datensätze</span></div><div class="stat">Dienste<b id="countEvents">–</b><span class="muted tiny">geplant</span></div><div class="stat">Bekleidung<b id="countClothing">–</b><span class="muted tiny">Einträge</span></div><div class="stat">Übungen<b id="countExercises">–</b><span class="muted tiny">geplant</span></div></div><div class="panel" style="margin-top:12px"><h2>Nächste Dienste</h2><div id="upcoming"></div></div><div class="panel"><h2>Systemstatus</h2><p class="muted">JUVIS ist mit Supabase verbunden, sobald du die Zugangsdaten in <code>config.js</code> einträgst und das Datenbankschema ausführst.</p></div></section>
 <section id="members" class="page hidden">
+
   <div class="panel">
-    <h2>Mitglied hinzufügen</h2>
+    <div class="mainhead">
+      <div class="page-heading">
+        <h2>Mitgliederkartei</h2>
+        <p class="muted tiny">Mitglieder ansehen und verwalten</p>
+      </div>
+
+      <button type="button" id="addMemberButton" aria-label="Neues Mitglied hinzufügen">
+        <span aria-hidden="true">＋</span> Mitglied
+      </button>
+    </div>
+
+    <input
+      id="memberSearch"
+      type="search"
+      placeholder="Mitglied suchen …"
+      aria-label="Mitglieder suchen"
+    >
+
+    <div id="memberList">
+      <p class="muted">Mitglieder werden geladen …</p>
+    </div>
+  </div>
+
+  <div class="panel hidden" id="memberFormPanel">
+    <h2 id="memberFormTitle">Neues Mitglied anlegen</h2>
 
     <form id="memberForm">
       <div class="row">
@@ -583,10 +608,7 @@ input[type="time"] {
       </div>
 
       <label>Geburtsdatum</label>
-<div style="width:100%; min-width:0; max-width:100%; overflow:hidden;">
-  <input name="birth_date" type="date"
-    style="width:100%; min-width:0; max-width:100%; display:block;">
-</div>
+      <input name="birth_date" type="date">
 
       <div class="row">
         <div>
@@ -604,7 +626,7 @@ input[type="time"] {
         name="known_position"
         placeholder="z. B. Angriffstruppführer (bei Übungen)"
       >
-      
+
       <label>Spindnummer</label>
       <input name="locker_number" placeholder="z. B. 12">
 
@@ -614,19 +636,30 @@ input[type="time"] {
       <label>Notiz (keine sensiblen Daten)</label>
       <textarea name="notes" rows="2"></textarea>
 
-<div class="form-actions">
-  <button type="submit">Mitglied speichern</button>
-  <button type="button" id="cancelMemberEdit" hidden>Abbrechen</button>
-</div>
+      <div class="form-actions">
+        <button type="submit">Mitglied speichern</button>
+        <button type="button" id="cancelMemberEdit" class="secondary">
+          Abbrechen
+        </button>
+      </div>
     </form>
   </div>
 
-  <div class="panel">
-    <h2>Mitgliederliste</h2>
-    <input id="memberSearch" placeholder="Mitglied suchen …">
-    <div id="memberList"></div>
+  <div class="panel hidden" id="memberDetailPanel">
+    <div class="mainhead">
+      <h2 id="memberDetailName">Mitgliederdetails</h2>
+      <button type="button" id="closeMemberDetail" class="secondary">
+        Zurück
+      </button>
+    </div>
+
+    <div id="memberDetailContent"></div>
+
+    <button type="button" id="editMemberButton">
+      Mitglied bearbeiten
+    </button>
   </div>
-  
+
   <div class="panel">
     <h2>Auszeichnung hinzufügen</h2>
 
@@ -637,21 +670,13 @@ input[type="time"] {
       </select>
 
       <label>Bezeichnung der Auszeichnung</label>
-      <input
-        name="title"
-        required
-        placeholder="z. B. Jugendflamme Stufe 1"
-      >
+      <input name="title" required placeholder="z. B. Jugendflamme Stufe 1">
 
       <label>Verleihungsdatum</label>
       <input name="awarded_on" type="date">
 
       <label>Notiz (optional)</label>
-      <textarea
-        name="notes"
-        rows="2"
-        placeholder="z. B. verliehen bei der Abnahme"
-      ></textarea>
+      <textarea name="notes" rows="2"></textarea>
 
       <button type="submit">Auszeichnung speichern</button>
     </form>
@@ -661,6 +686,7 @@ input[type="time"] {
     <h2>Auszeichnungen der Mitglieder</h2>
     <div id="awardList"></div>
   </div>
+
 </section>
 <section id="events" class="page hidden">
   <div class="panel">
