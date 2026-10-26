@@ -532,6 +532,37 @@ $("memberList").innerHTML = cache.members
   .join("") ||
   '<p class="muted">Keine Mitglieder gefunden.</p>';
 
+    const formerSearch = (
+  $("formerMemberSearch").value || ""
+).toLowerCase();
+
+$("formerMemberList").innerHTML = cache.members
+  .filter(member => !!member.leave_date)
+  .filter(member =>
+    `${member.first_name} ${member.last_name}`
+      .toLowerCase()
+      .includes(formerSearch)
+  )
+  .map(member => `
+    <button
+      type="button"
+      class="member-card"
+      data-open-member="${esc(member.id)}"
+    >
+      <span class="member-card-icon">♙</span>
+      <span class="member-card-info">
+        <strong>${esc(member.first_name)} ${esc(member.last_name)}</strong>
+        <small>
+          Ausgetreten am ${esc(member.leave_date)}
+          · Spind ${esc(member.locker_number || "–")}
+        </small>
+      </span>
+      <span class="member-card-arrow" aria-hidden="true">›</span>
+    </button>
+  `)
+  .join("") ||
+  '<p class="muted">Keine ausgetretenen Mitglieder gefunden.</p>'
+    
 bindMemberCardButtons();
     
     const awardMember = $("awardMember");
