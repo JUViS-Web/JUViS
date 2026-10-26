@@ -1389,6 +1389,58 @@ $("closeMemberDetail").onclick = () => {
   $("memberDetailPanel").classList.add("hidden");
 };
 
+$("deleteMemberButton").onclick = async () => {
+  if (!admin()) {
+    msg("Nur Betreuer und Administratoren dürfen Mitglieder löschen.");
+    return;
+  }
+
+  const memberId = $("memberDetailPanel").dataset.memberId;
+
+  const member = cache.members.find(
+    item => String(item.id) === String(memberId)
+  );
+
+  if (!member) {
+    msg("Mitglied konnte nicht gefunden werden.");
+    return;
+  }
+
+  const fullName =
+    `${member.first_name} ${member.last_name}`;
+
+  const confirmed = confirm(
+    `Möchtest du das Mitglied ${fullName} wirklich endgültig löschen?\n\n` +
+    "Dieser Vorgang kann nicht rückgängig gemacht werden."
+  );
+
+  if (!confirmed) return;
+
+  const button = $("deleteMemberButton");
+  button.disabled = true;
+
+  try {
+    const { error } = await sb
+      .from("members")
+      .delete()
+      .eq("id", member.id);
+
+    if (error) throw error;
+
+    $("memberDetailPanel").classList.add("hidden");
+
+    msg(`Mitglied ${fullName} wurde gelöscht.`);
+    await load();
+  } catch (error) {
+    msg(
+      "Mitglied konnte nicht gelöscht werden: " +
+      error.message
+    );
+  } finally {
+    button.disabled = false;
+  }
+};
+
 $("editMemberButton").onclick = () => {
   const memberId = $("memberDetailPanel").dataset.memberId;
   const member = cache.members.find(
