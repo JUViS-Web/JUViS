@@ -348,18 +348,54 @@ function renderFegedienst() {
       a.name.localeCompare(b.name, "de")
     );
 
-  stats.innerHTML = counts.map(item => `
-    <div class="entry">
-      <div class="icon">#</div>
-      <div class="grow">
-        <b>${esc(item.name)}</b>
-        <small>
-          ${item.count} ${item.count === 1 ? "Fegedienst" : "Fegedienste"}
-          <br>Zuletzt: ${item.lastDate ? esc(item.lastDate.toLocaleDateString("de-DE")) : "Noch nie"}
-        </small>
+  
+  const recommended = counts.slice(0, 3);
+
+  const recommendationHtml = recommended.length
+    ? `
+      <div class="fegedienst-recommendations">
+        <p class="muted">
+          Diese Mitglieder haben nach der bisherigen Statistik Vorrang.
+          Die endgültige Auswahl triffst du selbst.
+        </p>
+        ${recommended.map((item, index) => `
+          <div class="fegedienst-recommendation">
+            <span class="fegedienst-rank">${index + 1}</span>
+            <div class="grow">
+              <b>${esc(item.name)}</b>
+              <small>
+                ${item.count} ${item.count === 1 ? "Fegedienst" : "Fegedienste"}
+                · Zuletzt:
+                ${item.lastDate
+                  ? esc(item.lastDate.toLocaleDateString("de-DE"))
+                  : "Noch nie"}
+              </small>
+            </div>
+          </div>
+        `).join("")}
       </div>
-    </div>
-  `).join("") || '<p class="muted">Keine Mitglieder vorhanden.</p>';
+    `
+    : '<p class="muted">Keine Mitglieder vorhanden.</p>';
+
+  stats.innerHTML = `
+    <h3>Nächste Empfehlung</h3>
+    ${recommendationHtml}
+    <h3>Gesamtübersicht</h3>
+    ${counts.map(item => `
+      <div class="entry">
+        <div class="icon">#</div>
+        <div class="grow">
+          <b>${esc(item.name)}</b>
+          <small>
+            ${item.count} ${item.count === 1 ? "Fegedienst" : "Fegedienste"}
+            <br>Zuletzt: ${item.lastDate
+              ? esc(item.lastDate.toLocaleDateString("de-DE"))
+              : "Noch nie"}
+          </small>
+        </div>
+      </div>
+    `).join("") || '<p class="muted">Keine Mitglieder vorhanden.</p>'}
+  `;
 }
 
   function render() {
