@@ -531,6 +531,63 @@ input[type="time"] {
 #fegedienst #fegedienstMemberList input[type="checkbox"] {
   background: initial !important;
 }
+  
+/* JUVIS – Mitgliederkartei */
+.member-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin: 0 0 9px;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel2);
+  color: var(--text);
+  text-align: left;
+}
+
+.member-card:hover {
+  border-color: var(--red);
+}
+
+.member-card-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 42px;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  background: #392124;
+  color: #ff777c;
+  font-size: 22px;
+}
+
+.member-card-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.member-card-info strong,
+.member-card-info small {
+  display: block;
+  overflow-wrap: anywhere;
+}
+
+.member-card-info strong {
+  margin-bottom: 5px;
+  font-size: 15px;
+}
+
+.member-card-info small {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.member-card-arrow {
+  color: var(--muted);
+  font-size: 25px;
+}
 </style>
 </head>
 <body>
