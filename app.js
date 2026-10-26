@@ -1374,6 +1374,19 @@ $("navToggle").addEventListener("click", () => {
   // Formulare
 $("addMemberButton").onclick = openNewMemberForm;
 
+  $("showFormerMembersButton").onclick = () => {
+  hideMemberPanels();
+  $("formerMembersPanel").classList.remove("hidden");
+};
+
+$("closeFormerMembersButton").onclick = () => {
+  $("formerMembersPanel").classList.add("hidden");
+};
+
+$("formerMemberSearch").addEventListener("input", () => {
+  render();
+});
+  
 $("closeMemberDetail").onclick = () => {
   $("memberDetailPanel").classList.add("hidden");
 };
