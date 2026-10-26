@@ -1339,6 +1339,53 @@ $("navToggle").addEventListener("click", () => {
   };
 
   // Formulare
+$("addMemberButton").onclick = openNewMemberForm;
+
+$("closeMemberDetail").onclick = () => {
+  $("memberDetailPanel").classList.add("hidden");
+};
+
+$("editMemberButton").onclick = () => {
+  const memberId = $("memberDetailPanel").dataset.memberId;
+  const member = cache.members.find(
+    item => String(item.id) === String(memberId)
+  );
+
+  if (!member) {
+    msg("Mitglied konnte nicht gefunden werden.");
+    return;
+  }
+
+  if (!admin()) {
+    msg("Nur Betreuer und Administratoren dürfen Mitglieder bearbeiten.");
+    return;
+  }
+
+  hideMemberPanels();
+
+  window.editingMemberId = member.id;
+  $("memberFormTitle").textContent = "Mitglied bearbeiten";
+
+  const form = $("memberForm");
+  form.elements.first_name.value = member.first_name || "";
+  form.elements.last_name.value = member.last_name || "";
+  form.elements.birth_date.value = member.birth_date || "";
+  form.elements.join_date.value = member.join_date || "";
+  form.elements.leave_date.value = member.leave_date || "";
+  form.elements.known_position.value = member.known_position || "";
+  form.elements.locker_number.value = member.locker_number || "";
+  form.elements.email.value = member.email || "";
+  form.elements.notes.value = member.notes || "";
+
+  $("memberFormPanel").classList.remove("hidden");
+  $("cancelMemberEdit").hidden = false;
+
+  $("memberFormPanel").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+};
+
 $("cancelMemberEdit").onclick = () => {
   window.editingMemberId = null;
   $("memberForm").reset();
