@@ -447,6 +447,47 @@ input[type="time"] {
   margin: 12px 0 8px;
   font-size: 16px;
 }
+
+  /* Fegedienst niemand hat gefegt */
+function setupFegedienstForm() {
+  const nobody = $("fegedienstNobody");
+  const form = $("fegedienstForm");
+  const memberList = $("fegedienstMemberList");
+
+  if (!nobody || !form || !memberList) return;
+
+  const allowed = admin();
+
+  function updateMemberCheckboxes() {
+    memberList
+      .querySelectorAll('input[name="fegedienst_member"]')
+      .forEach(checkbox => {
+        checkbox.disabled = !allowed || nobody.checked;
+        if (nobody.checked) {
+          checkbox.checked = false;
+        }
+      });
+  }
+
+  nobody.onchange = updateMemberCheckboxes;
+
+  memberList.onchange = event => {
+    if (
+      event.target.matches('input[name="fegedienst_member"]') &&
+      event.target.checked
+    ) {
+      nobody.checked = false;
+      updateMemberCheckboxes();
+    }
+  };
+
+  form.querySelectorAll("input, select, textarea, button").forEach(control => {
+    control.disabled = !allowed;
+  });
+
+  updateMemberCheckboxes();
+}
+
 </style>
 </head>
 <body>
