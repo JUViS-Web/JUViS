@@ -1366,15 +1366,15 @@ function setupFegedienstForm() {
 
   nobody.onchange = updateMemberCheckboxes;
 
-  memberList.onchange = event => {
-    if (
-      event.target.matches('input[name="fegedienst_member"]') &&
-      event.target.checked
-    ) {
-      nobody.checked = false;
-      updateMemberCheckboxes();
-    }
-  };
+  memberList.addEventListener("change", event => {
+  if (
+    event.target.matches('input[name="fegedienst_member"]') &&
+    event.target.checked
+  ) {
+    nobody.checked = false;
+    updateMemberCheckboxes();
+  }
+});
 
   form.querySelectorAll("input, select, textarea, button").forEach(control => {
     control.disabled = !allowed;
