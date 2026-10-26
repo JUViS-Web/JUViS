@@ -503,7 +503,10 @@ function bindMemberCardButtons() {
 
 const search = ($("memberSearch").value || "").toLowerCase();
 
+const search = ($("memberSearch").value || "").toLowerCase();
+
 $("memberList").innerHTML = cache.members
+  .filter(member => !member.leave_date)
   .filter(member =>
     `${member.first_name} ${member.last_name}`
       .toLowerCase()
