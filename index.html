@@ -647,6 +647,42 @@ input[type="time"] {
     <div id="memberList">
       <p class="muted">Mitglieder werden geladen …</p>
     </div>
+    
+<button
+  type="button"
+  id="showFormerMembersButton"
+  class="secondary"
+  style="margin-top: 10px;"
+>
+  Ausgetretene Mitglieder
+</button>
+
+<div id="formerMembersPanel" class="hidden" style="margin-top: 16px;">
+  <div class="mainhead">
+    <div>
+      <h2>Ausgetretene Mitglieder</h2>
+      <p class="muted tiny">Archiv – frühere Mitglieder</p>
+    </div>
+    <button
+      type="button"
+      id="closeFormerMembersButton"
+      class="secondary"
+    >
+      Zurück
+    </button>
+  </div>
+
+  <input
+    id="formerMemberSearch"
+    type="search"
+    placeholder="Archiv durchsuchen …"
+    aria-label="Ausgetretene Mitglieder suchen"
+  >
+
+  <div id="formerMemberList">
+    <p class="muted">Archiv wird geladen …</p>
+  </div>
+</div>
   </div>
 
   <div class="panel hidden" id="memberFormPanel">
