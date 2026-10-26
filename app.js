@@ -1351,37 +1351,36 @@ function setupFegedienstForm() {
 
   if (!nobody || !form || !memberList) return;
 
-  nobody.onchange = () => {
-    const checkboxes = memberList.querySelectorAll(
-      'input[name="fegedienst_member"]'
-    );
+  const allowed = admin();
 
-    checkboxes.forEach(checkbox => {
-      checkbox.disabled = nobody.checked;
+  function updateMemberCheckboxes() {
+    memberList
+      .querySelectorAll('input[name="fegedienst_member"]')
+      .forEach(checkbox => {
+        checkbox.disabled = !allowed || nobody.checked;
+        if (nobody.checked) {
+          checkbox.checked = false;
+        }
+      });
+  }
 
-      if (nobody.checked) {
-        checkbox.checked = false;
-      }
-    });
-  };
+  nobody.onchange = updateMemberCheckboxes;
 
   memberList.onchange = event => {
-    if (event.target.matches('input[name="fegedienst_member"]')) {
-      if (event.target.checked) {
-        nobody.checked = false;
-      }
+    if (
+      event.target.matches('input[name="fegedienst_member"]') &&
+      event.target.checked
+    ) {
+      nobody.checked = false;
+      updateMemberCheckboxes();
     }
   };
-
-  const allowed = admin();
 
   form.querySelectorAll("input, select, textarea, button").forEach(control => {
     control.disabled = !allowed;
   });
 
-  memberList.querySelectorAll('input[name="fegedienst_member"]').forEach(control => {
-    control.disabled = !allowed || nobody.checked;
-  });
+  updateMemberCheckboxes();
 }
 
 $("fegedienstForm").onsubmit = async event => {
