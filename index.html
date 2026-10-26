@@ -515,6 +515,41 @@ function setupFegedienstForm() {
   margin: 0 !important;
   transform: none !important;
 }
+  
+/* Fegedienst: Checkboxen unabhängig von allgemeinen Eingabefeld-Regeln */
+#fegedienst #fegedienstMemberList label.fegedienst-member {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  width: 100% !important;
+  min-height: 30px !important;
+  padding: 4px 8px !important;
+  margin: 0 !important;
+  font-size: 14px !important;
+  line-height: 1.3 !important;
+}
+
+#fegedienst #fegedienstMemberList input[type="checkbox"],
+#fegedienst input#fegedienstNobody {
+  -webkit-appearance: checkbox !important;
+  appearance: auto !important;
+  display: inline-block !important;
+  width: 16px !important;
+  height: 16px !important;
+  min-width: 16px !important;
+  min-height: 16px !important;
+  max-width: 16px !important;
+  max-height: 16px !important;
+  flex: 0 0 16px !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border-radius: 3px !important;
+  vertical-align: middle !important;
+}
+
+#fegedienst #fegedienstMemberList input[type="checkbox"] {
+  background: initial !important;
+}
 </style>
 </head>
 <body>
