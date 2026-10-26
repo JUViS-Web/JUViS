@@ -527,21 +527,25 @@ if (clothingMember) {
       attendanceEvent.value = selected;
     }
 
-    $("exerciseList").innerHTML =
-      cache.exercises.map(exercise => `
-        <div class="entry">
-          <div class="icon">☷</div>
-          <div class="grow">
-            <b>${esc(exercise.title)}</b>
-            <small>
-              ${esc(exercise.planned_date || "Kein Datum")}
-              <br>${esc(exercise.notes || "")}
-            </small>
-          </div>
-          ${removeButton("exercises", exercise.id)}
+    const exerciseList = $("exerciseList");
+
+    if (exerciseList) {
+ exerciseList.innerHTML =
+    cache.exercises.map(exercise => `
+      <div class="entry">
+        <div class="icon">☷</div>
+        <div class="grow">
+          <b>${esc(exercise.title)}</b>
+          <small>
+            ${esc(exercise.planned_date || "Kein Datum")}
+            <br>${esc(exercise.notes || "")}
+          </small>
         </div>
-      `).join("") ||
-      '<p class="muted">Keine Übungen vorhanden.</p>';
+        ${removeButton("exercises", exercise.id)}
+      </div>
+    `).join("") ||
+    '<p class="muted">Keine Übungen vorhanden.</p>';
+}
 
     $("clothingList").innerHTML =
       cache.clothing.map(item => {
