@@ -1389,8 +1389,10 @@ $("editMemberButton").onclick = () => {
 $("cancelMemberEdit").onclick = () => {
   window.editingMemberId = null;
   $("memberForm").reset();
+  $("memberFormPanel").classList.add("hidden");
   $("cancelMemberEdit").hidden = true;
-  msg("Bearbeitung abgebrochen.");
+  $("memberFormTitle").textContent = "Neues Mitglied anlegen";
+  msg("Vorgang abgebrochen.");
 };
   $("memberForm").onsubmit = async event => {
     event.preventDefault();
@@ -1431,8 +1433,12 @@ $("cancelMemberEdit").onclick = () => {
         msg("Mitglied erfolgreich angelegt.");
       }
 
-      form.reset(); $("cancelMemberEdit").hidden = true;
-      await load();
+      form.reset();
+$("cancelMemberEdit").hidden = true;
+$("memberFormPanel").classList.add("hidden");
+$("memberDetailPanel").classList.add("hidden");
+$("memberFormTitle").textContent = "Neues Mitglied anlegen";
+await load();
     } catch (error) {
       msg("Speichern fehlgeschlagen: " + error.message);
     }
