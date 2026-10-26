@@ -397,6 +397,88 @@ function renderFegedienst() {
     `).join("") || '<p class="muted">Keine Mitglieder vorhanden.</p>'}
   `;
 }
+  
+function hideMemberPanels() {
+  $("memberFormPanel").classList.add("hidden");
+  $("memberDetailPanel").classList.add("hidden");
+}
+
+function openNewMemberForm() {
+  if (!admin()) {
+    msg("Nur Betreuer und Administratoren dürfen Mitglieder anlegen.");
+    return;
+  }
+
+  hideMemberPanels();
+
+  window.editingMemberId = null;
+  $("memberForm").reset();
+  $("memberFormTitle").textContent = "Neues Mitglied anlegen";
+  $("memberFormPanel").classList.remove("hidden");
+  $("cancelMemberEdit").hidden = false;
+
+  $("memberFormPanel").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
+function openMemberDetails(memberId) {
+  const member = cache.members.find(
+    item => String(item.id) === String(memberId)
+  );
+
+  if (!member) {
+    msg("Mitglied konnte nicht gefunden werden.");
+    return;
+  }
+
+  hideMemberPanels();
+
+  const date = value => value
+    ? new Date(value + "T00:00:00").toLocaleDateString("de-DE")
+    : "–";
+
+  $("memberDetailName").textContent =
+    `${member.first_name} ${member.last_name}`;
+
+  const details = [
+    ["Vorname", member.first_name],
+    ["Nachname", member.last_name],
+    ["Geburtsdatum", date(member.birth_date)],
+    ["Eintrittsdatum", date(member.join_date)],
+    ["Austrittsdatum", date(member.leave_date)],
+    ["Einsatzposition", member.known_position || "Keine angegeben"],
+    ["Spindnummer", member.locker_number || "Keine angegeben"],
+    ["E-Mail", member.email || "Keine hinterlegt"],
+    ["Notiz", member.notes || "Keine Notiz"]
+  ];
+
+  $("memberDetailContent").innerHTML = details.map(([label, value]) => `
+    <div class="entry">
+      <div class="grow">
+        <small class="muted">${esc(label)}</small>
+        <b>${esc(value)}</b>
+      </div>
+    </div>
+  `).join("");
+
+  $("memberDetailPanel").dataset.memberId = member.id;
+  $("memberDetailPanel").classList.remove("hidden");
+
+  $("memberDetailPanel").scrollIntoView({
+    behavior: "smooth",
+    block: "start"
+  });
+}
+
+function bindMemberCardButtons() {
+  document.querySelectorAll("[data-open-member]").forEach(button => {
+    button.onclick = () => {
+      openMemberDetails(button.dataset.openMember);
+    };
+  });
+}
 
   function render() {
     $("countMembers").textContent = cache.members.length;
@@ -419,38 +501,35 @@ function renderFegedienst() {
       `).join("") ||
       '<p class="muted">Noch keine Dienste angelegt.</p>';
 
-    const search = ($("memberSearch").value || "").toLowerCase();
+const search = ($("memberSearch").value || "").toLowerCase();
 
-    $("memberList").innerHTML =
-      cache.members
-        .filter(member =>
-          `${member.first_name} ${member.last_name}`
-            .toLowerCase().includes(search)
-        )
-        .map(member => `
-          <div class="entry">
-            <div class="icon">♙</div>
-            <div class="grow">
-              <b>${esc(member.first_name)} ${esc(member.last_name)}</b>
-              <small>
-                Geburtstag: ${member.birth_date ? new Date(member.birth_date + "T00:00:00").toLocaleDateString("de-DE") : "–"}
-                <br>
-                Eintritt: ${member.join_date ? new Date(member.join_date + "T00:00:00").toLocaleDateString("de-DE") : "–"}
-                <br>
-                Austritt: ${member.leave_date ? new Date(member.leave_date + "T00:00:00").toLocaleDateString("de-DE") : "–"}
-                <br>
-                Einsatzposition: ${esc(member.known_position || "Keine angegeben")}
-                <br>
-                Spindnummer: ${esc(member.locker_number || "Keine angegeben")}
-                <br>
-                E-Mail: ${esc(member.email || "Keine hinterlegt")}
-              </small>
-            </div>
-            <button type="button" class="tiny" data-edit-member="${esc(member.id)}">Bearbeiten</button>
-            ${removeButton("members", member.id)}
-          </div>
-        `).join("") ||
-      '<p class="muted">Keine Mitglieder gefunden.</p>';
+$("memberList").innerHTML = cache.members
+  .filter(member =>
+    `${member.first_name} ${member.last_name}`
+      .toLowerCase()
+      .includes(search)
+  )
+  .map(member => `
+    <button
+      type="button"
+      class="member-card"
+      data-open-member="${esc(member.id)}"
+    >
+      <span class="member-card-icon">♙</span>
+      <span class="member-card-info">
+        <strong>${esc(member.first_name)} ${esc(member.last_name)}</strong>
+        <small>
+          ${member.leave_date ? "Ausgetreten" : "Aktives Mitglied"}
+          · Spind ${esc(member.locker_number || "–")}
+        </small>
+      </span>
+      <span class="member-card-arrow" aria-hidden="true">›</span>
+    </button>
+  `)
+  .join("") ||
+  '<p class="muted">Keine Mitglieder gefunden.</p>';
+
+bindMemberCardButtons();
     
     const awardMember = $("awardMember");
 
