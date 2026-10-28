@@ -1114,7 +1114,7 @@ function bindEditMemberButtons() {
     if (sessionError) throw sessionError;
   } catch (error) {
     console.error("Anmeldefehler:", error);
-    msg("Anmeldung fehlgeschlagen. Bitte Benutzername und Passwort prüfen.", true);
+    msg("Anmeldefehler: " + (error?.message || String(error)), true);
   } finally {
     button.disabled = false;
   }
