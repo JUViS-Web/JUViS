@@ -12,7 +12,6 @@
   let user = null;
   let profile = null;
   let scan = null;
-  let authMode = "login";
   
   const cache = {
   members: [],
