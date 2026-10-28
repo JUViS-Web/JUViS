@@ -1162,25 +1162,11 @@ function bindEditMemberButtons() {
     if (event.key === "Enter") handleAuth();
   });
 
-  $("toggleAuth").addEventListener("click", () => {
-    authMode = authMode === "login" ? "register" : "login";
+  $("authSubmit").addEventListener("click", handleAuth);
 
-    $("authTitle").textContent =
-      authMode === "login" ? "Anmelden" : "Konto registrieren";
-
-    $("authSubmit").textContent =
-      authMode === "login" ? "Anmelden" : "Registrieren";
-
-    $("toggleAuth").textContent =
-      authMode === "login"
-        ? "Neues Konto registrieren"
-        : "Zur Anmeldung";
-
-    $("password").autocomplete =
-      authMode === "login" ? "current-password" : "new-password";
-
-    clearMsg(true);
-  });
+$("password").addEventListener("keydown", event => {
+  if (event.key === "Enter") handleAuth();
+});
 
   // Navigation
   $("logout").onclick = async () => {
