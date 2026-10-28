@@ -1080,48 +1080,47 @@ function bindEditMemberButtons() {
   }
 
   async function handleAuth() {
-    clearMsg(true);
+  clearMsg(true);
 
-    const email = $("email").value.trim();
-    const password = $("password").value;
+  const username = $("username").value.trim().toLowerCase();
+  const password = $("password").value;
 
-    if (!email || !password) {
-      msg("Bitte E-Mail und Passwort eingeben.", true);
-      return;
-    }
-
-    const button = $("authSubmit");
-    button.disabled = true;
-
-    try {
-      if (authMode === "login") {
-        const { error } = await sb.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        if (error) throw error;
-      } else {
-        const { data, error } = await sb.auth.signUp({
-          email,
-          password
-        });
-
-        if (error) throw error;
-
-        if (data.session) {
-          msg("Registrierung erfolgreich.", true);
-        } else {
-          msg("Registrierung erfolgreich. Bitte prüfe deine E-Mails, um dein Konto zu bestätigen.", true);
-        }
-      }
-    } catch (error) {
-      msg("Anmeldung/Registrierung fehlgeschlagen: " + error.message, true);
-    } finally {
-      button.disabled = false;
-    }
+  if (!username || !password) {
+    msg("Bitte Benutzername und Passwort eingeben.", true);
+    return;
   }
 
+  const button = $("authSubmit");
+  button.disabled = true;
+
+  try {
+    const { data, error } = await sb.functions.invoke(
+      "juvis-username-login",
+      {
+        body: { username, password }
+      }
+    );
+
+    if (error) throw error;
+
+    if (!data?.session?.access_token || !data?.session?.refresh_token) {
+      throw new Error("Die Anmeldung konnte nicht abgeschlossen werden.");
+    }
+
+    const { error: sessionError } = await sb.auth.setSession({
+      access_token: data.session.access_token,
+      refresh_token: data.session.refresh_token
+    });
+
+    if (sessionError) throw sessionError;
+  } catch (error) {
+    console.error("Anmeldefehler:", error);
+    msg("Anmeldung fehlgeschlagen. Bitte Benutzername und Passwort prüfen.", true);
+  } finally {
+    button.disabled = false;
+  }
+}
+  
   async function boot() {
     if (!configured || !window.supabase) {
       $("authView").classList.remove("hidden");
