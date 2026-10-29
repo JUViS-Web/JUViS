@@ -864,65 +864,103 @@ form.elements.locker_number.value = item.locker_number || "";
   });
 }
   
-  function renderAttendance() {
-    const list = $("attendanceList");
-    const saveButton = $("saveAttendance");
-    const eventId = $("attendanceEvent")?.value;
+  
+function renderAttendance() {
+  const list = $("attendanceList");
+  const saveButton = $("saveAttendance");
+  const eventId = $("attendanceEvent")?.value;
 
-    if (!list) return;
+  if (!list) return;
 
-    if (!admin()) {
-      list.innerHTML =
-        '<p class="muted">Die Anwesenheitserfassung ist nur für Betreuer und Administratoren verfügbar.</p>';
+  if (!admin()) {
+    list.innerHTML =
+      '<p class="muted">Die Anwesenheitserfassung ist nur für Betreuer und Administratoren verfügbar.</p>';
+    if (saveButton) saveButton.hidden = true;
+    return;
+  }
 
-      if (saveButton) saveButton.hidden = true;
-      return;
-    }
-
-    if (!eventId) {
-      list.innerHTML =
-        '<p class="muted">Bitte zuerst einen Dienst auswählen.</p>';
-
-      if (saveButton) saveButton.hidden = false;
-      return;
-    }
-
+  if (!eventId) {
+    list.innerHTML =
+      '<p class="muted">Bitte zuerst einen Dienst auswählen.</p>';
     if (saveButton) saveButton.hidden = false;
+    return;
+  }
 
-    list.innerHTML = cache.members
-  .filter(member => !member.leave_date)
-  .slice()
-  .sort((a, b) =>
-    `${a.last_name} ${a.first_name}`.localeCompare(
-      `${b.last_name} ${b.first_name}`,
-      "de"
+  if (saveButton) saveButton.hidden = false;
+
+  list.innerHTML = cache.members
+    .filter(member => !member.leave_date)
+    .slice()
+    .sort((a, b) =>
+      `${a.last_name} ${a.first_name}`.localeCompare(
+        `${b.last_name} ${b.first_name}`,
+        "de"
+      )
     )
-  )
-  .map(member => {
+    .map(member => {
       const record = cache.attendance.find(entry =>
         String(entry.event_id) === String(eventId) &&
         String(entry.member_id) === String(member.id)
       );
 
       const status = record?.status || "";
-const lateMinutes = Number(record?.late_minutes || 0);
+      const lateMinutes = Number(record?.late_minutes || 0);
+
+      let statusText = "Noch nicht erfasst";
+      let statusColor = "#6b7280";
+      let statusBackground = "#f3f4f6";
+
+      if (status === "present") {
+        statusText = "Anwesend";
+        statusColor = "#166534";
+        statusBackground = "#dcfce7";
+      } else if (status === "absent") {
+        statusText = "Abwesend";
+        statusColor = "#991b1b";
+        statusBackground = "#fee2e2";
+      } else if (status === "excused") {
+        statusText = "Entschuldigt";
+        statusColor = "#92400e";
+        statusBackground = "#fef3c7";
+      }
 
       return `
-        <div class="entry attendance-entry">
+        <div class="entry attendance-entry"
+             style="touch-action: pan-y;">
+
           <div class="icon">♙</div>
+
           <div class="grow attendance-member">
             <strong class="attendance-name">
               ${esc(member.first_name)} ${esc(member.last_name)}
             </strong>
             <small class="attendance-subtitle">
-              Jugendfeuerwehrmitglied
+              Nach rechts: anwesend · nach links: abwesend
             </small>
+
+            <div
+              data-attendance-label
+              style="
+                display: inline-block;
+                margin-top: 8px;
+                padding: 6px 10px;
+                border-radius: 8px;
+                font-weight: 600;
+                color: ${statusColor};
+                background: ${statusBackground};
+              "
+            >${statusText}</div>
           </div>
+
           <div class="attendance-status">
-            <label for="attendance-${esc(member.id)}">Anwesenheit</label>
-            <select id="attendance-${esc(member.id)}"
-  data-attendance-member="${esc(member.id)}"
-  data-late-minutes="${lateMinutes}">
+            <select
+              id="attendance-${esc(member.id)}"
+              data-attendance-member="${esc(member.id)}"
+              data-late-minutes="${lateMinutes}"
+              style="display: none;"
+              aria-hidden="true"
+              tabindex="-1"
+            >
               <option value="" ${status === "" ? "selected" : ""}>
                 Noch nicht erfasst
               </option>
@@ -936,7 +974,11 @@ const lateMinutes = Number(record?.late_minutes || 0);
                 Entschuldigt
               </option>
             </select>
-            <label for="late-${esc(member.id)}">Verspätung (Minuten)</label>
+
+            <label for="late-${esc(member.id)}">
+              Verspätung (Minuten)
+            </label>
+
             <input
               id="late-${esc(member.id)}"
               type="number"
@@ -949,42 +991,66 @@ const lateMinutes = Number(record?.late_minutes || 0);
           </div>
         </div>
       `;
-    }).join("") ||
-    '<p class="muted">Keine Mitglieder vorhanden.</p>';
-    list.querySelectorAll(".attendance-entry").forEach(entry => {
-      let startX = 0;
-      let startY = 0;
+    })
+    .join("") || '<p class="muted">Keine Mitglieder vorhanden.</p>';
 
-      entry.addEventListener("touchstart", event => {
-        startX = event.changedTouches[0].clientX;
-        startY = event.changedTouches[0].clientY;
-      }, { passive: true });
+  list.querySelectorAll(".attendance-entry").forEach(entry => {
+    let startX = 0;
+    let startY = 0;
 
-      entry.addEventListener("touchend", event => {
-        const deltaX = event.changedTouches[0].clientX - startX;
-        const deltaY = event.changedTouches[0].clientY - startY;
+    entry.addEventListener("touchstart", event => {
+      startX = event.changedTouches[0].clientX;
+      startY = event.changedTouches[0].clientY;
+    }, { passive: true });
 
-        if (
-          Math.abs(deltaX) < 60 ||
-          Math.abs(deltaX) < Math.abs(deltaY) ||
-          event.target.closest("select, input, button, label")
-        ) return;
+    entry.addEventListener("touchend", event => {
+      const deltaX = event.changedTouches[0].clientX - startX;
+      const deltaY = event.changedTouches[0].clientY - startY;
 
-        const select = entry.querySelector("[data-attendance-member]");
-        const lateInput = entry.querySelector("[data-late-minutes-input]");
+      if (
+        Math.abs(deltaX) < 60 ||
+        Math.abs(deltaX) < Math.abs(deltaY) ||
+        event.target.closest("select, input, button, label")
+      ) {
+        return;
+      }
 
-        if (!select || !lateInput) return;
+      const select = entry.querySelector("[data-attendance-member]");
+      const lateInput = entry.querySelector("[data-late-minutes-input]");
+      const badge = entry.querySelector("[data-attendance-label]");
 
-        if (deltaX < 0) {
-          select.value = "absent";
-          lateInput.value = "";
-          select.dataset.lateMinutes = "0";
-        } else {
-          select.value = "present";
+      if (!select || !lateInput || !badge) return;
+
+      if (deltaX < 0) {
+        select.value = "absent";
+        lateInput.value = "";
+        select.dataset.lateMinutes = "0";
+      } else {
+        select.value = "present";
+      }
+
+      const styles = {
+        present: {
+          text: "Anwesend",
+          color: "#166534",
+          background: "#dcfce7"
+        },
+        absent: {
+          text: "Abwesend",
+          color: "#991b1b",
+          background: "#fee2e2"
         }
-      }, { passive: true });
-    });
-  }
+      };
+
+      const display = styles[select.value];
+      if (!display) return;
+
+      badge.textContent = display.text;
+      badge.style.color = display.color;
+      badge.style.background = display.background;
+    }, { passive: true });
+  });
+}
   
 function bindEditMemberButtons() {
   document.querySelectorAll("[data-edit-member]").forEach(button => {
