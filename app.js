@@ -1282,11 +1282,12 @@ $("navToggle").addEventListener("click", () => {
         const { error } = await sb
           .from("attendance")
           .upsert({
-            event_id: eventId,
-            member_id: memberId,
-            status,
-            recorded_by: user.id
-          }, {
+  event_id: eventId,
+  member_id: memberId,
+  status,
+  late_minutes: Number(select.dataset.lateMinutes || 0),
+  recorded_by: user.id
+}, {
             onConflict: "event_id,member_id"
           });
 
