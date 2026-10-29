@@ -936,6 +936,16 @@ const lateMinutes = Number(record?.late_minutes || 0);
                 Entschuldigt
               </option>
             </select>
+            <label for="late-${esc(member.id)}">Verspätung (Minuten)</label>
+            <input
+              id="late-${esc(member.id)}"
+              type="number"
+              min="1"
+              step="1"
+              value="${lateMinutes >= 1 ? lateMinutes : ""}"
+              data-late-minutes-input="${esc(member.id)}"
+              placeholder="Keine Verspätung"
+            />
           </div>
         </div>
       `;
