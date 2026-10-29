@@ -1277,6 +1277,23 @@ $("navToggle").addEventListener("click", () => {
       for (const select of selects) {
         const memberId = select.dataset.attendanceMember;
         const status = select.value;
+        const lateInput = document.querySelector(
+  `[data-late-minutes-input="${memberId}"]`
+);
+const lateMinutes = lateInput?.value.trim() === ""
+  ? 0
+  : Number(lateInput.value);
+
+if (
+  !Number.isInteger(lateMinutes) ||
+  lateMinutes < 0 ||
+  (lateMinutes > 0 && status !== "present")
+) {
+  $("attendanceMessage").textContent =
+    "Bitte gib ganze Verspätungsminuten ab 1 ein. Verspätungen sind nur bei anwesenden Mitgliedern möglich.";
+  lateInput?.focus();
+  throw new Error("Bitte die Verspätungsangabe korrigieren.");
+}
 
         if (!status) {
           const { error } = await sb
