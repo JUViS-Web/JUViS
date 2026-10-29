@@ -921,7 +921,8 @@ const lateMinutes = Number(record?.late_minutes || 0);
           <div class="attendance-status">
             <label for="attendance-${esc(member.id)}">Anwesenheit</label>
             <select id="attendance-${esc(member.id)}"
-              data-attendance-member="${esc(member.id)}">
+  data-attendance-member="${esc(member.id)}"
+  data-late-minutes="${lateMinutes}">
               <option value="" ${status === "" ? "selected" : ""}>
                 Noch nicht erfasst
               </option>
