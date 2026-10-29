@@ -950,7 +950,40 @@ const lateMinutes = Number(record?.late_minutes || 0);
         </div>
       `;
     }).join("") ||
-    '<p class="muted">Keine Mitglieder vorhanden.</p>';
+    '<p class="muted">Keine Mitglieder vorhanden.</
+    list.querySelectorAll(".attendance-entry").forEach(entry => {
+      let startX = 0;
+      let startY = 0;
+
+      entry.addEventListener("touchstart", event => {
+        startX = event.changedTouches[0].clientX;
+        startY = event.changedTouches[0].clientY;
+      }, { passive: true });
+
+      entry.addEventListener("touchend", event => {
+        const deltaX = event.changedTouches[0].clientX - startX;
+        const deltaY = event.changedTouches[0].clientY - startY;
+
+        if (
+          Math.abs(deltaX) < 60 ||
+          Math.abs(deltaX) < Math.abs(deltaY) ||
+          event.target.closest("select, input, button, label")
+        ) return;
+
+        const select = entry.querySelector("[data-attendance-member]");
+        const lateInput = entry.querySelector("[data-late-minutes-input]");
+
+        if (!select || !lateInput) return;
+
+        if (deltaX < 0) {
+          select.value = "absent";
+          lateInput.value = "";
+          select.dataset.lateMinutes = "0";
+        } else {
+          select.value = "present";
+        }
+      }, { passive: true });
+    });
   }
   
 function bindEditMemberButtons() {
