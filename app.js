@@ -732,6 +732,41 @@ if (clothingMember) {
           </div>
         `;
           }).join("") ||
+  list.querySelectorAll(".attendance-entry").forEach(entry => {
+    let startX = 0;
+    let startY = 0;
+
+    entry.addEventListener("touchstart", event => {
+      startX = event.changedTouches[0].clientX;
+      startY = event.changedTouches[0].clientY;
+    }, { passive: true });
+
+    entry.addEventListener("touchend", event => {
+      const endX = event.changedTouches[0].clientX;
+      const endY = event.changedTouches[0].clientY;
+      const deltaX = endX - startX;
+      const deltaY = endY - startY;
+
+      if (Math.abs(deltaX) < 60 ||
+          Math.abs(deltaX) < Math.abs(deltaY)) return;
+
+      if (event.target.closest("select, input, button, label")) return;
+
+      const select = entry.querySelector("[data-attendance-member]");
+      const lateInput = entry.querySelector("[data-late-minutes-input]");
+
+      if (!select || !lateInput) return;
+
+      if (deltaX < 0) {
+        select.value = "absent";
+        lateInput.value = "";
+        select.dataset.lateMinutes = "0";
+        return;
+      }
+
+      select.value = "present";
+    }, { passive: true });
+  });
     '<p class="muted">Keine Mitglieder vorhanden.</p>';
 
     $("docList").innerHTML =
