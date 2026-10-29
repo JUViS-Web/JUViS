@@ -1312,7 +1312,7 @@ if (
   event_id: eventId,
   member_id: memberId,
   status,
-  late_minutes: Number(select.dataset.lateMinutes || 0),
+  late_minutes: lateMinutes,
   recorded_by: user.id
 }, {
             onConflict: "event_id,member_id"
