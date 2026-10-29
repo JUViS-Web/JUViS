@@ -889,7 +889,16 @@ form.elements.locker_number.value = item.locker_number || "";
 
     if (saveButton) saveButton.hidden = false;
 
-    list.innerHTML = cache.members.map(member => {
+    list.innerHTML = cache.members
+  .filter(member => !member.leave_date)
+  .slice()
+  .sort((a, b) =>
+    `${a.last_name} ${a.first_name}`.localeCompare(
+      `${b.last_name} ${b.first_name}`,
+      "de"
+    )
+  )
+  .map(member => {
       const record = cache.attendance.find(entry =>
         String(entry.event_id) === String(eventId) &&
         String(entry.member_id) === String(member.id)
