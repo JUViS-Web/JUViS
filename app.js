@@ -16,6 +16,7 @@
   const cache = {
   members: [],
   events: [],
+  attendance: "Anwesenheit",
   exercises: [],
   clothing: [],
   docs: [],
