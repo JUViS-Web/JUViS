@@ -950,7 +950,7 @@ const lateMinutes = Number(record?.late_minutes || 0);
         </div>
       `;
     }).join("") ||
-    '<p class="muted">Keine Mitglieder vorhanden.</
+    '<p class="muted">Keine Mitglieder vorhanden.</p>';
     list.querySelectorAll(".attendance-entry").forEach(entry => {
       let startX = 0;
       let startY = 0;
