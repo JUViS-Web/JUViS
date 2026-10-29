@@ -905,6 +905,7 @@ form.elements.locker_number.value = item.locker_number || "";
       );
 
       const status = record?.status || "";
+const lateMinutes = Number(record?.late_minutes || 0);
 
       return `
         <div class="entry attendance-entry">
