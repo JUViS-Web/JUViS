@@ -957,7 +957,7 @@ function renderAttendance() {
               id="attendance-${esc(member.id)}"
               data-attendance-member="${esc(member.id)}"
               data-late-minutes="${lateMinutes}"
-              style="display: none;"
+              style="display: none !important;"
               aria-hidden="true"
               tabindex="-1"
             >
