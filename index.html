@@ -692,6 +692,64 @@ input[type="time"] {
     min-width: 0;
   }
 }
+  /* JUVIS-Anwesenheitsfenster */
+.juvis-dialog {
+  width: min(440px, calc(100% - 30px));
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 0;
+  color: var(--text);
+  background: var(--panel);
+  box-shadow: 0 20px 60px rgba(0,0,0,.45);
+}
+
+.juvis-dialog::backdrop {
+  background: rgba(0,0,0,.72);
+  backdrop-filter: blur(4px);
+}
+
+.juvis-dialog-content {
+  padding: 22px;
+}
+
+.juvis-dialog-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+
+.juvis-dialog-header h2 {
+  margin: 0 0 6px;
+}
+
+.juvis-dialog-content label {
+  display: block;
+  margin: 14px 0 7px;
+  font-weight: 600;
+}
+
+.juvis-dialog-content input,
+.juvis-dialog-content select,
+.juvis-dialog-content textarea {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.juvis-dialog-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.juvis-dialog-actions button {
+  flex: 1;
+}
+
+.juvis-dialog [hidden] {
+  display: none !important;
+}
 </style>
 </head>
 <body>
