@@ -1305,6 +1305,21 @@ $("serviceBookGoAttendance").onclick = () => {
   renderAttendance();
 };
 
+$("attendanceOpenServiceBook").onclick = () => {
+  const eventId = $("attendanceEvent").value;
+
+  if (!eventId) {
+    $("attendanceMessage").textContent =
+      "Bitte zuerst einen Dienst auswählen.";
+    return;
+  }
+
+  window.currentServiceBookEventId = eventId;
+
+  showPage("serviceBook");
+  renderServiceBook();
+};
+
 function bindEditMemberButtons() {
   document.querySelectorAll("[data-edit-member]").forEach(button => {
     button.onclick = () => {
