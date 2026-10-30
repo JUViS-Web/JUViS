@@ -901,7 +901,7 @@ function renderAttendance() {
         String(entry.member_id) === String(member.id)
       );
 
-      const status = record?.status || "";
+      const status = record?.status || "present";
       const lateMinutes = Number(record?.late_minutes || 0);
       const reason = record?.excuse_reason || "";
 
