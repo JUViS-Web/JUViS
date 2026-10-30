@@ -352,9 +352,33 @@ function renderFegedienst() {
       (a.lastDate?.getTime() || 0) - (b.lastDate?.getTime() || 0) ||
       a.name.localeCompare(b.name, "de")
     );
-
   
-  const recommended = counts.slice(0, 3);
+  const selectedEventId = eventSelect.value;
+
+const eligibleMemberIds = new Set(
+  cache.members
+    .filter(member => !member.leave_date)
+    .filter(member => {
+      const attendanceRecord = cache.attendance.find(entry =>
+        String(entry.event_id) === String(selectedEventId) &&
+        String(entry.member_id) === String(member.id)
+      );
+
+      const status = attendanceRecord?.status || "present";
+      return status === "present" || status === "late";
+    })
+    .map(member => member.id)
+);
+
+const recommended = counts
+  .filter(item => {
+    const member = cache.members.find(candidate =>
+      `${candidate.first_name} ${candidate.last_name}` === item.name
+    );
+
+    return member && eligibleMemberIds.has(member.id);
+  })
+  .slice(0, 3);
 
   const recommendationHtml = recommended.length
     ? `
