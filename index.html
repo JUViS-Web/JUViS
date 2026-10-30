@@ -1050,7 +1050,47 @@ input[type="time"] {
     <p id="attendanceMessage" class="muted"></p>
   </div>
 </section>
- 
+
+<section id="serviceBook" class="page hidden">
+  <div class="panel">
+    <button type="button" class="secondary" id="serviceBookBack">
+      Zurück zum Dienstplan
+    </button>
+
+    <h2 id="serviceBookTitle">Dienstbuch</h2>
+    <div id="serviceBookInfo"></div>
+  </div>
+
+  <div class="panel">
+    <h2>Anwesenheit</h2>
+    <div id="serviceBookAttendance"></div>
+
+    <button type="button" class="secondary" id="serviceBookGoAttendance">
+      Anwesenheit bearbeiten
+    </button>
+  </div>
+
+  <div class="panel">
+    <h2>Dienstbucheinträge</h2>
+
+    <div id="serviceBookEntries"></div>
+
+    <form id="serviceBookForm">
+      <label for="serviceBookEntry">Neuer Eintrag</label>
+      <textarea
+        id="serviceBookEntry"
+        rows="4"
+        required
+        placeholder="Was ist während des Dienstes passiert?"
+      ></textarea>
+
+      <button type="submit">Eintrag speichern</button>
+    </form>
+
+    <p id="serviceBookMessage" class="muted"></p>
+  </div>
+</section>
+    
 <section id="fegedienst" class="page hidden">
   <div class="panel">
     <h2>Fegedienst dokumentieren</h2>
