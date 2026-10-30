@@ -30,6 +30,7 @@
     home: "Übersicht",
     members: "Mitglieder",
     events: "Dienstplan",
+    serviceBook: "Dienstbuch",
     fegedienst: "Fegedienst",
     clothing: "Bekleidung",
     docs: "Dokumente & Links",
