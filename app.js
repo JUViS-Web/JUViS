@@ -1448,6 +1448,15 @@ $("nav").onclick = event => {
       $("navToggle").textContent = "☰ Menü";
     }
   }
+  $("eventList").addEventListener("click", event => {
+  const button = event.target.closest("[data-open-service-book]");
+  if (!button) return;
+
+  window.currentServiceBookEventId = button.dataset.openServiceBook;
+
+  showPage("serviceBook");
+  renderServiceBook();
+});
 };
 
 $("navToggle").addEventListener("click", () => {
