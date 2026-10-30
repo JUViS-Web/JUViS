@@ -1254,6 +1254,57 @@ async function renderServiceBook() {
   `).join("") || '<p class="muted">Noch keine Einträge vorhanden.</p>';
 }
 
+$("serviceBookForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  if (!admin()) return;
+
+  const input = $("serviceBookEntry");
+  const message = $("serviceBookMessage");
+  const button = $("serviceBookForm").querySelector(
+    'button[type="submit"]'
+  );
+
+  const entry = input.value.trim();
+  const eventId = window.currentServiceBookEventId;
+
+  if (!entry || !eventId) return;
+
+  button.disabled = true;
+  message.textContent = "Eintrag wird gespeichert …";
+
+  try {
+    const { error } = await sb
+      .from("service_book_entries")
+      .insert({
+        event_id: eventId,
+        entry: entry,
+        created_by: user.id
+      });
+
+    if (error) throw error;
+
+    input.value = "";
+    message.textContent = "Eintrag erfolgreich gespeichert.";
+
+    await renderServiceBook();
+  } catch (error) {
+    message.textContent = "Fehler: " + error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
+
+$("serviceBookBack").onclick = () => {
+  showPage("events");
+};
+
+$("serviceBookGoAttendance").onclick = () => {
+  $("attendanceEvent").value = window.currentServiceBookEventId;
+  showPage("attendance");
+  renderAttendance();
+};
+
 function bindEditMemberButtons() {
   document.querySelectorAll("[data-edit-member]").forEach(button => {
     button.onclick = () => {
