@@ -1013,14 +1013,34 @@ function renderAttendance() {
         reasonInput.value = "";
       } else if (select.value === "absent") {
         const value = prompt(
-          "Grund der Abwesenheit:",
-          reasonInput.value || ""
-        );
+          const choice = prompt(
+  "Abwesenheitsgrund auswählen:\n1 = Krank\n2 = Urlaub\n3 = Feier\n4 = Abwesend\n5 = Freitext\n\nLeer lassen = unentschuldigt",
+  ""
+);
 
-        if (value === null) return;
+if (choice === null) return;
 
-        reasonInput.value = value.trim();
-        lateInput.value = "0";
+const reasons = {
+  "1": "Krank",
+  "2": "Urlaub",
+  "3": "Feier",
+  "4": "Abwesend"
+};
+
+if (choice.trim() === "") {
+  reasonInput.value = "";
+} else if (reasons[choice.trim()]) {
+  reasonInput.value = reasons[choice.trim()];
+} else if (choice.trim() === "5") {
+  const freeText = prompt("Freitext zum Abwesenheitsgrund:", "");
+  if (freeText === null) return;
+  reasonInput.value = freeText.trim();
+} else {
+  alert("Bitte 1, 2, 3, 4 oder 5 eingeben.");
+  return;
+}
+
+lateInput.value = "0";
       } else {
         alert("Bitte zuerst nach rechts (anwesend) oder links (abwesend) wischen.");
         return;
