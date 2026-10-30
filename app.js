@@ -1572,13 +1572,7 @@ showPage(lastPage);
   }
 
   // Anmeldung und Registrierung
-  $("authSubmit").addEventListener("click", handleAuth);
-
-  $("password").addEventListener("keydown", event => {
-    if (event.key === "Enter") handleAuth();
-  });
-
-  $("authSubmit").addEventListener("click", handleAuth);
+$("authSubmit").addEventListener("click", handleAuth);
 
 $("password").addEventListener("keydown", event => {
   if (event.key === "Enter") handleAuth();
