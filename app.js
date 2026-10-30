@@ -1285,7 +1285,34 @@ function bindEditMemberButtons() {
 
       $("connection").textContent = "Angemeldet";
 
-      showPage("home");
+      let lastPage = "home";
+
+try {
+  lastPage = localStorage.getItem("juvis_last_page") || "home";
+} catch (error) {
+  console.warn("Gespeicherter Reiter konnte nicht geladen werden:", error);
+}
+
+const allowedPages = [
+  "home",
+  "members",
+  "events",
+  "fegedienst",
+  "clothing",
+  "docs",
+  "scanner",
+  "admin"
+];
+
+if (!allowedPages.includes(lastPage)) {
+  lastPage = "home";
+}
+
+if (lastPage === "admin" && !isAdmin()) {
+  lastPage = "home";
+}
+
+showPage(lastPage);
       await load();
 
       if (isAdmin()) {
