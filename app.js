@@ -906,16 +906,25 @@ function renderAttendance() {
       const reason = record?.excuse_reason || "";
 
       const present = status === "present";
+      const late = status === "late";
       const absent = status === "absent";
 
-      const statusText = present ? "Anwesend" :
-        absent ? "Abwesend" : "Noch nicht erfasst";
+      const statusText = late ? "Verspätet" :
+        present ? "Anwesend" : "Abwesend";
 
-      const statusColor = present ? "#22c55e" :
-        absent ? "#ef4444" : "#9ca3af";
+      const statusColor = absent ? "#ef4444" :
+        late ? "#f59e0b" : "#22c55e";
 
-      const statusBackground = present ? "#183b2b" :
-        absent ? "#592327" : "#292d31";
+      const statusBackground = absent ? "#592327" :
+        late ? "#493718" : "#183b2b";
+
+      const subtitle = late
+        ? `${lateMinutes} Minuten verspätet`
+        : absent
+          ? (reason || "Unentschuldigt")
+          : present && lateMinutes > 0
+            ? `${lateMinutes} Minuten verspätet`
+            : "Pünktlich";
 
       return `
         <div class="entry attendance-entry"
@@ -929,11 +938,7 @@ function renderAttendance() {
             </strong>
 
             <small class="attendance-subtitle">
-              ${present && lateMinutes > 0
-                ? `${lateMinutes} Minuten verspätet`
-                : absent && reason
-                  ? esc(reason)
-                  : "Wischen zum Erfassen"}
+              ${esc(subtitle)}
             </small>
 
             <div data-attendance-label
@@ -956,26 +961,23 @@ function renderAttendance() {
               style="display:none!important;"
               aria-hidden="true"
               tabindex="-1">
-              <option value="" ${status === "" ? "selected" : ""}></option>
               <option value="present" ${present ? "selected" : ""}></option>
+              <option value="late" ${late ? "selected" : ""}></option>
               <option value="absent" ${absent ? "selected" : ""}></option>
             </select>
 
-            <input
-              type="hidden"
+            <input type="hidden"
               data-late-minutes-input="${esc(member.id)}"
-              value="${lateMinutes || 0}">
+              value="${lateMinutes}">
 
-            <input
-              type="hidden"
+            <input type="hidden"
               data-excuse-reason="${esc(member.id)}"
               value="${esc(reason)}">
 
-            <button
-              type="button"
+            <button type="button"
               class="secondary"
               data-attendance-details="${esc(member.id)}"
-              title="Verspätung oder Abwesenheitsgrund eintragen"
+              title="Anwesenheit bearbeiten"
               style="font-size:22px;padding:10px 13px;">
               ◷
             </button>
@@ -985,75 +987,129 @@ function renderAttendance() {
     })
     .join("") || '<p class="muted">Keine Mitglieder vorhanden.</p>';
 
-  // Uhr: Verspätung oder Abwesenheitsgrund
-list.querySelectorAll("[data-attendance-details]").forEach(button => {
-  button.onclick = () => {
-    const entry = button.closest(".attendance-entry");
+  const dialog = $("attendanceDialog");
+  const closeButton = $("attendanceDialogClose");
+  const cancelButton = $("attendanceDialogCancel");
+  const saveDialogButton = $("attendanceDialogSave");
+  const lateArea = $("attendanceDialogLate");
+  const absentArea = $("attendanceDialogAbsent");
+  const lateField = $("attendanceLateMinutes");
+  const reasonField = $("attendanceExcuseReason");
+  const freeTextWrap = $("attendanceFreeTextWrap");
+  const freeTextField = $("attendanceFreeText");
+
+  let activeEntry = null;
+
+  function closeDialog() {
+    if (dialog.open) dialog.close();
+    activeEntry = null;
+  }
+
+  function openDialog(entry, mode) {
+    activeEntry = entry;
+
+    const name = entry.querySelector(".attendance-name").textContent.trim();
     const select = entry.querySelector("[data-attendance-member]");
     const lateInput = entry.querySelector("[data-late-minutes-input]");
     const reasonInput = entry.querySelector("[data-excuse-reason]");
-    const subtitle = entry.querySelector(".attendance-subtitle");
 
-    if (select.value === "present") {
-      const value = prompt(
-        "Verspätung in Minuten (0 = pünktlich):",
-        lateInput.value || "0"
-      );
+    $("attendanceDialogMember").textContent = name;
 
-      if (value === null) return;
+    lateArea.hidden = mode !== "late";
+    absentArea.hidden = mode !== "absent";
 
-      const minutes = Number(value);
+    if (mode === "late") {
+      $("attendanceDialogTitle").textContent = "Verspätung eintragen";
+      lateField.value = lateInput.value || "";
+    } else {
+      $("attendanceDialogTitle").textContent = "Abwesenheit eintragen";
 
-      if (!Number.isInteger(minutes) || minutes < 0) {
-        alert("Bitte eine gültige Anzahl ganzer Minuten eingeben.");
+      const savedReason = reasonInput.value || "";
+      const isFreeText = savedReason.startsWith("Freitext: ");
+
+      reasonField.value = isFreeText ? "Freitext" : savedReason;
+      freeTextField.value = isFreeText
+        ? savedReason.substring(10)
+        : "";
+
+      freeTextWrap.hidden = !isFreeText;
+    }
+
+    if (!dialog.open) dialog.showModal();
+  }
+
+  closeButton.onclick = closeDialog;
+  cancelButton.onclick = closeDialog;
+
+  reasonField.onchange = () => {
+    freeTextWrap.hidden = reasonField.value !== "Freitext";
+  };
+
+  saveDialogButton.onclick = () => {
+    if (!activeEntry) return;
+
+    const select = activeEntry.querySelector("[data-attendance-member]");
+    const lateInput = activeEntry.querySelector("[data-late-minutes-input]");
+    const reasonInput = activeEntry.querySelector("[data-excuse-reason]");
+    const subtitle = activeEntry.querySelector(".attendance-subtitle");
+    const badge = activeEntry.querySelector("[data-attendance-label]");
+
+    if (!lateArea.hidden) {
+      const minutes = Number(lateField.value);
+
+      if (!Number.isInteger(minutes) || minutes < 1) {
+        $("attendanceDialogTitle").textContent =
+          "Bitte gültige Verspätungsminuten eintragen";
         return;
       }
 
+      select.value = "late";
       lateInput.value = minutes;
       reasonInput.value = "";
 
-      subtitle.textContent = minutes > 0
-        ? `${minutes} Minuten verspätet`
-        : "Pünktlich";
-
-    } else if (select.value === "absent") {
-      const choice = prompt(
-        "Abwesenheitsgrund auswählen:\n1 = Krank\n2 = Urlaub\n3 = Feier\n4 = Abwesend\n5 = Freitext\n\nLeer lassen = unentschuldigt",
-        ""
-      );
-
-      if (choice === null) return;
-
-      const reasons = {
-        "1": "Krank",
-        "2": "Urlaub",
-        "3": "Feier",
-        "4": "Abwesend"
-      };
-
-      if (choice.trim() === "") {
-        reasonInput.value = "";
-      } else if (reasons[choice.trim()]) {
-        reasonInput.value = reasons[choice.trim()];
-      } else if (choice.trim() === "5") {
-        const freeText = prompt("Freitext zum Abwesenheitsgrund:", "");
-        if (freeText === null) return;
-        reasonInput.value = freeText.trim();
-      } else {
-        alert("Bitte 1, 2, 3, 4 oder 5 eingeben.");
-        return;
-      }
-
-      lateInput.value = "0";
-      subtitle.textContent = reasonInput.value || "Unentschuldigt";
+      subtitle.textContent = `${minutes} Minuten verspätet`;
+      badge.textContent = "Verspätet";
+      badge.style.color = "#f59e0b";
+      badge.style.background = "#493718";
 
     } else {
-      alert("Bitte zuerst nach rechts (anwesend) oder links (abwesend) wischen.");
-    }
-  };
-});
+      const reason = reasonField.value;
 
-  // Wischsteuerung
+      if (reason === "Freitext") {
+        const freeText = freeTextField.value.trim();
+
+        if (!freeText) {
+          $("attendanceDialogTitle").textContent =
+            "Bitte einen Freitext eintragen";
+          return;
+        }
+
+        reasonInput.value = `Freitext: ${freeText}`;
+      } else {
+        reasonInput.value = reason;
+      }
+
+      select.value = "absent";
+      lateInput.value = "0";
+
+      subtitle.textContent = reasonInput.value || "Unentschuldigt";
+      badge.textContent = "Abwesend";
+      badge.style.color = "#ef4444";
+      badge.style.background = "#592327";
+    }
+
+    closeDialog();
+  };
+
+  list.querySelectorAll("[data-attendance-details]").forEach(button => {
+    button.onclick = () => {
+      const entry = button.closest(".attendance-entry");
+      const select = entry.querySelector("[data-attendance-member]");
+
+      openDialog(entry, select.value === "absent" ? "absent" : "late");
+    };
+  });
+
   list.querySelectorAll(".attendance-entry").forEach(entry => {
     let startX = 0;
     let startY = 0;
@@ -1081,19 +1137,25 @@ list.querySelectorAll("[data-attendance-details]").forEach(button => {
       if (deltaX < 0) {
         select.value = "absent";
         lateInput.value = "0";
-        subtitle.textContent = reasonInput.value || "Abwesenheitsgrund noch offen";
+
         badge.textContent = "Abwesend";
         badge.style.color = "#ef4444";
         badge.style.background = "#592327";
+
+        subtitle.textContent = reasonInput.value || "Unentschuldigt";
+
+        openDialog(entry, "absent");
+
       } else {
         select.value = "present";
+        lateInput.value = "0";
         reasonInput.value = "";
-        subtitle.textContent = Number(lateInput.value) > 0
-          ? `${lateInput.value} Minuten verspätet`
-          : "Pünktlich";
+
         badge.textContent = "Anwesend";
         badge.style.color = "#22c55e";
         badge.style.background = "#183b2b";
+
+        subtitle.textContent = "Pünktlich";
       }
     }, { passive: true });
   });
