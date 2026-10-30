@@ -865,6 +865,7 @@ form.elements.locker_number.value = item.locker_number || "";
 }
   
   
+
 function renderAttendance() {
   const list = $("attendanceList");
   const saveButton = $("saveAttendance");
@@ -873,15 +874,13 @@ function renderAttendance() {
   if (!list) return;
 
   if (!admin()) {
-    list.innerHTML =
-      '<p class="muted">Die Anwesenheitserfassung ist nur für Betreuer und Administratoren verfügbar.</p>';
+    list.innerHTML = '<p class="muted">Nur Betreuer und Administratoren dürfen Anwesenheit erfassen.</p>';
     if (saveButton) saveButton.hidden = true;
     return;
   }
 
   if (!eventId) {
-    list.innerHTML =
-      '<p class="muted">Bitte zuerst einen Dienst auswählen.</p>';
+    list.innerHTML = '<p class="muted">Bitte zuerst einen Dienst auswählen.</p>';
     if (saveButton) saveButton.hidden = false;
     return;
   }
@@ -893,8 +892,7 @@ function renderAttendance() {
     .slice()
     .sort((a, b) =>
       `${a.last_name} ${a.first_name}`.localeCompare(
-        `${b.last_name} ${b.first_name}`,
-        "de"
+        `${b.last_name} ${b.first_name}`, "de"
       )
     )
     .map(member => {
@@ -905,28 +903,23 @@ function renderAttendance() {
 
       const status = record?.status || "";
       const lateMinutes = Number(record?.late_minutes || 0);
+      const reason = record?.excuse_reason || "";
 
-      let statusText = "Noch nicht erfasst";
-      let statusColor = "#6b7280";
-      let statusBackground = "#f3f4f6";
+      const present = status === "present";
+      const absent = status === "absent";
 
-      if (status === "present") {
-        statusText = "Anwesend";
-        statusColor = "#166534";
-        statusBackground = "#dcfce7";
-      } else if (status === "absent") {
-        statusText = "Abwesend";
-        statusColor = "#991b1b";
-        statusBackground = "#fee2e2";
-      } else if (status === "excused") {
-        statusText = "Entschuldigt";
-        statusColor = "#92400e";
-        statusBackground = "#fef3c7";
-      }
+      const statusText = present ? "Anwesend" :
+        absent ? "Abwesend" : "Noch nicht erfasst";
+
+      const statusColor = present ? "#22c55e" :
+        absent ? "#ef4444" : "#9ca3af";
+
+      const statusBackground = present ? "#183b2b" :
+        absent ? "#592327" : "#292d31";
 
       return `
         <div class="entry attendance-entry"
-             style="touch-action: pan-y;">
+             style="touch-action:pan-y;">
 
           <div class="icon">♙</div>
 
@@ -934,66 +927,118 @@ function renderAttendance() {
             <strong class="attendance-name">
               ${esc(member.first_name)} ${esc(member.last_name)}
             </strong>
+
             <small class="attendance-subtitle">
-              Nach rechts: anwesend · nach links: abwesend
+              ${present && lateMinutes > 0
+                ? `${lateMinutes} Minuten verspätet`
+                : absent && reason
+                  ? esc(reason)
+                  : "Wischen zum Erfassen"}
             </small>
 
-            <div
-              data-attendance-label
+            <div data-attendance-label
               style="
-                display: inline-block;
-                margin-top: 8px;
-                padding: 6px 10px;
-                border-radius: 8px;
-                font-weight: 600;
-                color: ${statusColor};
-                background: ${statusBackground};
-              "
-            >${statusText}</div>
+                display:inline-block;
+                margin-top:7px;
+                padding:6px 10px;
+                border-radius:8px;
+                font-weight:600;
+                color:${statusColor};
+                background:${statusBackground};
+              ">
+              ${statusText}
+            </div>
           </div>
 
           <div class="attendance-status">
             <select
-              id="attendance-${esc(member.id)}"
               data-attendance-member="${esc(member.id)}"
-              data-late-minutes="${lateMinutes}"
-              style="display: none !important;"
+              style="display:none!important;"
               aria-hidden="true"
-              tabindex="-1"
-            >
-              <option value="" ${status === "" ? "selected" : ""}>
-                Noch nicht erfasst
-              </option>
-              <option value="present" ${status === "present" ? "selected" : ""}>
-                Anwesend
-              </option>
-              <option value="absent" ${status === "absent" ? "selected" : ""}>
-                Abwesend
-              </option>
-              <option value="excused" ${status === "excused" ? "selected" : ""}>
-                Entschuldigt
-              </option>
+              tabindex="-1">
+              <option value="" ${status === "" ? "selected" : ""}></option>
+              <option value="present" ${present ? "selected" : ""}></option>
+              <option value="absent" ${absent ? "selected" : ""}></option>
             </select>
 
-            <label for="late-${esc(member.id)}">
-              Verspätung (Minuten)
-            </label>
+            <input
+              type="hidden"
+              data-late-minutes-input="${esc(member.id)}"
+              value="${lateMinutes || 0}">
 
             <input
-              id="late-${esc(member.id)}"
-              type="number"
-              min="1"
-              step="1"
-              value="${lateMinutes >= 1 ? lateMinutes : ""}"
-              data-late-minutes-input="${esc(member.id)}"
-              placeholder="Keine Verspätung"
-            />
+              type="hidden"
+              data-excuse-reason="${esc(member.id)}"
+              value="${esc(reason)}">
+
+            <button
+              type="button"
+              class="secondary"
+              data-attendance-details="${esc(member.id)}"
+              title="Verspätung oder Abwesenheitsgrund eintragen"
+              style="font-size:22px;padding:10px 13px;">
+              ◷
+            </button>
           </div>
         </div>
       `;
     })
     .join("") || '<p class="muted">Keine Mitglieder vorhanden.</p>';
 
+  // Uhr: Verspätung oder Abwesenheitsgrund
+  list.querySelectorAll("[data-attendance-details]").forEach(button => {
+    button.onclick = () => {
+      const memberId = button.dataset.attendanceDetails;
+      const entry = button.closest(".attendance-entry");
+      const select = entry.querySelector("[data-attendance-member]");
+      const lateInput = entry.querySelector("[data-late-minutes-input]");
+      const reasonInput = entry.querySelector("[data-excuse-reason]");
+
+      if (select.value === "present") {
+        const value = prompt(
+          "Verspätung in Minuten (0 = pünktlich):",
+          lateInput.value || "0"
+        );
+
+        if (value === null) return;
+
+        const minutes = Number(value);
+
+        if (!Number.isInteger(minutes) || minutes < 0) {
+          alert("Bitte eine gültige Anzahl ganzer Minuten eingeben.");
+          return;
+        }
+
+        lateInput.value = minutes;
+        reasonInput.value = "";
+      } else if (select.value === "absent") {
+        const value = prompt(
+          "Grund der Abwesenheit:",
+          reasonInput.value || ""
+        );
+
+        if (value === null) return;
+
+        reasonInput.value = value.trim();
+        lateInput.value = "0";
+      } else {
+        alert("Bitte zuerst nach rechts (anwesend) oder links (abwesend) wischen.");
+        return;
+      }
+
+      const subtitle = entry.querySelector(".attendance-subtitle");
+
+      if (select.value === "present") {
+        subtitle.textContent = Number(lateInput.value) > 0
+          ? `${lateInput.value} Minuten verspätet`
+          : "Pünktlich";
+      } else {
+        subtitle.textContent = reasonInput.value || "Kein Grund angegeben";
+      }
+    };
+  });
+
+  // Wischsteuerung
   list.querySelectorAll(".attendance-entry").forEach(entry => {
     let startX = 0;
     let startY = 0;
@@ -1004,50 +1049,37 @@ function renderAttendance() {
     }, { passive: true });
 
     entry.addEventListener("touchend", event => {
+      if (event.target.closest("button, input, select, label")) return;
+
       const deltaX = event.changedTouches[0].clientX - startX;
       const deltaY = event.changedTouches[0].clientY - startY;
 
-      if (
-        Math.abs(deltaX) < 60 ||
-        Math.abs(deltaX) < Math.abs(deltaY) ||
-        event.target.closest("select, input, button, label")
-      ) {
-        return;
-      }
+      if (Math.abs(deltaX) < 60 ||
+          Math.abs(deltaX) < Math.abs(deltaY)) return;
 
       const select = entry.querySelector("[data-attendance-member]");
       const lateInput = entry.querySelector("[data-late-minutes-input]");
+      const reasonInput = entry.querySelector("[data-excuse-reason]");
       const badge = entry.querySelector("[data-attendance-label]");
-
-      if (!select || !lateInput || !badge) return;
+      const subtitle = entry.querySelector(".attendance-subtitle");
 
       if (deltaX < 0) {
         select.value = "absent";
-        lateInput.value = "";
-        select.dataset.lateMinutes = "0";
+        lateInput.value = "0";
+        subtitle.textContent = reasonInput.value || "Abwesenheitsgrund noch offen";
+        badge.textContent = "Abwesend";
+        badge.style.color = "#ef4444";
+        badge.style.background = "#592327";
       } else {
         select.value = "present";
+        reasonInput.value = "";
+        subtitle.textContent = Number(lateInput.value) > 0
+          ? `${lateInput.value} Minuten verspätet`
+          : "Pünktlich";
+        badge.textContent = "Anwesend";
+        badge.style.color = "#22c55e";
+        badge.style.background = "#183b2b";
       }
-
-      const styles = {
-        present: {
-          text: "Anwesend",
-          color: "#166534",
-          background: "#dcfce7"
-        },
-        absent: {
-          text: "Abwesend",
-          color: "#991b1b",
-          background: "#fee2e2"
-        }
-      };
-
-      const display = styles[select.value];
-      if (!display) return;
-
-      badge.textContent = display.text;
-      badge.style.color = display.color;
-      badge.style.background = display.background;
     }, { passive: true });
   });
 }
