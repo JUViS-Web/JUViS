@@ -936,6 +936,50 @@ input[type="time"] {
       <option value="">Bitte Dienst auswählen</option>
     </select>
     <div id="attendanceList"></div>
+    <dialog id="attendanceDialog" class="juvis-dialog">
+  <div class="juvis-dialog-content">
+    <div class="juvis-dialog-header">
+      <div>
+        <h2 id="attendanceDialogTitle">Anwesenheit bearbeiten</h2>
+        <p id="attendanceDialogMember" class="muted"></p>
+      </div>
+      <button type="button" id="attendanceDialogClose"
+        class="secondary">✕</button>
+    </div>
+
+    <div id="attendanceDialogLate" hidden>
+      <label for="attendanceLateMinutes">Verspätung in Minuten</label>
+      <input id="attendanceLateMinutes" type="number"
+        min="1" step="1" placeholder="z. B. 10">
+    </div>
+
+    <div id="attendanceDialogAbsent" hidden>
+      <label for="attendanceExcuseReason">Abwesenheitsgrund</label>
+      <select id="attendanceExcuseReason">
+        <option value="">Unentschuldigt</option>
+        <option value="Krank">Krank</option>
+        <option value="Urlaub">Urlaub</option>
+        <option value="Feier">Feier</option>
+        <option value="Abwesend">Abwesend</option>
+        <option value="Freitext">Freitext</option>
+      </select>
+
+      <div id="attendanceFreeTextWrap" hidden>
+        <label for="attendanceFreeText">Eigener Grund</label>
+        <textarea id="attendanceFreeText"
+          placeholder="Grund eintragen"></textarea>
+      </div>
+    </div>
+
+    <div class="juvis-dialog-actions">
+      <button type="button" id="attendanceDialogCancel"
+        class="secondary">Abbrechen</button>
+      <button type="button" id="attendanceDialogSave">
+        Übernehmen
+      </button>
+    </div>
+  </div>
+</dialog>
     <button type="button" id="saveAttendance">Anwesenheit speichern</button>
     <p id="attendanceMessage" class="muted"></p>
   </div>
