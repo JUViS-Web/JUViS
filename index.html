@@ -655,6 +655,43 @@ input[type="time"] {
   color: var(--muted);
   font-size: 25px;
 }
+  
+/* Korrekturen für die Anwesenheit */
+.attendance-entry {
+  position: relative;
+  user-select: none;
+  touch-action: pan-y;
+}
+
+.attendance-status {
+  display: block !important;
+  width: 190px;
+  min-width: 140px;
+  flex-shrink: 0;
+}
+
+.attendance-status input[data-late-minutes-input] {
+  display: block !important;
+  width: 100%;
+  min-width: 0;
+  position: relative;
+  z-index: 2;
+  user-select: text;
+  touch-action: auto;
+  pointer-events: auto;
+  margin: 5px 0 10px;
+}
+
+.attendance-status select[data-attendance-member] {
+  display: none !important;
+}
+
+@media (max-width: 600px) {
+  .attendance-status {
+    width: 100%;
+    min-width: 0;
+  }
+}
 </style>
 </head>
 <body>
