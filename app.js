@@ -1438,6 +1438,7 @@ $("password").addEventListener("keydown", event => {
 
 $("nav").onclick = event => {
   const button = event.target.closest("[data-page]");
+
   if (button) {
     showPage(button.dataset.page);
 
@@ -1448,7 +1449,9 @@ $("nav").onclick = event => {
       $("navToggle").textContent = "☰ Menü";
     }
   }
-  $("eventList").addEventListener("click", event => {
+};
+
+$("eventList").addEventListener("click", event => {
   const button = event.target.closest("[data-open-service-book]");
   if (!button) return;
 
