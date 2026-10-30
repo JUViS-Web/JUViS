@@ -1375,93 +1375,99 @@ $("navToggle").addEventListener("click", () => {
   // Suche und Anwesenheit
   $("memberSearch").oninput = render;
   $("attendanceEvent").onchange = render;
+  
+$("saveAttendance").onclick = async () => {
+  if (!admin()) {
+    msg("Nur Betreuer und Administratoren dürfen Anwesenheit speichern.");
+    return;
+  }
 
-  $("saveAttendance").onclick = async () => {
-    if (!admin()) {
-      msg("Nur Betreuer und Administratoren dürfen Anwesenheit speichern.");
-      return;
-    }
+  const eventId = $("attendanceEvent").value;
 
-    const eventId = $("attendanceEvent").value;
+  if (!eventId) {
+    $("attendanceMessage").textContent =
+      "Bitte zuerst einen Dienst auswählen.";
+    return;
+  }
 
-    if (!eventId) {
-      $("attendanceMessage").textContent =
-        "Bitte zuerst einen Dienst auswählen.";
-      return;
-    }
+  const selects = [
+    ...document.querySelectorAll("[data-attendance-member]")
+  ];
 
-    const selects = [
-      ...document.querySelectorAll("[data-attendance-member]")
-    ];
+  if (!selects.length) {
+    $("attendanceMessage").textContent =
+      "Keine Mitglieder zum Speichern gefunden.";
+    return;
+  }
 
-    if (!selects.length) {
-      $("attendanceMessage").textContent =
-        "Keine Mitglieder zum Speichern gefunden.";
-      return;
-    }
+  const button = $("saveAttendance");
+  button.disabled = true;
+  $("attendanceMessage").textContent = "Anwesenheit wird gespeichert …";
 
-    const button = $("saveAttendance");
-    button.disabled = true;
-    $("attendanceMessage").textContent = "Anwesenheit wird gespeichert …";
+  try {
+    for (const select of selects) {
+      const memberId = select.dataset.attendanceMember;
+      const status = select.value;
 
-    try {
-      for (const select of selects) {
-        const memberId = select.dataset.attendanceMember;
-        const status = select.value;
-        const lateInput = document.querySelector(
-  `[data-late-minutes-input="${memberId}"]`
-);
-const lateMinutes = lateInput?.value.trim() === ""
-  ? 0
-  : Number(lateInput.value);
+      const lateInput = document.querySelector(
+        `[data-late-minutes-input="${memberId}"]`
+      );
 
-if (
-  !Number.isInteger(lateMinutes) ||
-  lateMinutes < 0 ||
-  (lateMinutes > 0 && status !== "present")
-) {
-  $("attendanceMessage").textContent =
-    "Bitte gib ganze Verspätungsminuten ab 1 ein. Verspätungen sind nur bei anwesenden Mitgliedern möglich.";
-  lateInput?.focus();
-  throw new Error("Bitte die Verspätungsangabe korrigieren.");
-}
+      const reasonInput = document.querySelector(
+        `[data-excuse-reason="${memberId}"]`
+      );
 
-        if (!status) {
-          const { error } = await sb
-            .from("attendance")
-            .delete()
-            .eq("event_id", eventId)
-            .eq("member_id", memberId);
+      const lateMinutes = Number(lateInput?.value || 0);
+      const excuseReason = reasonInput?.value.trim() || "";
 
-          if (error) throw error;
-          continue;
-        }
-
-        const { error } = await sb
-          .from("attendance")
-          .upsert({
-  event_id: eventId,
-  member_id: memberId,
-  status,
-  late_minutes: lateMinutes,
-  recorded_by: user.id
-}, {
-            onConflict: "event_id,member_id"
-          });
-
-        if (error) throw error;
+      if (
+        !Number.isInteger(lateMinutes) ||
+        lateMinutes < 0 ||
+        (lateMinutes > 0 && status !== "present")
+      ) {
+        throw new Error(
+          "Verspätungsminuten sind nur bei anwesenden Mitgliedern möglich."
+        );
       }
 
-      await load();
-      $("attendanceMessage").textContent =
-        "Anwesenheit erfolgreich gespeichert.";
-    } catch (error) {
-      $("attendanceMessage").textContent =
-        "Fehler beim Speichern: " + error.message;
-    } finally {
-      button.disabled = false;
+      if (!status) {
+        const { error } = await sb
+          .from("attendance")
+          .delete()
+          .eq("event_id", eventId)
+          .eq("member_id", memberId);
+
+        if (error) throw error;
+        continue;
+      }
+
+      const { error } = await sb
+        .from("attendance")
+        .upsert({
+          event_id: eventId,
+          member_id: memberId,
+          status,
+          late_minutes: lateMinutes,
+          excuse_reason: status === "absent" ? excuseReason : null,
+          recorded_by: user.id
+        }, {
+          onConflict: "event_id,member_id"
+        });
+
+      if (error) throw error;
     }
-  };
+
+    await load();
+    $("attendanceMessage").textContent =
+      "Anwesenheit erfolgreich gespeichert.";
+
+  } catch (error) {
+    $("attendanceMessage").textContent =
+      "Fehler beim Speichern: " + error.message;
+  } finally {
+    button.disabled = false;
+  }
+};
 
   // Bekleidung drucken
   $("printClothing").onclick = () => {
