@@ -1461,7 +1461,6 @@ $("eventList").addEventListener("click", event => {
   showPage("serviceBook");
   renderServiceBook();
 });
-};
 
 $("navToggle").addEventListener("click", () => {
   const layout = $("appLayout");
