@@ -83,6 +83,11 @@
   }
 
   function showPage(page) {
+    try {
+  localStorage.setItem("juvis_last_page", page);
+} catch (error) {
+  console.warn("Reiter konnte nicht gespeichert werden:", error);
+}
     if (page === "admin" && !isAdmin()) {
       msg("Du hast keine Berechtigung für die Administration.");
       return;
