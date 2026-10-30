@@ -1498,14 +1498,15 @@ $("saveAttendance").onclick = async () => {
       const excuseReason = reasonInput?.value.trim() || "";
 
       if (
-        !Number.isInteger(lateMinutes) ||
-        lateMinutes < 0 ||
-        (lateMinutes > 0 && status !== "present")
-      ) {
-        throw new Error(
-          "Verspätungsminuten sind nur bei anwesenden Mitgliedern möglich."
-        );
-      }
+  !Number.isInteger(lateMinutes) ||
+  lateMinutes < 0 ||
+  (status === "late" && lateMinutes < 1) ||
+  (status !== "late" && lateMinutes > 0)
+) {
+  throw new Error(
+    "Bitte prüfe den Anwesenheitsstatus und die Verspätungsminuten."
+  );
+}
 
       if (!status) {
         const { error } = await sb
