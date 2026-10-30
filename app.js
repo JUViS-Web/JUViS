@@ -986,77 +986,72 @@ function renderAttendance() {
     .join("") || '<p class="muted">Keine Mitglieder vorhanden.</p>';
 
   // Uhr: Verspätung oder Abwesenheitsgrund
-  list.querySelectorAll("[data-attendance-details]").forEach(button => {
-    button.onclick = () => {
-      const memberId = button.dataset.attendanceDetails;
-      const entry = button.closest(".attendance-entry");
-      const select = entry.querySelector("[data-attendance-member]");
-      const lateInput = entry.querySelector("[data-late-minutes-input]");
-      const reasonInput = entry.querySelector("[data-excuse-reason]");
+list.querySelectorAll("[data-attendance-details]").forEach(button => {
+  button.onclick = () => {
+    const entry = button.closest(".attendance-entry");
+    const select = entry.querySelector("[data-attendance-member]");
+    const lateInput = entry.querySelector("[data-late-minutes-input]");
+    const reasonInput = entry.querySelector("[data-excuse-reason]");
+    const subtitle = entry.querySelector(".attendance-subtitle");
 
-      if (select.value === "present") {
-        const value = prompt(
-          "Verspätung in Minuten (0 = pünktlich):",
-          lateInput.value || "0"
-        );
+    if (select.value === "present") {
+      const value = prompt(
+        "Verspätung in Minuten (0 = pünktlich):",
+        lateInput.value || "0"
+      );
 
-        if (value === null) return;
+      if (value === null) return;
 
-        const minutes = Number(value);
+      const minutes = Number(value);
 
-        if (!Number.isInteger(minutes) || minutes < 0) {
-          alert("Bitte eine gültige Anzahl ganzer Minuten eingeben.");
-          return;
-        }
-
-        lateInput.value = minutes;
-        reasonInput.value = "";
-      } else if (select.value === "absent") {
-        const value = prompt(
-          const choice = prompt(
-  "Abwesenheitsgrund auswählen:\n1 = Krank\n2 = Urlaub\n3 = Feier\n4 = Abwesend\n5 = Freitext\n\nLeer lassen = unentschuldigt",
-  ""
-);
-
-if (choice === null) return;
-
-const reasons = {
-  "1": "Krank",
-  "2": "Urlaub",
-  "3": "Feier",
-  "4": "Abwesend"
-};
-
-if (choice.trim() === "") {
-  reasonInput.value = "";
-} else if (reasons[choice.trim()]) {
-  reasonInput.value = reasons[choice.trim()];
-} else if (choice.trim() === "5") {
-  const freeText = prompt("Freitext zum Abwesenheitsgrund:", "");
-  if (freeText === null) return;
-  reasonInput.value = freeText.trim();
-} else {
-  alert("Bitte 1, 2, 3, 4 oder 5 eingeben.");
-  return;
-}
-
-lateInput.value = "0";
-      } else {
-        alert("Bitte zuerst nach rechts (anwesend) oder links (abwesend) wischen.");
+      if (!Number.isInteger(minutes) || minutes < 0) {
+        alert("Bitte eine gültige Anzahl ganzer Minuten eingeben.");
         return;
       }
 
-      const subtitle = entry.querySelector(".attendance-subtitle");
+      lateInput.value = minutes;
+      reasonInput.value = "";
 
-      if (select.value === "present") {
-        subtitle.textContent = Number(lateInput.value) > 0
-          ? `${lateInput.value} Minuten verspätet`
-          : "Pünktlich";
+      subtitle.textContent = minutes > 0
+        ? `${minutes} Minuten verspätet`
+        : "Pünktlich";
+
+    } else if (select.value === "absent") {
+      const choice = prompt(
+        "Abwesenheitsgrund auswählen:\n1 = Krank\n2 = Urlaub\n3 = Feier\n4 = Abwesend\n5 = Freitext\n\nLeer lassen = unentschuldigt",
+        ""
+      );
+
+      if (choice === null) return;
+
+      const reasons = {
+        "1": "Krank",
+        "2": "Urlaub",
+        "3": "Feier",
+        "4": "Abwesend"
+      };
+
+      if (choice.trim() === "") {
+        reasonInput.value = "";
+      } else if (reasons[choice.trim()]) {
+        reasonInput.value = reasons[choice.trim()];
+      } else if (choice.trim() === "5") {
+        const freeText = prompt("Freitext zum Abwesenheitsgrund:", "");
+        if (freeText === null) return;
+        reasonInput.value = freeText.trim();
       } else {
-        subtitle.textContent = reasonInput.value || "Kein Grund angegeben";
+        alert("Bitte 1, 2, 3, 4 oder 5 eingeben.");
+        return;
       }
-    };
-  });
+
+      lateInput.value = "0";
+      subtitle.textContent = reasonInput.value || "Unentschuldigt";
+
+    } else {
+      alert("Bitte zuerst nach rechts (anwesend) oder links (abwesend) wischen.");
+    }
+  };
+});
 
   // Wischsteuerung
   list.querySelectorAll(".attendance-entry").forEach(entry => {
