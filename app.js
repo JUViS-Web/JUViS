@@ -1160,7 +1160,100 @@ function renderAttendance() {
     }, { passive: true });
   });
 }
-  
+
+async function renderServiceBook() {
+  const eventId = window.currentServiceBookEventId;
+
+  const title = $("serviceBookTitle");
+  const info = $("serviceBookInfo");
+  const attendance = $("serviceBookAttendance");
+  const entries = $("serviceBookEntries");
+  const form = $("serviceBookForm");
+
+  if (!eventId) {
+    title.textContent = "Kein Dienst ausgewählt";
+    return;
+  }
+
+  if (!admin()) {
+    info.textContent = "Nur Betreuer und Administratoren dürfen das Dienstbuch öffnen.";
+    form.hidden = true;
+    return;
+  }
+
+  form.hidden = false;
+
+  const service = cache.events.find(
+    event => String(event.id) === String(eventId)
+  );
+
+  if (!service) {
+    title.textContent = "Dienst nicht gefunden";
+    return;
+  }
+
+  title.textContent = service.title;
+
+  info.textContent =
+    `${new Date(service.starts_at).toLocaleString("de-DE")}` +
+    (service.location ? ` · ${service.location}` : "");
+
+  attendance.innerHTML = cache.members
+    .filter(member => !member.leave_date)
+    .slice()
+    .sort((a, b) =>
+      `${a.last_name} ${a.first_name}`.localeCompare(
+        `${b.last_name} ${b.first_name}`, "de"
+      )
+    )
+    .map(member => {
+      const record = cache.attendance.find(entry =>
+        String(entry.event_id) === String(eventId) &&
+        String(entry.member_id) === String(member.id)
+      );
+
+      const status = record?.status || "present";
+
+      const text = status === "late"
+        ? `Verspätet (${record.late_minutes || 0} Min.)`
+        : status === "absent"
+          ? `Abwesend – ${record.excuse_reason || "Unentschuldigt"}`
+          : "Anwesend";
+
+      return `
+        <div class="entry">
+          <div class="grow">
+            <strong>${esc(member.first_name)} ${esc(member.last_name)}</strong>
+            <small>${esc(text)}</small>
+          </div>
+        </div>
+      `;
+    })
+    .join("") || '<p class="muted">Keine Mitglieder vorhanden.</p>';
+
+  entries.textContent = "Dienstbucheinträge werden geladen …";
+
+  const { data, error } = await sb
+    .from("service_book_entries")
+    .select("*")
+    .eq("event_id", eventId)
+    .order("created_at", { ascending: false });
+
+  if (error) {
+    entries.textContent = "Fehler beim Laden: " + error.message;
+    return;
+  }
+
+  entries.innerHTML = (data || []).map(entry => `
+    <div class="entry">
+      <div class="grow">
+        <small>${esc(new Date(entry.created_at).toLocaleString("de-DE"))}</small>
+        <p style="white-space:pre-wrap;">${esc(entry.entry)}</p>
+      </div>
+    </div>
+  `).join("") || '<p class="muted">Noch keine Einträge vorhanden.</p>';
+}
+
 function bindEditMemberButtons() {
   document.querySelectorAll("[data-edit-member]").forEach(button => {
     button.onclick = () => {
