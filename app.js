@@ -816,6 +816,35 @@ function renderCalendar() {
   }
 }
 
+  $("addEventButton").onclick = () => {
+  $("eventFormPanel").classList.remove("hidden");
+};
+
+$("closeEventForm").onclick = () => {
+  $("eventFormPanel").classList.add("hidden");
+};
+
+$("calendarPrevious").onclick = () => {
+  if (calendarMode === "week") {
+    calendarDate.setDate(calendarDate.getDate() - 7);
+  }
+  renderCalendar();
+};
+
+$("calendarNext").onclick = () => {
+  if (calendarMode === "week") {
+    calendarDate.setDate(calendarDate.getDate() + 7);
+  }
+  renderCalendar();
+};
+
+document.querySelectorAll("[data-calendar-mode]").forEach(button => {
+  button.onclick = () => {
+    calendarMode = button.dataset.calendarMode;
+    renderCalendar();
+  };
+});
+  
 function setupClothingSizes() {
   const itemSelect = $("clothingItem");
   const sizeSelect = $("clothingSize");
