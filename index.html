@@ -1062,6 +1062,49 @@ input[type="time"] {
   </div>
 </section>
 
+    <section id="absences" class="page hidden">
+  <div class="panel">
+    <h2>Fehlzeitenübersicht</h2>
+    <p class="muted">
+      Übersicht aller erfassten Abwesenheiten.
+    </p>
+
+    <div class="form-grid">
+      <div>
+        <label for="absenceMemberFilter">Mitglied</label>
+        <select id="absenceMemberFilter">
+          <option value="">Alle Mitglieder</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="absenceReasonFilter">Abwesenheitsgrund</label>
+        <select id="absenceReasonFilter">
+          <option value="">Alle Gründe</option>
+          <option value="Unentschuldigt">Unentschuldigt</option>
+          <option value="Krank">Krank</option>
+          <option value="Urlaub">Urlaub</option>
+          <option value="Feier">Feier</option>
+          <option value="Abwesend">Abwesend</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="absenceFrom">Von</label>
+        <input type="date" id="absenceFrom">
+      </div>
+
+      <div>
+        <label for="absenceTo">Bis</label>
+        <input type="date" id="absenceTo">
+      </div>
+    </div>
+
+    <div id="absenceSummary"></div>
+    <div id="absenceList"></div>
+  </div>
+</section>
+
 <section id="serviceBook" class="page hidden">
   <div class="panel">
     <button type="button" class="secondary" id="serviceBookBack">
