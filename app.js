@@ -674,29 +674,7 @@ if (clothingMember) {
       }).join("") ||
       '<p class="muted">Noch keine Auszeichnungen eingetragen.</p>';
 
-    $("eventList").innerHTML =
-  cache.events.map(event => `
-    <div class="entry">
-      <div class="icon">▣</div>
-      <div class="grow">
-        <b>${esc(event.title)}</b>
-        <small>
-          ${esc(new Date(event.starts_at).toLocaleString("de-DE"))}
-          ${event.location ? " · " + esc(event.location) : ""}
-          <br>${esc(event.description || "")}
-        </small>
-        <button
-          type="button"
-          class="secondary"
-          data-open-service-book="${esc(event.id)}"
-          style="margin-top:10px;">
-          Dienstbuch öffnen
-        </button>
-      </div>
-      ${removeButton("events", event.id)}
-    </div>
-  `).join("") ||
-  '<p class="muted">Keine Dienste vorhanden.</p>';
+    renderCalendar();
 
     $("clothingList").innerHTML =
       cache.clothing.map(item => {
