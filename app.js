@@ -1410,7 +1410,7 @@ async function renderAbsences() {
     </p>
   `;
 
-  list.innerHTML = absences.map(item => {
+    list.innerHTML = absences.map(item => {
     const reason = item.excuse_reason || "Unentschuldigt";
     const isUnexcused = reason === "Unentschuldigt";
 
@@ -1420,9 +1420,24 @@ async function renderAbsences() {
           <strong>${esc(item.first_name)} ${esc(item.last_name)}</strong>
           <small>${esc(item.event_title)}</small>
           <small>${esc(new Date(item.event_date).toLocaleDateString("de-DE"))}</small>
+
           <p style="color:${isUnexcused ? "#ef4444" : "inherit"};">
             ${esc(reason)}
           </p>
+
+          <select data-absence-reason="${esc(item.id)}">
+            <option value="">Bitte Grund auswählen</option>
+            <option value="Krank">Krank</option>
+            <option value="Urlaub">Urlaub</option>
+            <option value="Feier">Feier</option>
+            <option value="Abwesend">Abwesend</option>
+            <option value="Unentschuldigt">Unentschuldigt</option>
+          </select>
+
+          <button type="button" class="tiny"
+            data-save-absence="${esc(item.id)}">
+            Grund speichern
+          </button>
         </div>
       </div>
     `;
