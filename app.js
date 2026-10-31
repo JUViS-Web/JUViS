@@ -1323,6 +1323,107 @@ async function renderServiceBook() {
   }
 }
 
+async function renderAbsences() {
+  const list = $("absenceList");
+  const summary = $("absenceSummary");
+  const memberFilter = $("absenceMemberFilter");
+  const reasonFilter = $("absenceReasonFilter");
+  const fromFilter = $("absenceFrom");
+  const toFilter = $("absenceTo");
+
+  if (!admin()) {
+    list.textContent = "Nur Betreuer und Administratoren dürfen die Fehlzeiten einsehen.";
+    return;
+  }
+
+  const selectedMember = memberFilter.value;
+
+  memberFilter.innerHTML =
+    '<option value="">Alle Mitglieder</option>' +
+    cache.members
+      .filter(member => !member.leave_date)
+      .slice()
+      .sort((a, b) =>
+        `${a.last_name} ${a.first_name}`.localeCompare(
+          `${b.last_name} ${b.first_name}`, "de"
+        )
+      )
+      .map(member => `
+        <option value="${esc(member.id)}">
+          ${esc(member.first_name)} ${esc(member.last_name)}
+        </option>
+      `).join("");
+
+  memberFilter.value = selectedMember;
+
+  list.textContent = "Fehlzeiten werden geladen …";
+
+  const { data, error } = await sb
+    .from("service_book_absences")
+    .select("*")
+    .order("event_date", { ascending: false });
+
+  if (error) {
+    list.textContent = "Fehler beim Laden: " + error.message;
+    return;
+  }
+
+  let absences = data || [];
+
+  if (memberFilter.value) {
+    absences = absences.filter(item =>
+      String(item.member_id) === String(memberFilter.value)
+    );
+  }
+
+  if (reasonFilter.value) {
+    absences = absences.filter(item =>
+      (item.excuse_reason || "Unentschuldigt") === reasonFilter.value
+    );
+  }
+
+  if (fromFilter.value) {
+    absences = absences.filter(item =>
+      item.event_date >= fromFilter.value
+    );
+  }
+
+  if (toFilter.value) {
+    absences = absences.filter(item =>
+      item.event_date.slice(0, 10) <= toFilter.value
+    );
+  }
+
+  const unexcused = absences.filter(item =>
+    !item.excuse_reason || item.excuse_reason === "Unentschuldigt"
+  ).length;
+
+  summary.innerHTML = `
+    <p><strong>${absences.length}</strong> Fehlzeiten insgesamt</p>
+    <p style="color:#ef4444;">
+      <strong>${unexcused}</strong> unentschuldigte Fehlzeiten
+    </p>
+  `;
+
+  list.innerHTML = absences.map(item => {
+    const reason = item.excuse_reason || "Unentschuldigt";
+    const isUnexcused = reason === "Unentschuldigt";
+
+    return `
+      <div class="entry">
+        <div class="grow">
+          <strong>${esc(item.first_name)} ${esc(item.last_name)}</strong>
+          <small>${esc(item.event_title)}</small>
+          <small>${esc(new Date(item.event_date).toLocaleDateString("de-DE"))}</small>
+          <p style="color:${isUnexcused ? "#ef4444" : "inherit"};">
+            ${esc(reason)}
+          </p>
+        </div>
+      </div>
+    `;
+  }).join("") || '<p class="muted">Keine Fehlzeiten gefunden.</p>';
+}
+  
 $("serviceBookForm").addEventListener("submit", async event => {
   event.preventDefault();
 
