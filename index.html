@@ -1093,8 +1093,32 @@ input[type="time"] {
 
       <button type="submit">Eintrag speichern</button>
     </form>
-
+    
     <p id="serviceBookMessage" class="muted"></p>
+  </div>
+
+  <div class="panel">
+    <h2>Mitgliedsvermerke zu diesem Dienst</h2>
+    <div id="serviceBookMemberNotes"></div>
+
+    <form id="serviceBookMemberNoteForm">
+      <label for="serviceBookNoteMember">Mitglied</label>
+      <select id="serviceBookNoteMember" required>
+        <option value="">Mitglied auswählen</option>
+      </select>
+
+      <label for="serviceBookNoteText">Vermerk</label>
+      <textarea
+        id="serviceBookNoteText"
+        rows="3"
+        required
+        placeholder="Zum Beispiel: Hat besonders gut mitgearbeitet."
+      ></textarea>
+
+      <button type="submit">Vermerk speichern</button>
+    </form>
+
+    <p id="serviceBookNoteMessage" class="muted"></p>
   </div>
 </section>
     
