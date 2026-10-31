@@ -2100,6 +2100,11 @@ showPage(lastPage);
   const button = $("authSubmit");
   button.disabled = true;
 
+      if (!sb) {
+    msg("Supabase ist noch nicht initialisiert. Bitte Seite neu laden.", true);
+    return;
+  }
+
   try {
     const { data, error } = await sb.functions.invoke(
       "juvis-username-login",
