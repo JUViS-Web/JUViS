@@ -1412,6 +1412,73 @@ $("serviceBookMemberNoteForm").addEventListener("submit", async event => {
   }
 });
 
+$("serviceBookEntries").addEventListener("click", async event => {
+  const editButton = event.target.closest("[data-edit-service-entry]");
+  const deleteButton = event.target.closest("[data-delete-service-entry]");
+
+  if (!editButton && !deleteButton) return;
+  if (!admin()) return;
+
+  const id = editButton
+    ? editButton.dataset.editServiceEntry
+    : deleteButton.dataset.deleteServiceEntry;
+
+  const message = $("serviceBookMessage");
+
+  if (editButton) {
+    const { data, error } = await sb
+      .from("service_book_entries")
+      .select("entry")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      message.textContent = "Fehler: " + error.message;
+      return;
+    }
+
+    const updated = prompt("Dienstbucheintrag bearbeiten:", data.entry);
+
+    if (updated === null) return;
+
+    if (!updated.trim()) {
+      message.textContent = "Der Eintrag darf nicht leer sein.";
+      return;
+    }
+
+    const { error: updateError } = await sb
+      .from("service_book_entries")
+      .update({
+        entry: updated.trim(),
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", id);
+
+    if (updateError) {
+      message.textContent = "Fehler: " + updateError.message;
+      return;
+    }
+
+    message.textContent = "Eintrag erfolgreich geändert.";
+  } else {
+    if (!confirm("Dienstbucheintrag wirklich löschen?")) return;
+
+    const { error } = await sb
+      .from("service_book_entries")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      message.textContent = "Fehler: " + error.message;
+      return;
+    }
+
+    message.textContent = "Eintrag erfolgreich gelöscht.";
+  }
+
+  await renderServiceBook();
+});
+  
 $("serviceBookMemberNotes").addEventListener("click", async event => {
   const editButton = event.target.closest("[data-edit-service-note]");
   const deleteButton = event.target.closest("[data-delete-service-note]");
