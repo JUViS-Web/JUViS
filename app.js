@@ -2154,6 +2154,9 @@ showPage(lastPage);
     }
 
     sb = window.supabase.createClient(
+      $("authMessage").textContent =
+  "Diagnose: Supabase-Client wurde erstellt. Client vorhanden: " + !!sb;
+$("authMessage").classList.remove("hidden");
       cfg.SUPABASE_URL,
       cfg.SUPABASE_ANON_KEY
     );
