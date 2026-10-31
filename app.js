@@ -2133,7 +2133,8 @@ showPage(lastPage);
     if (!configured || !window.supabase) {
       $("authView").classList.remove("hidden");
       $("authMessage").textContent =
-        "Noch nicht konfiguriert: Öffne config.js und trage die Supabase-Projekt-URL sowie den anon/public key ein. Danach schema.sql im Supabase SQL Editor ausführen.";
+  "Diagnose: configured = " + configured +
+  " | Supabase-Bibliothek geladen = " + !!window.supabase;
       $("authMessage").classList.remove("hidden");
       $("authSubmit").disabled = true;
       return;
