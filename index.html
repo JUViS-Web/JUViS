@@ -972,15 +972,32 @@ input[type="time"] {
       <label>Diensttitel</label>
       <input name="title" required>
       <div class="row">
-        <div>
-          <label>Datum und Uhrzeit</label>
-          <input name="starts_at" type="datetime-local" required>
-        </div>
-        <div>
-          <label>Ort</label>
-          <input name="location">
-        </div>
-      </div>
+        <div class="row">
+  <div>
+    <label>Beginn</label>
+    <input name="starts_at" type="datetime-local" required>
+  </div>
+  <div>
+    <label>Ende</label>
+    <input name="ends_at" type="datetime-local" required>
+  </div>
+</div>
+
+<div class="row">
+  <div>
+    <label>Ort</label>
+    <input name="location">
+  </div>
+  <div>
+    <label>Terminfarbe</label>
+    <input
+      name="color"
+      type="color"
+      value="#c62828"
+      required
+    >
+  </div>
+</div>
       <label>Beschreibung</label>
       <textarea name="description" rows="2"></textarea>
       <button>Dienst speichern</button>
