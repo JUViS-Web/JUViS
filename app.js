@@ -1,3 +1,4 @@
+alert("JUVIS: app.js wurde geladen");
 (() => {
   const cfg = window.JUVIS_CONFIG || {};
   const configured =
