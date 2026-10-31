@@ -2143,6 +2143,11 @@ showPage(lastPage);
       cfg.SUPABASE_URL,
       cfg.SUPABASE_ANON_KEY
     );
+console.log("JUVIS-Diagnose:", {
+  configured,
+  supabaseLibrary: !!window.supabase,
+  clientCreated: !!sb
+});
 
     const { data, error } = await sb.auth.getSession();
 
