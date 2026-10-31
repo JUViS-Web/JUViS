@@ -2143,6 +2143,7 @@ showPage(lastPage);
   async function boot() {
     console.log("JUVIS boot gestartet");
     if (!configured || !window.supabase) {
+     msg("Diagnose: boot() gestartet. configured = " + configured + " | Supabase = " + !!window.supabase, true);
       $("authView").classList.remove("hidden");
       $("authMessage").textContent =
   "Diagnose: configured = " + configured +
