@@ -1251,6 +1251,65 @@ async function renderServiceBook() {
       </div>
     </div>
   `).join("") || '<p class="muted">Noch keine Einträge vorhanden.</p>';
+  const noteMember = $("serviceBookNoteMember");
+  const noteList = $("serviceBookMemberNotes");
+
+  if (noteMember && noteList) {
+    const selectedMember = noteMember.value;
+
+    noteMember.innerHTML =
+      '<option value="">Mitglied auswählen</option>' +
+      cache.members
+        .filter(member => !member.leave_date)
+        .slice()
+        .sort((a, b) =>
+          `${a.last_name} ${a.first_name}`.localeCompare(
+            `${b.last_name} ${b.first_name}`, "de"
+          )
+        )
+        .map(member => `
+          <option value="${esc(member.id)}">
+            ${esc(member.first_name)} ${esc(member.last_name)}
+          </option>
+        `).join("");
+
+    noteMember.value = selectedMember;
+
+    noteList.textContent = "Mitgliedsvermerke werden geladen …";
+
+    const { data: notes, error: notesError } = await sb
+      .from("service_book_member_notes")
+      .select("*")
+      .eq("event_id", eventId)
+      .order("created_at", { ascending: false });
+
+    if (notesError) {
+      noteList.textContent =
+        "Fehler beim Laden: " + notesError.message;
+    } else {
+      noteList.innerHTML = (notes || []).map(note => {
+        const member = cache.members.find(
+          item => String(item.id) === String(note.member_id)
+        );
+
+        return `
+          <div class="entry">
+            <div class="grow">
+              <strong>${member
+                ? esc(member.first_name + " " + member.last_name)
+                : "Unbekanntes Mitglied"}</strong>
+              <small>${esc(new Date(note.created_at).toLocaleString("de-DE"))}</small>
+              <p style="white-space:pre-wrap;">${esc(note.note)}</p>
+            </div>
+            <button type="button" class="tiny"
+              data-edit-service-note="${esc(note.id)}">Bearbeiten</button>
+            <button type="button" class="tiny"
+              data-delete-service-note="${esc(note.id)}">Löschen</button>
+          </div>
+        `;
+      }).join("") || '<p class="muted">Noch keine Mitgliedsvermerke vorhanden.</p>';
+    }
+  }
 }
 
 $("serviceBookForm").addEventListener("submit", async event => {
