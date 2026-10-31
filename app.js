@@ -1703,6 +1703,7 @@ const allowedPages = [
   "home",
   "members",
   "events",
+  "absences",
   "serviceBook",
   "fegedienst",
   "clothing",
