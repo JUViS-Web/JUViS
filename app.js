@@ -740,6 +740,82 @@ if (clothingMember) {
     renderFegedienst();
   }
 
+  let calendarMode = "week";
+let calendarDate = new Date();
+
+function renderCalendar() {
+  const container = $("calendarView");
+  if (!container) return;
+
+  const events = [...cache.events].sort(
+    (a, b) => new Date(a.starts_at) - new Date(b.starts_at)
+  );
+
+  const date = new Date(calendarDate);
+  const monday = new Date(date);
+  monday.setDate(date.getDate() - ((date.getDay() + 6) % 7));
+  monday.setHours(0, 0, 0, 0);
+
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const day = new Date(monday);
+    day.setDate(monday.getDate() + i);
+    return day;
+  });
+
+  const title = $("calendarTitle");
+
+  if (calendarMode === "week") {
+    title.textContent =
+      `${monday.toLocaleDateString("de-DE")} – ` +
+      `${days[6].toLocaleDateString("de-DE")}`;
+
+    container.innerHTML = `
+      <div style="display:grid;grid-template-columns:55px repeat(7,minmax(110px,1fr));overflow-x:auto;">
+        <div></div>
+        ${days.map(day => `
+          <div style="text-align:center;padding:8px;border-bottom:1px solid #888;">
+            <b>${day.toLocaleDateString("de-DE", { weekday: "short" })}</b><br>
+            ${day.getDate()}.${day.getMonth() + 1}.
+          </div>
+        `).join("")}
+        <div>
+          ${Array.from({length:18},(_,i)=>`
+            <div style="height:60px;font-size:12px;">${String(i+6).padStart(2,"0")}:00</div>
+          `).join("")}
+        </div>
+        ${days.map(day => `
+          <div style="position:relative;height:1080px;border-left:1px solid #888;">
+            ${Array.from({length:18},(_,i)=>`
+              <div style="position:absolute;top:${i*60}px;width:100%;border-top:1px solid #ddd;"></div>
+            `).join("")}
+            ${events.filter(event => {
+              const start = new Date(event.starts_at);
+              return start.toDateString() === day.toDateString();
+            }).map(event => {
+              const start = new Date(event.starts_at);
+              const end = event.ends_at
+                ? new Date(event.ends_at)
+                : new Date(start.getTime() + 2*60*60*1000);
+              const top = (start.getHours() + start.getMinutes()/60 - 6) * 60;
+              const height = Math.max(25, (end-start)/60000);
+              return `
+                <div style="position:absolute;top:${top}px;height:${height}px;left:3px;right:3px;background:${esc(event.color || "#c62828")};color:white;border-radius:5px;padding:4px;font-size:12px;overflow:hidden;">
+                  <b>${esc(event.title)}</b><br>
+                  ${start.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})}
+                  –
+                  ${end.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})}
+                  <br>
+                  <button type="button" data-open-service-book="${esc(event.id)}">Dienstbuch</button>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        `).join("")}
+      </div>
+    `;
+  }
+}
+
 function setupClothingSizes() {
   const itemSelect = $("clothingItem");
   const sizeSelect = $("clothingSize");
