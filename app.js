@@ -1442,6 +1442,41 @@ async function renderAbsences() {
       </div>
     `;
   }).join("") || '<p class="muted">Keine Fehlzeiten gefunden.</p>';
+    list.querySelectorAll("[data-save-absence]").forEach(button => {
+    button.addEventListener("click", async () => {
+      const absenceId = button.dataset.saveAbsence;
+      const select = list.querySelector(
+        `[data-absence-reason="${absenceId}"]`
+      );
+
+      const reason = select.value;
+
+      if (!reason) {
+        alert("Bitte zuerst einen Abwesenheitsgrund auswählen.");
+        return;
+      }
+
+      button.disabled = true;
+      button.textContent = "Wird gespeichert …";
+
+      try {
+        const { error } = await sb
+          .from("attendance")
+          .update({
+            excuse_reason: reason
+          })
+          .eq("id", absenceId);
+
+        if (error) throw error;
+
+        await renderAbsences();
+      } catch (error) {
+        alert("Fehler beim Speichern: " + error.message);
+        button.disabled = false;
+        button.textContent = "Grund speichern";
+      }
+    });
+  });
 }
   
 $("serviceBookForm").addEventListener("submit", async event => {
