@@ -2404,20 +2404,30 @@ await load();
   };
 
   $("eventForm").onsubmit = async event => {
-    event.preventDefault();
+  event.preventDefault();
 
-    const form = event.target;
-    const data = formObj(form);
+  const form = event.target;
+  const data = formObj(form);
 
-    const saved = await add("events", {
-      title: data.title,
-      starts_at: new Date(data.starts_at).toISOString(),
-      location: data.location || null,
-      description: data.description || null
-    });
+  const startsAt = new Date(data.starts_at);
+  const endsAt = new Date(data.ends_at);
 
-    if (saved) form.reset();
-  };
+  if (endsAt <= startsAt) {
+    alert("Die Endzeit muss nach der Anfangszeit liegen.");
+    return;
+  }
+
+  const saved = await add("events", {
+    title: data.title,
+    starts_at: startsAt.toISOString(),
+    ends_at: endsAt.toISOString(),
+    location: data.location || null,
+    description: data.description || null,
+    color: data.color || "#c62828"
+  });
+
+  if (saved) form.reset();
+};
 
 function setupFegedienstForm() {
   const nobody = $("fegedienstNobody");
