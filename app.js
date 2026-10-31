@@ -907,16 +907,26 @@ $("closeEventForm").onclick = () => {
 };
 
 $("calendarPrevious").onclick = () => {
-  if (calendarMode === "week") {
+  if (calendarMode === "day") {
+    calendarDate.setDate(calendarDate.getDate() - 1);
+  } else if (calendarMode === "week") {
     calendarDate.setDate(calendarDate.getDate() - 7);
+  } else {
+    calendarDate.setMonth(calendarDate.getMonth() - 1);
   }
+
   renderCalendar();
 };
 
 $("calendarNext").onclick = () => {
-  if (calendarMode === "week") {
+  if (calendarMode === "day") {
+    calendarDate.setDate(calendarDate.getDate() + 1);
+  } else if (calendarMode === "week") {
     calendarDate.setDate(calendarDate.getDate() + 7);
+  } else {
+    calendarDate.setMonth(calendarDate.getMonth() + 1);
   }
+
   renderCalendar();
 };
 
