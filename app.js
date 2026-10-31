@@ -697,7 +697,6 @@ if (clothingMember) {
     </div>
   `).join("") ||
   '<p class="muted">Keine Dienste vorhanden.</p>';
-}
 
     $("clothingList").innerHTML =
       cache.clothing.map(item => {
