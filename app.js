@@ -1353,6 +1353,54 @@ $("serviceBookForm").addEventListener("submit", async event => {
   }
 });
 
+$("serviceBookMemberNoteForm").addEventListener("submit", async event => {
+  event.preventDefault();
+
+  if (!admin()) return;
+
+  const memberId = $("serviceBookNoteMember").value;
+  const noteInput = $("serviceBookNoteText");
+  const message = $("serviceBookNoteMessage");
+  const button = $("serviceBookMemberNoteForm").querySelector(
+    'button[type="submit"]'
+  );
+
+  const note = noteInput.value.trim();
+  const eventId = window.currentServiceBookEventId;
+
+  if (!memberId || !note || !eventId) {
+    message.textContent = "Bitte Mitglied und Vermerk angeben.";
+    return;
+  }
+
+  button.disabled = true;
+  message.textContent = "Vermerk wird gespeichert …";
+
+  try {
+    const { error } = await sb
+      .from("service_book_member_notes")
+      .insert({
+        event_id: eventId,
+        member_id: memberId,
+        note: note,
+        created_by: user.id,
+        updated_by: user.id
+      });
+
+    if (error) throw error;
+
+    noteInput.value = "";
+    $("serviceBookNoteMember").value = "";
+    message.textContent = "Vermerk erfolgreich gespeichert.";
+
+    await renderServiceBook();
+  } catch (error) {
+    message.textContent = "Fehler beim Speichern: " + error.message;
+  } finally {
+    button.disabled = false;
+  }
+});
+  
 $("serviceBookBack").onclick = () => {
   showPage("events");
 };
