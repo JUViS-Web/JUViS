@@ -1244,13 +1244,24 @@ async function renderServiceBook() {
   }
 
   entries.innerHTML = (data || []).map(entry => `
-    <div class="entry">
-      <div class="grow">
-        <small>${esc(new Date(entry.created_at).toLocaleString("de-DE"))}</small>
-        <p style="white-space:pre-wrap;">${esc(entry.entry)}</p>
-      </div>
+  <div class="entry">
+    <div class="grow">
+      <small>${esc(new Date(entry.created_at).toLocaleString("de-DE"))}</small>
+      <p style="white-space:pre-wrap;">${esc(entry.entry)}</p>
     </div>
-  `).join("") || '<p class="muted">Noch keine Einträge vorhanden.</p>';
+
+    <button type="button" class="tiny"
+      data-edit-service-entry="${esc(entry.id)}">
+      Bearbeiten
+    </button>
+
+    <button type="button" class="tiny"
+      data-delete-service-entry="${esc(entry.id)}">
+      Löschen
+    </button>
+  </div>
+`).join("") || '<p class="muted">Noch keine Einträge vorhanden.</p>';
+  
   const noteMember = $("serviceBookNoteMember");
   const noteList = $("serviceBookMemberNotes");
 
