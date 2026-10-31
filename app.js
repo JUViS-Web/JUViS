@@ -89,6 +89,7 @@
 } catch (error) {
   console.warn("Reiter konnte nicht gespeichert werden:", error);
 }
+    
     if (page === "admin" && !isAdmin()) {
       msg("Du hast keine Berechtigung für die Administration.");
       return;
@@ -107,6 +108,10 @@
 
     if (page === "scanner" && !window.Html5Qrcode) {
       msg("QR-Bibliothek konnte nicht geladen werden. Prüfe die Internetverbindung.");
+    }
+    
+        if (page === "absences") {
+      renderAbsences();
     }
   }
 
