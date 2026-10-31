@@ -2100,8 +2100,15 @@ showPage(lastPage);
   const button = $("authSubmit");
   button.disabled = true;
 
-      if (!sb) {
-    msg("Supabase ist noch nicht initialisiert. Bitte Seite neu laden.", true);
+        if (!sb || !sb.functions || typeof sb.functions.invoke !== "function") {
+    button.disabled = false;
+
+    msg(
+      "Supabase-Fehler: " +
+      "Client vorhanden: " + !!sb +
+      " | Functions vorhanden: " + !!sb?.functions,
+      true
+    );
     return;
   }
 
