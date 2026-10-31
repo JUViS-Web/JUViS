@@ -2129,6 +2129,7 @@ showPage(lastPage);
 }
   
   async function boot() {
+    console.log("JUVIS boot gestartet");
     if (!configured || !window.supabase) {
       $("authView").classList.remove("hidden");
       $("authMessage").textContent =
