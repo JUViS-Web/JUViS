@@ -1470,6 +1470,13 @@ $("serviceBookForm").addEventListener("submit", async event => {
   }
 });
 
+["absenceMemberFilter", "absenceReasonFilter", "absenceFrom", "absenceTo"]
+  .forEach(id => {
+    $(id).addEventListener("change", () => {
+      renderAbsences();
+    });
+  });
+  
 $("serviceBookMemberNoteForm").addEventListener("submit", async event => {
   event.preventDefault();
 
