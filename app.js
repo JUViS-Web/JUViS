@@ -7,6 +7,11 @@
     !cfg.SUPABASE_ANON_KEY.includes("DEIN_");
 
   const $ = id => document.getElementById(id);
+  $("authSubmit").onclick = () => {
+  const message = $("authMessage");
+  message.textContent = "Klick wird erkannt.";
+  message.classList.remove("hidden");
+};
 
   let sb = null;
   let user = null;
