@@ -1400,6 +1400,74 @@ $("serviceBookMemberNoteForm").addEventListener("submit", async event => {
     button.disabled = false;
   }
 });
+
+$("serviceBookMemberNotes").addEventListener("click", async event => {
+  const editButton = event.target.closest("[data-edit-service-note]");
+  const deleteButton = event.target.closest("[data-delete-service-note]");
+
+  if (!editButton && !deleteButton) return;
+  if (!admin()) return;
+
+  const id = editButton
+    ? editButton.dataset.editServiceNote
+    : deleteButton.dataset.deleteServiceNote;
+
+  const message = $("serviceBookNoteMessage");
+
+  if (editButton) {
+    const { data, error } = await sb
+      .from("service_book_member_notes")
+      .select("note")
+      .eq("id", id)
+      .single();
+
+    if (error) {
+      message.textContent = "Fehler: " + error.message;
+      return;
+    }
+
+    const updated = prompt("Mitgliedsvermerk bearbeiten:", data.note);
+
+    if (updated === null) return;
+
+    if (!updated.trim()) {
+      message.textContent = "Der Vermerk darf nicht leer sein.";
+      return;
+    }
+
+    const { error: updateError } = await sb
+      .from("service_book_member_notes")
+      .update({
+        note: updated.trim(),
+        updated_by: user.id,
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", id);
+
+    if (updateError) {
+      message.textContent = "Fehler: " + updateError.message;
+      return;
+    }
+
+    message.textContent = "Vermerk erfolgreich geändert.";
+  } else {
+    if (!confirm("Mitgliedsvermerk wirklich löschen?")) return;
+
+    const { error } = await sb
+      .from("service_book_member_notes")
+      .delete()
+      .eq("id", id);
+
+    if (error) {
+      message.textContent = "Fehler: " + error.message;
+      return;
+    }
+
+    message.textContent = "Vermerk erfolgreich gelöscht.";
+  }
+
+  await renderServiceBook();
+});
   
 $("serviceBookBack").onclick = () => {
   showPage("events");
