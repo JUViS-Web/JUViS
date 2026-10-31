@@ -752,30 +752,81 @@ function renderCalendar() {
   );
 
   const date = new Date(calendarDate);
-  const monday = new Date(date);
-  monday.setDate(date.getDate() - ((date.getDay() + 6) % 7));
-  monday.setHours(0, 0, 0, 0);
-
-  const days = Array.from({ length: 7 }, (_, i) => {
-    const day = new Date(monday);
-    day.setDate(monday.getDate() + i);
-    return day;
-  });
-
   const title = $("calendarTitle");
 
+  const formatDate = value =>
+    value.toLocaleDateString("de-DE");
+
+  const eventBlock = event => {
+    const start = new Date(event.starts_at);
+    const end = event.ends_at
+      ? new Date(event.ends_at)
+      : new Date(start.getTime() + 2 * 60 * 60 * 1000);
+
+    return `
+      <div style="background:${esc(event.color || "#c62828")};color:white;border-radius:5px;padding:5px;margin:3px;font-size:12px;">
+        <b>${esc(event.title)}</b><br>
+        ${start.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})}
+        –
+        ${end.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})}
+        <br>
+        <button type="button" data-open-service-book="${esc(event.id)}">
+          Dienstbuch
+        </button>
+      </div>
+    `;
+  };
+
+  if (calendarMode === "day") {
+    title.textContent = formatDate(date);
+
+    container.innerHTML = `
+      <div style="position:relative;height:1080px;margin-left:55px;">
+        ${Array.from({length:18},(_,i)=>`
+          <div style="position:absolute;top:${i*60}px;left:-55px;height:60px;font-size:12px;">
+            ${String(i+6).padStart(2,"0")}:00
+          </div>
+          <div style="position:absolute;top:${i*60}px;left:0;right:0;border-top:1px solid #ddd;"></div>
+        `).join("")}
+        ${events.filter(event =>
+          new Date(event.starts_at).toDateString() === date.toDateString()
+        ).map(event => {
+          const start = new Date(event.starts_at);
+          const end = event.ends_at
+            ? new Date(event.ends_at)
+            : new Date(start.getTime() + 2*60*60*1000);
+
+          return `
+            <div style="position:absolute;top:${(start.getHours()+start.getMinutes()/60-6)*60}px;height:${Math.max(25,(end-start)/60000)}px;left:3px;right:3px;">
+              ${eventBlock(event)}
+            </div>
+          `;
+        }).join("")}
+      </div>
+    `;
+  }
+
   if (calendarMode === "week") {
+    const monday = new Date(date);
+    monday.setDate(date.getDate() - ((date.getDay()+6)%7));
+    monday.setHours(0,0,0,0);
+
+    const days = Array.from({length:7},(_,i)=>{
+      const day = new Date(monday);
+      day.setDate(monday.getDate()+i);
+      return day;
+    });
+
     title.textContent =
-      `${monday.toLocaleDateString("de-DE")} – ` +
-      `${days[6].toLocaleDateString("de-DE")}`;
+      `${formatDate(monday)} – ${formatDate(days[6])}`;
 
     container.innerHTML = `
       <div style="display:grid;grid-template-columns:55px repeat(7,minmax(110px,1fr));overflow-x:auto;">
         <div></div>
-        ${days.map(day => `
+        ${days.map(day=>`
           <div style="text-align:center;padding:8px;border-bottom:1px solid #888;">
-            <b>${day.toLocaleDateString("de-DE", { weekday: "short" })}</b><br>
-            ${day.getDate()}.${day.getMonth() + 1}.
+            <b>${day.toLocaleDateString("de-DE",{weekday:"short"})}</b><br>
+            ${day.getDate()}.${day.getMonth()+1}.
           </div>
         `).join("")}
         <div>
@@ -783,34 +834,65 @@ function renderCalendar() {
             <div style="height:60px;font-size:12px;">${String(i+6).padStart(2,"0")}:00</div>
           `).join("")}
         </div>
-        ${days.map(day => `
+        ${days.map(day=>`
           <div style="position:relative;height:1080px;border-left:1px solid #888;">
             ${Array.from({length:18},(_,i)=>`
               <div style="position:absolute;top:${i*60}px;width:100%;border-top:1px solid #ddd;"></div>
             `).join("")}
-            ${events.filter(event => {
-              const start = new Date(event.starts_at);
-              return start.toDateString() === day.toDateString();
-            }).map(event => {
+            ${events.filter(event =>
+              new Date(event.starts_at).toDateString() === day.toDateString()
+            ).map(event=>{
               const start = new Date(event.starts_at);
               const end = event.ends_at
                 ? new Date(event.ends_at)
-                : new Date(start.getTime() + 2*60*60*1000);
-              const top = (start.getHours() + start.getMinutes()/60 - 6) * 60;
-              const height = Math.max(25, (end-start)/60000);
+                : new Date(start.getTime()+2*60*60*1000);
+
               return `
-                <div style="position:absolute;top:${top}px;height:${height}px;left:3px;right:3px;background:${esc(event.color || "#c62828")};color:white;border-radius:5px;padding:4px;font-size:12px;overflow:hidden;">
-                  <b>${esc(event.title)}</b><br>
-                  ${start.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})}
-                  –
-                  ${end.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})}
-                  <br>
-                  <button type="button" data-open-service-book="${esc(event.id)}">Dienstbuch</button>
+                <div style="position:absolute;top:${(start.getHours()+start.getMinutes()/60-6)*60}px;height:${Math.max(25,(end-start)/60000)}px;left:3px;right:3px;">
+                  ${eventBlock(event)}
                 </div>
               `;
             }).join("")}
           </div>
         `).join("")}
+      </div>
+    `;
+  }
+
+  if (calendarMode === "month") {
+    const year = date.getFullYear();
+    const month = date.getMonth();
+    const firstDay = new Date(year,month,1);
+    const offset = (firstDay.getDay()+6)%7;
+    const daysInMonth = new Date(year,month+1,0).getDate();
+
+    title.textContent = date.toLocaleDateString("de-DE",{
+      month:"long",year:"numeric"
+    });
+
+    container.innerHTML = `
+      <div style="display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;">
+        ${["Mo","Di","Mi","Do","Fr","Sa","So"].map(day=>`
+          <b style="text-align:center;padding:6px;">${day}</b>
+        `).join("")}
+        ${Array.from({length:offset},()=>"<div></div>").join("")}
+        ${Array.from({length:daysInMonth},(_,i)=>{
+          const day = new Date(year,month,i+1);
+          const dayEvents = events.filter(event =>
+            new Date(event.starts_at).toDateString() === day.toDateString()
+          );
+
+          return `
+            <div style="min-height:90px;border:1px solid #ddd;border-radius:5px;padding:4px;">
+              <b>${i+1}</b>
+              ${dayEvents.map(event=>`
+                <div style="background:${esc(event.color || "#c62828")};color:white;border-radius:3px;padding:3px;margin-top:3px;font-size:11px;">
+                  ${esc(event.title)}
+                </div>
+              `).join("")}
+            </div>
+          `;
+        }).join("")}
       </div>
     `;
   }
