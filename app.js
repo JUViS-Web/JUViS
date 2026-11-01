@@ -2091,9 +2091,13 @@ showPage(lastPage);
 
       if (!sb?.auth) {
   msg(
-    "Supabase ist noch nicht initialisiert. Bitte lade JUVIS neu und prüfe die Verbindung.",
-    true
-  );
+  "Diagnose:\n" +
+  "Konfiguration vorhanden: " + !!configured + "\n" +
+  "Supabase geladen: " + !!window.supabase + "\n" +
+  "createClient verfügbar: " + (typeof window.supabase?.createClient) + "\n" +
+  "Client initialisiert: " + !!sb,
+  true
+);
   return;
 }
 
