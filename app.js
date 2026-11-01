@@ -2142,7 +2142,8 @@ showPage(lastPage);
 }
   
   async function boot() {
-    console.log("JUVIS boot gestartet");
+    document.getElementById("authMessage").textContent = "TEST: boot() wurde gestartet";
+document.getElementById("authMessage").classList.remove("hidden");
     if (!configured || !window.supabase) {
      msg("Diagnose: boot() gestartet. configured = " + configured + " | Supabase = " + !!window.supabase, true);
       $("authView").classList.remove("hidden");
