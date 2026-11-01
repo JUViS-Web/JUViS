@@ -1,4 +1,3 @@
-alert("JUVIS: app.js wurde geladen");
 (() => {
   const cfg = window.JUVIS_CONFIG || {};
   const configured =
@@ -2142,31 +2141,22 @@ showPage(lastPage);
 }
   
   async function boot() {
-    document.getElementById("authMessage").textContent = "TEST: boot() wurde gestartet";
-document.getElementById("authMessage").classList.remove("hidden");
-    if (!configured || !window.supabase) {
-     msg("Diagnose: boot() gestartet. configured = " + configured + " | Supabase = " + !!window.supabase, true);
-      $("authView").classList.remove("hidden");
-      $("authMessage").textContent =
-  "Diagnose: configured = " + configured +
-  " | Supabase-Bibliothek geladen = " + !!window.supabase;
-      $("authMessage").classList.remove("hidden");
-      $("authSubmit").disabled = true;
-      return;
-    }
+  if (!configured || !window.supabase) {
+    $("authView").classList.remove("hidden");
+    msg(
+      "Diagnose: configured = " + !!configured +
+      " | Supabase-Bibliothek geladen = " + !!window.supabase,
+      true
+    );
+    $("authSubmit").disabled = true;
+    return;
+  }
 
+  try {
     sb = window.supabase.createClient(
-      $("authMessage").textContent =
-  "Diagnose: Supabase-Client wurde erstellt. Client vorhanden: " + !!sb;
-$("authMessage").classList.remove("hidden");
       cfg.SUPABASE_URL,
       cfg.SUPABASE_ANON_KEY
     );
-console.log("JUVIS-Diagnose:", {
-  configured,
-  supabaseLibrary: !!window.supabase,
-  clientCreated: !!sb
-});
 
     const { data, error } = await sb.auth.getSession();
 
@@ -2185,7 +2175,12 @@ console.log("JUVIS-Diagnose:", {
         signedOut();
       }
     });
+  } catch (error) {
+    console.error("JUVIS-Initialisierungsfehler:", error);
+    msg("JUVIS konnte nicht gestartet werden: " + (error?.message || String(error)), true);
+    $("authSubmit").disabled = true;
   }
+}
 
   // Anmeldung und Registrierung
 $("authSubmit").addEventListener("click", handleAuth);
