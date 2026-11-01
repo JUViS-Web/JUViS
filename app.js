@@ -2168,9 +2168,17 @@ async function boot() {
       }
     });
   } catch (error) {
-    console.error("JUVIS-Initialisierungsfehler:", error);
-    msg("JUVIS konnte nicht gestartet werden: " + (error?.message || String(error)), true);
-    $("authSubmit").disabled = true;
+  window.JUVIS_INIT_ERROR = error?.stack || error?.message || String(error);
+
+  console.error("JUVIS-Initialisierungsfehler:", error);
+
+  msg(
+    "JUVIS-Initialisierungsfehler:\n" +
+    window.JUVIS_INIT_ERROR,
+    true
+  );
+
+  $("authSubmit").disabled = true;
   }
 }
 
