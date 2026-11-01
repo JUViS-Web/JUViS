@@ -183,7 +183,7 @@
       output.textContent =
         "Speichern fehlgeschlagen: " + error.message;
     } finally {
-      button.disabled = false;
+      button.disabled = !sb?.auth;
     }
   }
     
