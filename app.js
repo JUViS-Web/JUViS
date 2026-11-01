@@ -2183,7 +2183,10 @@ showPage(lastPage);
 }
 
   // Anmeldung und Registrierung
-$("authSubmit").addEventListener("click", handleAuth);
+$("authSubmit").addEventListener("click", () => {
+  alert("JUVIS: Der Anmeldebutton funktioniert.");
+  handleAuth();
+});
 
 $("password").addEventListener("keydown", event => {
   if (event.key === "Enter") handleAuth();
