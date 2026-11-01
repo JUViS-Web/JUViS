@@ -2091,11 +2091,14 @@ showPage(lastPage);
 
       if (!sb?.auth) {
   msg(
+  msg(
   "Diagnose:\n" +
   "Konfiguration vorhanden: " + !!configured + "\n" +
   "Supabase geladen: " + !!window.supabase + "\n" +
-  "createClient verfügbar: " + (typeof window.supabase?.createClient) + "\n" +
-  "Client initialisiert: " + !!sb,
+  "createClient verfügbar: " + typeof window.supabase?.createClient + "\n" +
+  "Client initialisiert: " + !!sb + "\n\n" +
+  "Initialisierungsfehler:\n" +
+  (window.JUVIS_INIT_ERROR || "Kein Fehler im Initialisierungs-Catch gespeichert."),
   true
 );
   return;
