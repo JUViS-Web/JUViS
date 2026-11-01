@@ -2089,6 +2089,14 @@ showPage(lastPage);
     async function handleAuth() {
     clearMsg(true);
 
+      if (!sb?.auth) {
+  msg(
+    "Supabase ist noch nicht initialisiert. Bitte lade JUVIS neu und prüfe die Verbindung.",
+    true
+  );
+  return;
+}
+
     const email = $("username").value.trim();
     const password = $("password").value;
 
