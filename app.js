@@ -2164,10 +2164,9 @@ async function boot() {
 
   // Anmeldung und Registrierung
 $("authSubmit").addEventListener("click", () => {
-  alert("JUVIS: Der Anmeldebutton funktioniert.");
   handleAuth();
 });
-
+  
 $("password").addEventListener("keydown", event => {
   if (event.key === "Enter") handleAuth();
 });
