@@ -2176,7 +2176,7 @@ $("authSubmit").addEventListener("click", () => {
 });
   
 $("password").addEventListener("keydown", event => {
-  if (event.key === "Enter") handleAuth();
+  if (event.key === "Enter" && !$("authSubmit").disabled) handleAuth();
 });
 
   // Navigation
