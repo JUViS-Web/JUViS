@@ -2154,6 +2154,7 @@ showPage(lastPage);
 
   try {
     sb = window.supabase.createClient(
+      alert("JUVIS: Supabase-Client wird erstellt.");
       cfg.SUPABASE_URL,
       cfg.SUPABASE_ANON_KEY
     );
