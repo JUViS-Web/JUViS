@@ -2086,59 +2086,38 @@ showPage(lastPage);
     $("connection").textContent = "Nicht angemeldet";
   }
 
-  async function handleAuth() {
-  clearMsg(true);
+    async function handleAuth() {
+    clearMsg(true);
 
-  const username = $("username").value.trim().toLowerCase();
-  const password = $("password").value;
+    const email = $("username").value.trim();
+    const password = $("password").value;
 
-  if (!username || !password) {
-    msg("Bitte Benutzername und Passwort eingeben.", true);
-    return;
-  }
-
-  const button = $("authSubmit");
-  button.disabled = true;
-
-        if (!sb || !sb.functions || typeof sb.functions.invoke !== "function") {
-    button.disabled = false;
-
-    msg(
-      "Supabase-Fehler: " +
-      "Client vorhanden: " + !!sb +
-      " | Functions vorhanden: " + !!sb?.functions,
-      true
-    );
-    return;
-  }
-
-  try {
-    const { data, error } = await sb.functions.invoke(
-      "juvis-username-login",
-      {
-        body: { username, password }
-      }
-    );
-
-    if (error) throw error;
-
-    if (!data?.session?.access_token || !data?.session?.refresh_token) {
-      throw new Error("Die Anmeldung konnte nicht abgeschlossen werden.");
+    if (!email || !password) {
+      msg("Bitte E-Mail und Passwort eingeben.", true);
+      return;
     }
 
-    const { error: sessionError } = await sb.auth.setSession({
-      access_token: data.session.access_token,
-      refresh_token: data.session.refresh_token
-    });
+    const button = $("authSubmit");
+    button.disabled = true;
 
-    if (sessionError) throw sessionError;
-  } catch (error) {
-    console.error("Anmeldefehler:", error);
-    msg("Anmeldefehler: " + (error?.message || String(error)), true);
-  } finally {
-    button.disabled = false;
+    try {
+      const { data, error } = await sb.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) throw error;
+
+      if (!data?.session) {
+        throw new Error("Die Anmeldung konnte nicht abgeschlossen werden.");
+      }
+    } catch (error) {
+      console.error("Anmeldefehler:", error);
+      msg("Anmeldefehler: " + (error?.message || String(error)), true);
+    } finally {
+      button.disabled = false;
+    }
   }
-}
   
   
 async function boot() {
