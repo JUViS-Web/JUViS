@@ -1347,5 +1347,20 @@ input[type="time"] {
   alert("index.html funktioniert");
 </script>
 
+<script>
+  fetch("app.js")
+    .then(response => {
+      alert("app.js HTTP-Status: " + response.status);
+      return response.text();
+    })
+    .then(code => {
+      alert("app.js Zeichen: " + code.length);
+      console.log(code.substring(0, 300));
+    })
+    .catch(error => {
+      alert("Fehler beim Laden: " + error.message);
+    });
+</script>
+
 <script src="app.js"></script>
 </body></html>
