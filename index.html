@@ -758,6 +758,90 @@ input[type="time"] {
 .juvis-dialog [hidden] {
   display: none !important;
 }
+  /* JUVIS – Moderner Dienstplan */
+.calendar-heading {
+  display: flex;
+  flex-direction: row !important;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.calendar-heading h2 {
+  margin: 0;
+  flex: 1;
+}
+
+.calendar-heading #addEventButton {
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  font-size: 24px;
+  border-radius: 12px;
+}
+
+.calendar-navigation {
+  display: grid !important;
+  grid-template-columns: 46px minmax(0, 1fr) 46px;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.calendar-navigation button {
+  width: 46px;
+  height: 44px;
+  padding: 0;
+  font-size: 23px;
+  border-radius: 11px;
+}
+
+.calendar-navigation strong {
+  text-align: center;
+  align-self: center;
+}
+
+.calendar-modes {
+  display: grid !important;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+  padding: 5px;
+  margin-bottom: 16px;
+  background: var(--panel2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.calendar-modes button {
+  width: 100%;
+  min-width: 0;
+  padding: 11px 4px;
+  background: transparent;
+  color: var(--muted);
+  border-radius: 8px;
+}
+
+.calendar-modes button.primary {
+  background: var(--red);
+  color: white;
+}
+
+@media (max-width: 720px) {
+  .calendar-heading,
+  .calendar-navigation,
+  .calendar-modes {
+    width: 100%;
+    flex-direction: row !important;
+  }
+
+  .calendar-navigation > * {
+    flex: initial;
+  }
+
+  .calendar-modes button {
+    max-width: none;
+  }
+}
 </style>
 </head>
 <body>
