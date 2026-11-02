@@ -1348,19 +1348,15 @@ input[type="time"] {
 </script>
 
 <script>
-  fetch("app.js")
-    .then(response => response.text())
-    .then(code => {
-      try {
-        new Function(code);
-        alert("Syntaxprüfung: KEIN Syntaxfehler gefunden");
-      } catch (error) {
-        alert("Syntaxfehler: " + error.message);
-      }
-    })
-    .catch(error => {
-      alert("Ladefehler: " + error.message);
-    });
+  window.addEventListener("error", function(event) {
+    alert(
+      "JavaScript-Fehler:\n" +
+      event.message + "\n" +
+      "Datei: " + event.filename + "\n" +
+      "Zeile: " + event.lineno + "\n" +
+      "Spalte: " + event.colno
+    );
+  });
 </script>
 
 <script src="app.js"></script>
