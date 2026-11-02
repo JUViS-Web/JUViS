@@ -2087,7 +2087,9 @@ showPage(lastPage);
   }
 
     async function handleAuth() {
-    clearMsg(true);
+   alert("handleAuth wurde gestartet");
+      
+      clearMsg(true);
 
       if (!sb?.auth) {
   msg(
