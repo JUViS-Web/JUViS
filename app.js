@@ -2233,14 +2233,16 @@ $("nav").onclick = event => {
   }
 };
 
-const eventList = $("eventList");
+// Dienstbuch direkt aus dem Kalender öffnen
+const calendarView = $("calendarView");
 
-if (eventList) {
-  eventList.addEventListener("click", event => {
+if (calendarView) {
+  calendarView.addEventListener("click", event => {
     const button = event.target.closest("[data-open-service-book]");
     if (!button) return;
 
-    window.currentServiceBookEventId = button.dataset.openServiceBook;
+    window.currentServiceBookEventId =
+      button.dataset.openServiceBook;
 
     showPage("serviceBook");
     renderServiceBook();
