@@ -1,4 +1,6 @@
 (() => {
+alert("JUVIS app.js wurde gestartet");
+  
   const cfg = window.JUVIS_CONFIG || {};
   const configured =
     cfg.SUPABASE_URL?.includes("supabase.co") &&
