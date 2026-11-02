@@ -970,22 +970,22 @@ input[type="time"] {
 <section id="events" class="page hidden">
 
   <div class="panel">
-    <div class="row" style="justify-content:space-between;align-items:center;">
-      <h2>Dienstplan</h2>
-      <button type="button" id="addEventButton">＋</button>
-    </div>
+    <div class="row calendar-heading">
+  <h2>Dienstplan</h2>
+  <button type="button" id="addEventButton" aria-label="Neuen Dienst erstellen">＋</button>
+</div>
 
-    <div class="row" style="justify-content:space-between;align-items:center;">
-      <button type="button" id="calendarPrevious">‹</button>
-      <strong id="calendarTitle">Kalender</strong>
-      <button type="button" id="calendarNext">›</button>
-    </div>
+<div class="row calendar-navigation">
+  <button type="button" id="calendarPrevious" aria-label="Vorheriger Zeitraum">‹</button>
+  <strong id="calendarTitle">Kalender</strong>
+  <button type="button" id="calendarNext" aria-label="Nächster Zeitraum">›</button>
+</div>
 
-    <div class="row" style="gap:6px;">
-      <button type="button" data-calendar-mode="day">Tag</button>
-      <button type="button" data-calendar-mode="week" class="primary">Woche</button>
-      <button type="button" data-calendar-mode="month">Monat</button>
-    </div>
+<div class="row calendar-modes" role="group" aria-label="Kalenderansicht">
+  <button type="button" data-calendar-mode="day">Tag</button>
+  <button type="button" data-calendar-mode="week" class="primary">Woche</button>
+  <button type="button" data-calendar-mode="month">Monat</button>
+</div>
 
     <div id="calendarView"></div>
   </div>
