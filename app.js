@@ -935,6 +935,15 @@ $("calendarNext").onclick = () => {
 document.querySelectorAll("[data-calendar-mode]").forEach(button => {
   button.onclick = () => {
     calendarMode = button.dataset.calendarMode;
+
+    // Aktive Kalenderansicht optisch markieren
+    document.querySelectorAll("[data-calendar-mode]").forEach(modeButton => {
+      modeButton.classList.remove("primary");
+    });
+
+    button.classList.add("primary");
+
+    // Kalender aktualisieren
     renderCalendar();
   };
 });
