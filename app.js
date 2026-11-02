@@ -2224,15 +2224,19 @@ $("nav").onclick = event => {
   }
 };
 
-$("eventList").addEventListener("click", event => {
-  const button = event.target.closest("[data-open-service-book]");
-  if (!button) return;
+const eventList = $("eventList");
 
-  window.currentServiceBookEventId = button.dataset.openServiceBook;
+if (eventList) {
+  eventList.addEventListener("click", event => {
+    const button = event.target.closest("[data-open-service-book]");
+    if (!button) return;
 
-  showPage("serviceBook");
-  renderServiceBook();
-});
+    window.currentServiceBookEventId = button.dataset.openServiceBook;
+
+    showPage("serviceBook");
+    renderServiceBook();
+  });
+}
 
 $("navToggle").addEventListener("click", () => {
   const layout = $("appLayout");
