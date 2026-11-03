@@ -912,6 +912,52 @@ function renderCalendar() {
   }
 }
 
+  function dateTimeLocalValue(value) {
+  if (!value) return "";
+
+  const date = new Date(value);
+  const offset = date.getTimezoneOffset();
+
+  return new Date(date.getTime() - offset * 60000)
+    .toISOString()
+    .slice(0, 16);
+}
+
+function bindEditEventButtons() {
+  document.querySelectorAll("[data-edit-event]").forEach(button => {
+    button.onclick = () => {
+      if (!admin()) {
+        msg("Nur Betreuer und Administratoren dürfen Dienste bearbeiten.");
+        return;
+      }
+
+      const service = cache.events.find(
+        item => String(item.id) === String(button.dataset.editEvent)
+      );
+
+      if (!service) {
+        msg("Dienst wurde nicht gefunden.");
+        return;
+      }
+
+      const form = $("eventForm");
+
+      form.elements.title.value = service.title || "";
+      form.elements.starts_at.value = dateTimeLocalValue(service.starts_at);
+      form.elements.ends_at.value = dateTimeLocalValue(service.ends_at);
+      form.elements.location.value = service.location || "";
+      form.elements.color.value = service.color || "#c62828";
+      form.elements.description.value = service.description || "";
+
+      window.editingEventId = service.id;
+
+      $("eventFormPanel").classList.remove("hidden");
+      $("eventFormPanel").querySelector("h2").textContent = "Dienst bearbeiten";
+      form.querySelector('[type="submit"]').textContent = "Änderungen speichern";
+    };
+  });
+}
+  
   $("addEventButton").onclick = () => {
   $("eventFormPanel").classList.remove("hidden");
 };
