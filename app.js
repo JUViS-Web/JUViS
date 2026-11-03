@@ -738,6 +738,7 @@ if (clothingMember) {
 
     renderAttendance();
     bindDeleteButtons();
+    bindEditEventButtons();
     bindEditClothingButtons();
     renderFegedienst();
   }
