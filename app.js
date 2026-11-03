@@ -895,8 +895,14 @@ function renderCalendar() {
               <b>${i+1}</b>
               ${dayEvents.map(event=>`
                 <div style="background:${esc(event.color || "#c62828")};color:white;border-radius:3px;padding:3px;margin-top:3px;font-size:11px;">
-                  ${esc(event.title)}
-                </div>
+  <b>${esc(event.title)}</b>
+  ${admin() ? `
+    <div style="margin-top:3px;">
+      <button type="button" data-edit-event="${esc(event.id)}">Bearbeiten</button>
+      ${removeButton("events", event.id)}
+    </div>
+  ` : ""}
+</div>
               `).join("")}
             </div>
           `;
