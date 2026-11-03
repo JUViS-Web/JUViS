@@ -2700,6 +2700,61 @@ await load();
   updateMemberCheckboxes();
 }
 
+ $("eventForm").onsubmit = async event => {
+  event.preventDefault();
+
+  if (!admin()) {
+    msg("Keine Berechtigung zum Speichern.");
+    return;
+  }
+
+  const form = event.target;
+  const data = formObj(form);
+
+  const startsAt = new Date(data.starts_at);
+  const endsAt = new Date(data.ends_at);
+
+  if (endsAt <= startsAt) {
+    alert("Die Endzeit muss nach der Anfangszeit liegen.");
+    return;
+  }
+
+  const eventData = {
+    title: data.title,
+    starts_at: startsAt.toISOString(),
+    ends_at: endsAt.toISOString(),
+    location: data.location || null,
+    description: data.description || null,
+    color: data.color || "#c62828"
+  };
+
+  try {
+    if (window.editingEventId) {
+      const { error } = await sb
+        .from("events")
+        .update(eventData)
+        .eq("id", window.editingEventId);
+
+      if (error) throw error;
+
+      window.editingEventId = null;
+      msg("Dienst erfolgreich aktualisiert.");
+    } else {
+      const saved = await add("events", eventData);
+      if (!saved) return;
+    }
+
+    form.reset();
+    $("eventFormPanel").classList.add("hidden");
+    $("eventFormPanel").querySelector("h2").textContent = "Dienst erstellen";
+    form.querySelector('[type="submit"]').textContent = "Dienst speichern";
+
+    await load();
+  } catch (error) {
+    msg("Speichern fehlgeschlagen: " + error.message);
+  }
+};
+
 $("fegedienstForm").onsubmit = async event => {
   event.preventDefault();
 
