@@ -957,7 +957,6 @@ function bindEditEventButtons() {
       form.querySelector('[type="submit"]').textContent = "Änderungen speichern";
     };
   });
-  bindEditEventButtons();
 }
   
   $("addEventButton").onclick = () => {
