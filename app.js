@@ -760,24 +760,30 @@ function renderCalendar() {
     value.toLocaleDateString("de-DE");
 
   const eventBlock = event => {
-    const start = new Date(event.starts_at);
-    const end = event.ends_at
-      ? new Date(event.ends_at)
-      : new Date(start.getTime() + 2 * 60 * 60 * 1000);
+  const start = new Date(event.starts_at);
+  const end = event.ends_at
+    ? new Date(event.ends_at)
+    : new Date(start.getTime() + 2 * 60 * 60 * 1000);
 
-    return `
-      <div style="background:${esc(event.color || "#c62828")};color:white;border-radius:5px;padding:5px;margin:3px;font-size:12px;">
-        <b>${esc(event.title)}</b><br>
-        ${start.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})}
-        –
-        ${end.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})}
-        <br>
-        <button type="button" data-open-service-book="${esc(event.id)}">
-          Dienstbuch
+  return `
+    <div style="background:${esc(event.color || "#c62828")};color:white;border-radius:5px;padding:5px;margin:3px;font-size:12px;">
+      <b>${esc(event.title)}</b><br>
+      ${start.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})}
+      –
+      ${end.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})}
+      <br>
+      <button type="button" data-open-service-book="${esc(event.id)}">
+        Dienstbuch
+      </button>
+      ${admin() ? `
+        <button type="button" data-edit-event="${esc(event.id)}">
+          Bearbeiten
         </button>
-      </div>
-    `;
-  };
+        ${removeButton("events", event.id)}
+      ` : ""}
+    </div>
+  `;
+};
 
   if (calendarMode === "day") {
     title.textContent = formatDate(date);
