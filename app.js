@@ -767,21 +767,77 @@ function renderCalendar() {
     : new Date(start.getTime() + 2 * 60 * 60 * 1000);
 
   return `
-    <div style="background:${esc(event.color || "#c62828")};color:white;border-radius:5px;padding:5px;margin:3px;font-size:12px;">
-      <b>${esc(event.title)}</b><br>
-      ${start.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})}
-      –
-      ${end.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})}
-      <br>
-      <button type="button" data-open-service-book="${esc(event.id)}">
-        Dienstbuch
-      </button>
-      ${admin() ? `
-        <button type="button" data-edit-event="${esc(event.id)}">
-          Bearbeiten
-        </button>
-        ${removeButton("events", event.id)}
-      ` : ""}
+    <div style="
+      position:relative;
+      height:100%;
+      box-sizing:border-box;
+      margin:0;
+      padding:3px 30px 3px 5px;
+      background:${esc(event.color || "#c62828")};
+      color:white;
+      border-radius:5px;
+      font-size:11px;
+      display:flex;
+      align-items:center;
+      gap:5px;
+      overflow:visible;
+    ">
+      <b style="
+        flex:1;
+        min-width:0;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+      ">${esc(event.title)}</b>
+
+      <span style="white-space:nowrap;">
+        ${start.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})}
+        –
+        ${end.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})}
+      </span>
+
+      <details style="
+        position:absolute;
+        right:4px;
+        top:2px;
+        z-index:20;
+      ">
+        <summary aria-label="Weitere Aktionen" style="
+          cursor:pointer;
+          list-style:none;
+          font-size:19px;
+          font-weight:bold;
+          line-height:18px;
+          padding:0 3px;
+        ">…</summary>
+
+        <div style="
+          position:absolute;
+          right:0;
+          top:100%;
+          min-width:145px;
+          padding:6px;
+          background:#222;
+          border:1px solid #666;
+          border-radius:6px;
+          box-shadow:0 3px 10px rgba(0,0,0,.35);
+          display:flex;
+          flex-direction:column;
+          gap:5px;
+        ">
+          <button type="button"
+            data-open-service-book="${esc(event.id)}">
+            Dienstbuch öffnen
+          </button>
+
+          ${admin() ? `
+            <button type="button" data-edit-event="${esc(event.id)}">
+              Bearbeiten
+            </button>
+            ${removeButton("events", event.id)}
+          ` : ""}
+        </div>
+      </details>
     </div>
   `;
 };
