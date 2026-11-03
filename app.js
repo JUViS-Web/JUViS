@@ -772,25 +772,27 @@ function renderCalendar() {
       height:100%;
       box-sizing:border-box;
       margin:0;
-      padding:3px 30px 3px 5px;
+      padding:2px 25px 2px 4px;
       background:${esc(event.color || "#c62828")};
       color:white;
       border-radius:5px;
       font-size:11px;
-      display:flex;
-      align-items:center;
-      gap:5px;
+      line-height:12px;
       overflow:visible;
     ">
       <b style="
-        flex:1;
-        min-width:0;
+        display:block;
+        font-weight:800;
         white-space:nowrap;
         overflow:hidden;
         text-overflow:ellipsis;
       ">${esc(event.title)}</b>
 
-      <span style="white-space:nowrap;">
+      <span style="
+        display:block;
+        font-size:10px;
+        white-space:nowrap;
+      ">
         ${start.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})}
         –
         ${end.toLocaleTimeString("de-DE",{hour:"2-digit",minute:"2-digit"})}
@@ -798,7 +800,7 @@ function renderCalendar() {
 
       <details style="
         position:absolute;
-        right:4px;
+        right:3px;
         top:2px;
         z-index:20;
       ">
