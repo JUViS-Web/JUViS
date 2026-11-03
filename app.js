@@ -2683,6 +2683,11 @@ await load();
   $("eventForm").onsubmit = async event => {
   event.preventDefault();
 
+  if (!admin()) {
+    msg("Keine Berechtigung zum Speichern.");
+    return;
+  }
+
   const form = event.target;
   const data = formObj(form);
 
@@ -2694,37 +2699,43 @@ await load();
     return;
   }
 
-  const saved = await add("events", {
+  const eventData = {
     title: data.title,
     starts_at: startsAt.toISOString(),
     ends_at: endsAt.toISOString(),
     location: data.location || null,
     description: data.description || null,
     color: data.color || "#c62828"
-  });
+  };
 
-  if (saved) form.reset();
-};
+  try {
+    if (window.editingEventId) {
+      const { error } = await sb
+        .from("events")
+        .update(eventData)
+        .eq("id", window.editingEventId);
 
-function setupFegedienstForm() {
-  const nobody = $("fegedienstNobody");
-  const form = $("fegedienstForm");
-  const memberList = $("fegedienstMemberList");
+      if (error) throw error;
 
-  if (!nobody || !form || !memberList) return;
+      window.editingEventId = null;
+      msg("Dienst erfolgreich aktualisiert.");
+    } else {
+      const saved = await add("events", eventData);
+      if (!saved) return;
+    }
 
-  const allowed = admin();
+    form.reset();
 
-  function updateMemberCheckboxes() {
-    memberList
-      .querySelectorAll('input[name="fegedienst_member"]')
-      .forEach(checkbox => {
-        checkbox.disabled = !allowed || nobody.checked;
-        if (nobody.checked) {
-          checkbox.checked = false;
-        }
-      });
+    $("eventFormPanel").classList.add("hidden");
+    $("eventFormPanel").querySelector("h2").textContent = "Dienst erstellen";
+    form.querySelector('[type="submit"]').textContent = "Dienst speichern";
+
+    await load();
+
+  } catch (error) {
+    msg("Speichern fehlgeschlagen: " + error.message);
   }
+};
 
   nobody.onchange = updateMemberCheckboxes;
 
