@@ -2017,12 +2017,6 @@ $("serviceBookBack").onclick = () => {
   showPage("events");
 };
 
-$("serviceBookGoAttendance").onclick = () => {
-  $("attendanceEvent").value = window.currentServiceBookEventId;
-  showPage("attendance");
-  renderAttendance();
-};
-
 $("attendanceOpenServiceBook").onclick = () => {
   const eventId = $("attendanceEvent").value;
 
