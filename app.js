@@ -1514,7 +1514,7 @@ if (attendanceEvent) {
 }
 
 renderAttendance();
-
+  
   entries.textContent = "Dienstbucheinträge werden geladen …";
 
   const { data, error } = await sb
