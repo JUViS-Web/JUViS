@@ -1504,38 +1504,16 @@ async function renderServiceBook() {
     `${new Date(service.starts_at).toLocaleString("de-DE")}` +
     (service.location ? ` · ${service.location}` : "");
 
-  attendance.innerHTML = cache.members
-    .filter(member => !member.leave_date)
-    .slice()
-    .sort((a, b) =>
-      `${a.last_name} ${a.first_name}`.localeCompare(
-        `${b.last_name} ${b.first_name}`, "de"
-      )
-    )
-    .map(member => {
-      const record = cache.attendance.find(entry =>
-        String(entry.event_id) === String(eventId) &&
-        String(entry.member_id) === String(member.id)
-      );
+  const attendanceEvent = $("attendanceEvent");
 
-      const status = record?.status || "present";
+if (attendanceEvent) {
+  attendanceEvent.innerHTML =
+    `<option value="${esc(eventId)}">${esc(service.title)}</option>`;
 
-      const text = status === "late"
-        ? `Verspätet (${record.late_minutes || 0} Min.)`
-        : status === "absent"
-          ? `Abwesend – ${record.excuse_reason || "Unentschuldigt"}`
-          : "Anwesend";
+  attendanceEvent.value = String(eventId);
+}
 
-      return `
-        <div class="entry">
-          <div class="grow">
-            <strong>${esc(member.first_name)} ${esc(member.last_name)}</strong>
-            <small>${esc(text)}</small>
-          </div>
-        </div>
-      `;
-    })
-    .join("") || '<p class="muted">Keine Mitglieder vorhanden.</p>';
+renderAttendance();
 
   entries.textContent = "Dienstbucheinträge werden geladen …";
 
