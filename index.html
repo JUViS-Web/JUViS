@@ -1116,31 +1116,31 @@ input[type="time"] {
   <div class="panel">
     <h2>Anwesenheit erfassen</h2>
     <p class="muted">Wähle einen Dienst aus, um die Anwesenheit der Mitglieder zu verwalten.</p>
-    <label for="serviceBookAttendanceEvent">Dienst auswählen</label>
-    <select id="serviceBookAttendanceEvent">
+    <label for="attendanceEvent">Dienst auswählen</label>
+    <select id="attendanceEvent">
       <option value="">Bitte Dienst auswählen</option>
     </select>
-    <div id="serviceBookAttendanceList"></div>
-    <dialog id="serviceBookAttendanceDialog" class="juvis-dialog">
+    <div id="attendanceList"></div>
+    <dialog id="attendanceDialog" class="juvis-dialog">
   <div class="juvis-dialog-content">
     <div class="juvis-dialog-header">
       <div>
-        <h2 id="serviceBookAttendanceDialogTitle">Anwesenheit bearbeiten</h2>
-        <p id="serviceBookAttendanceDialogMember" class="muted"></p>
+        <h2 id="attendanceDialogTitle">Anwesenheit bearbeiten</h2>
+        <p id="attendanceDialogMember" class="muted"></p>
       </div>
-      <button type="button" id="serviceBookAttendanceDialogClose"
+      <button type="button" id="attendanceDialogClose"
         class="secondary">✕</button>
     </div>
 
-    <div id="serviceBookAttendanceDialogLate" hidden>
-      <label for="serviceBookAttendanceLateMinutes">Verspätung in Minuten</label>
-      <input id="serviceBookAttendanceLateMinutes" type="number"
+    <div id="attendanceDialogLate" hidden>
+      <label for="attendanceLateMinutes">Verspätung in Minuten</label>
+      <input id="attendanceLateMinutes" type="number"
         min="1" step="1" placeholder="z. B. 10">
     </div>
 
-    <div id="serviceBookAttendanceDialogAbsent" hidden>
-      <label for="serviceBookAttendanceExcuseReason">Abwesenheitsgrund</label>
-      <select id="serviceBookAttendanceExcuseReason">
+    <div id="attendanceDialogAbsent" hidden>
+      <label for="attendanceExcuseReason">Abwesenheitsgrund</label>
+      <select id="attendanceExcuseReason">
         <option value="">Unentschuldigt</option>
         <option value="Krank">Krank</option>
         <option value="Urlaub">Urlaub</option>
@@ -1149,23 +1149,23 @@ input[type="time"] {
         <option value="Freitext">Freitext</option>
       </select>
 
-      <div id="serviceBookAttendanceFreeTextWrap" hidden>
-        <label for="serviceBookAttendanceFreeText">Eigener Grund</label>
-        <textarea id="serviceBookAttendanceFreeText"
+      <div id="attendanceFreeTextWrap" hidden>
+        <label for="attendanceFreeText">Eigener Grund</label>
+        <textarea id="attendanceFreeText"
           placeholder="Grund eintragen"></textarea>
       </div>
     </div>
 
     <div class="juvis-dialog-actions">
-      <button type="button" id="serviceBookAttendanceDialogCancel"
+      <button type="button" id="attendanceDialogCancel"
         class="secondary">Abbrechen</button>
-      <button type="button" id="serviceBookAttendanceDialogSave">
+      <button type="button" id="attendanceDialogSave">
         Übernehmen
       </button>
     </div>
   </div>
 </dialog>
-    <button type="button" id="saveServiceBookAttendance">Anwesenheit speichern</button>
+    <button type="button" id="saveAttendance">Anwesenheit speichern</button>
     <button
   type="button"
   class="secondary"
@@ -1173,7 +1173,7 @@ input[type="time"] {
   style="margin-top:10px;">
   Dienstbuch öffnen
 </button>
-    <p id="serviceBookAttendanceMessage" class="muted"></p>
+    <p id="attendanceMessage" class="muted"></p>
   </div>
 </section>
 
