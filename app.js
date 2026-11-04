@@ -2435,6 +2435,7 @@ $("saveAttendance").onclick = async () => {
     }
 
     await load();
+    await renderServiceBook();
     $("attendanceMessage").textContent =
       "Anwesenheit erfolgreich gespeichert.";
 
