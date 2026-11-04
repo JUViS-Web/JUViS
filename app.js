@@ -2350,7 +2350,9 @@ $("navToggle").addEventListener("click", () => {
 
   // Suche und Anwesenheit
   $("memberSearch").oninput = render;
+  $if ($("attendanceEvent")) {
   $("attendanceEvent").onchange = render;
+}
   
 $("saveAttendance").onclick = async () => {
   if (!admin()) {
