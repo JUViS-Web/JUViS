@@ -1473,7 +1473,6 @@ async function renderServiceBook() {
 
   const title = $("serviceBookTitle");
   const info = $("serviceBookInfo");
-  const attendance = $("serviceBookAttendance");
   const entries = $("serviceBookEntries");
   const form = $("serviceBookForm");
 
