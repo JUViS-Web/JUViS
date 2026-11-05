@@ -1645,6 +1645,7 @@ if (attendanceEvent) {
 }
 
 renderAttendance();
+renderServiceBookAttendance();
   
   entries.textContent = "Dienstbucheinträge werden geladen …";
 
