@@ -1597,6 +1597,47 @@ function renderServiceBookAttendance() {
       }
     };
   });
+    // Wischgesten im Dienstbuch:
+  // Nach rechts = Anwesend
+  // Nach links = Abwesend
+
+  list.querySelectorAll("[data-service-book-entry]").forEach(entry => {
+    let startX = 0;
+    let startY = 0;
+
+    entry.addEventListener("pointerdown", event => {
+      if (event.pointerType !== "touch") return;
+
+      if (event.target.closest("select, input, button")) return;
+
+      startX = event.clientX;
+      startY = event.clientY;
+    });
+
+    entry.addEventListener("pointerup", event => {
+      if (event.pointerType !== "touch") return;
+
+      const deltaX = event.clientX - startX;
+      const deltaY = event.clientY - startY;
+
+      if (
+        Math.abs(deltaX) < 65 ||
+        Math.abs(deltaX) < Math.abs(deltaY) * 1.3
+      ) return;
+
+      const select = entry.querySelector(
+        "[data-service-book-status]"
+      );
+
+      if (!select) return;
+
+      select.value = deltaX > 0 ? "present" : "absent";
+
+      select.dispatchEvent(
+        new Event("change", { bubbles: true })
+      );
+    });
+  });
 }
   
 async function renderServiceBook() {
