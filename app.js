@@ -1475,14 +1475,12 @@ function renderServiceBookAttendance() {
   if (!list) return;
 
   if (!admin()) {
-    list.innerHTML =
-      '<p class="muted">Keine Berechtigung zur Anwesenheitskontrolle.</p>';
+    list.innerHTML = '<p class="muted">Keine Berechtigung zur Anwesenheitskontrolle.</p>';
     return;
   }
 
   if (!eventId) {
-    list.innerHTML =
-      '<p class="muted">Kein Dienst ausgewählt.</p>';
+    list.innerHTML = '<p class="muted">Kein Dienst ausgewählt.</p>';
     return;
   }
 
@@ -1505,109 +1503,95 @@ function renderServiceBookAttendance() {
     const lateMinutes = Number(record?.late_minutes || 0);
     const reason = record?.excuse_reason || "";
 
-    const statusText =
-      status === "late" ? "Verspätet" :
+    const statusLabel = status === "late" ? "Verspätet" :
       status === "absent" ? "Abwesend" : "Anwesend";
 
-    const subtitle =
-      status === "late"
-        ? `${lateMinutes} Minuten verspätet`
-        : status === "absent"
-          ? (reason || "Unentschuldigt")
-          : "Pünktlich";
-
     return `
-      <div class="entry attendance-entry"
-           data-service-book-entry="${esc(member.id)}">
+      <article class="sb-attendance-card status-${status}"
+        data-service-book-entry="${esc(member.id)}">
 
-        <div class="grow">
-          <strong>
-            ${esc(member.first_name)} ${esc(member.last_name)}
-          </strong>
+        <div class="sb-attendance-main">
+          <div class="sb-attendance-person">
+            <strong>${esc(member.first_name)} ${esc(member.last_name)}</strong>
+            <span class="sb-attendance-current">${statusLabel}</span>
+          </div>
 
-          <p class="muted"
-             data-service-book-subtitle>
-            ${esc(subtitle)}
-          </p>
-        </div>
-
-        <div>
-          <select
+          <select class="sb-attendance-select"
             data-service-book-status="${esc(member.id)}">
-            <option value="present" ${status === "present" ? "selected" : ""}>
-              Anwesend
-            </option>
-            <option value="late" ${status === "late" ? "selected" : ""}>
-              Verspätet
-            </option>
-            <option value="absent" ${status === "absent" ? "selected" : ""}>
-              Abwesend
-            </option>
+            <option value="present" ${status === "present" ? "selected" : ""}>Anwesend</option>
+            <option value="late" ${status === "late" ? "selected" : ""}>Verspätet</option>
+            <option value="absent" ${status === "absent" ? "selected" : ""}>Abwesend</option>
           </select>
-
-          <input type="hidden"
-            data-service-book-late="${esc(member.id)}"
-            value="${lateMinutes}">
-
-          <input type="hidden"
-            data-service-book-reason="${esc(member.id)}"
-            value="${esc(reason)}">
         </div>
-      </div>
+
+        <div class="sb-attendance-extra">
+          <div data-service-book-late-wrap ${status === "late" ? "" : "hidden"}>
+            <label>Verspätung in Minuten</label>
+            <input type="number" min="1" step="1"
+              inputmode="numeric"
+              placeholder="z. B. 10"
+              data-service-book-late="${esc(member.id)}"
+              value="${status === "late" && lateMinutes > 0 ? lateMinutes : ""}">
+          </div>
+
+          <div data-service-book-reason-wrap ${status === "absent" ? "" : "hidden"}>
+            <label>Abwesenheitsgrund</label>
+            <input type="text" maxlength="120"
+              placeholder="z. B. Krank oder Urlaub"
+              data-service-book-reason="${esc(member.id)}"
+              value="${esc(reason)}">
+          </div>
+        </div>
+      </article>
     `;
   }).join("") || '<p class="muted">Keine Mitglieder vorhanden.</p>';
 
-  const statusSelects = list.querySelectorAll(
-    "[data-service-book-status]"
-  );
+  const updateEntry = select => {
+    const entry = select.closest("[data-service-book-entry]");
+    if (!entry) return;
 
-  statusSelects.forEach(select => {
-    select.onchange = () => {
-      const memberId = select.dataset.serviceBookStatus;
+    const status = select.value;
 
-      const lateInput = list.querySelector(
-        `[data-service-book-late="${memberId}"]`
-      );
+    entry.classList.remove(
+      "status-present", "status-late", "status-absent"
+    );
+    entry.classList.add("status-" + status);
 
-      const reasonInput = list.querySelector(
-        `[data-service-book-reason="${memberId}"]`
-      );
+    const current = entry.querySelector(".sb-attendance-current");
+    const lateWrap = entry.querySelector("[data-service-book-late-wrap]");
+    const reasonWrap = entry.querySelector("[data-service-book-reason-wrap]");
 
-      const entry = select.closest(".attendance-entry");
-      const subtitle = entry.querySelector(
-        "[data-service-book-subtitle]"
-      );
+    current.textContent = status === "late" ? "Verspätet" :
+      status === "absent" ? "Abwesend" : "Anwesend";
 
-      if (select.value === "present") {
-        lateInput.value = "0";
-        reasonInput.value = "";
-        subtitle.textContent = "Pünktlich";
-      }
+    lateWrap.hidden = status !== "late";
+    reasonWrap.hidden = status !== "absent";
 
-      if (select.value === "late") {
-        const minutes = Number(lateInput.value || 0);
-        subtitle.textContent =
-          minutes > 0 ? `${minutes} Minuten verspätet` :
-          "Verspätung noch eintragen";
-      }
+    if (status === "present") {
+      entry.querySelector("[data-service-book-late]").value = "";
+      entry.querySelector("[data-service-book-reason]").value = "";
+    }
 
-      if (select.value === "absent") {
-        subtitle.textContent =
-          reasonInput.value || "Unentschuldigt";
-      }
-    };
+    if (status === "late") {
+      entry.querySelector("[data-service-book-reason]").value = "";
+    }
+
+    if (status === "absent") {
+      entry.querySelector("[data-service-book-late]").value = "";
+    }
+  };
+
+  list.querySelectorAll("[data-service-book-status]").forEach(select => {
+    select.addEventListener("change", () => updateEntry(select));
   });
-    // Wischgesten im Dienstbuch:
-  // Nach rechts = Anwesend
-  // Nach links = Abwesend
 
+  // Wischen: rechts = anwesend, links = abwesend.
   list.querySelectorAll("[data-service-book-entry]").forEach(entry => {
-    let startX = 0;
-    let startY = 0;
+    let startX = null;
+    let startY = null;
 
     entry.addEventListener("pointerdown", event => {
       if (event.pointerType !== "touch") return;
-
       if (event.target.closest("select, input, button")) return;
 
       startX = event.clientX;
@@ -1615,27 +1599,29 @@ function renderServiceBookAttendance() {
     });
 
     entry.addEventListener("pointerup", event => {
-      if (event.pointerType !== "touch") return;
+      if (event.pointerType !== "touch" || startX === null) return;
 
       const deltaX = event.clientX - startX;
       const deltaY = event.clientY - startY;
+
+      startX = null;
+      startY = null;
 
       if (
         Math.abs(deltaX) < 65 ||
         Math.abs(deltaX) < Math.abs(deltaY) * 1.3
       ) return;
 
-      const select = entry.querySelector(
-        "[data-service-book-status]"
-      );
-
+      const select = entry.querySelector("[data-service-book-status]");
       if (!select) return;
 
       select.value = deltaX > 0 ? "present" : "absent";
+      select.dispatchEvent(new Event("change", { bubbles: true }));
+    });
 
-      select.dispatchEvent(
-        new Event("change", { bubbles: true })
-      );
+    entry.addEventListener("pointercancel", () => {
+      startX = null;
+      startY = null;
     });
   });
 }
