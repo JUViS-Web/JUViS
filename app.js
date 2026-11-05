@@ -2725,11 +2725,12 @@ $("saveServiceBookAttendance").onclick = async () => {
 
   try {
     for (const entry of entries) {
-      const status = entry.querySelector(
-        "[data-service-book-status]"
-      ).value;
-
       const memberId = entry.dataset.serviceBookEntry;
+
+      const status =
+        entry.dataset.status ||
+        (entry.classList.contains("status-absent") ? "absent" :
+         entry.classList.contains("status-late") ? "late" : "present");
 
       const lateValue = entry.querySelector(
         "[data-service-book-late]"
