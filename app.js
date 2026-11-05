@@ -1484,6 +1484,13 @@ function renderServiceBookAttendance() {
     return;
   }
 
+  const dialog = $("serviceBookAttendanceDialog");
+  const dialogMember = $("serviceBookAttendanceDialogMember");
+  const dialogReason = $("serviceBookAttendanceExcuseReason");
+  const dialogLate = $("serviceBookAttendanceLateMinutes");
+
+  let selectedEntry = null;
+
   const members = cache.members
     .filter(member => !member.leave_date)
     .slice()
@@ -1503,9 +1510,6 @@ function renderServiceBookAttendance() {
     const lateMinutes = Number(record?.late_minutes || 0);
     const reason = record?.excuse_reason || "";
 
-    const statusLabel = status === "late" ? "Verspätet" :
-      status === "absent" ? "Abwesend" : "Anwesend";
-
     return `
       <article class="sb-attendance-card status-${status}"
         data-service-book-entry="${esc(member.id)}">
@@ -1513,77 +1517,155 @@ function renderServiceBookAttendance() {
         <div class="sb-attendance-main">
           <div class="sb-attendance-person">
             <strong>${esc(member.first_name)} ${esc(member.last_name)}</strong>
-            <span class="sb-attendance-current">${statusLabel}</span>
+            <span class="sb-attendance-current">
+              ${status === "absent" ? "Abwesend" :
+                status === "late" ? `Verspätet – ${lateMinutes} Minuten` :
+                "Anwesend"}
+            </span>
           </div>
 
-          <select class="sb-attendance-select"
-            data-service-book-status="${esc(member.id)}">
-            <option value="present" ${status === "present" ? "selected" : ""}>Anwesend</option>
-            <option value="late" ${status === "late" ? "selected" : ""}>Verspätet</option>
-            <option value="absent" ${status === "absent" ? "selected" : ""}>Abwesend</option>
-          </select>
+          <div class="sb-attendance-actions">
+            <button type="button"
+              class="sb-attendance-status"
+              data-service-book-toggle
+              aria-label="Anwesenheitsstatus ändern">
+              ${status === "absent" ? "×" :
+                status === "late" ? "◷" : "✓"}
+            </button>
+
+            <button type="button"
+              class="sb-attendance-note"
+              aria-label="Notiz – Funktion folgt">
+              ▤
+            </button>
+
+            <button type="button"
+              class="sb-attendance-clock"
+              data-service-book-clock
+              aria-label="Abwesenheit oder Verspätung bearbeiten">
+              ◷
+            </button>
+          </div>
         </div>
 
-        <div class="sb-attendance-extra">
-          <div data-service-book-late-wrap ${status === "late" ? "" : "hidden"}>
-            <label>Verspätung in Minuten</label>
-            <input type="number" min="1" step="1"
-              inputmode="numeric"
-              placeholder="z. B. 10"
-              data-service-book-late="${esc(member.id)}"
-              value="${status === "late" && lateMinutes > 0 ? lateMinutes : ""}">
-          </div>
+        <input type="hidden"
+          data-service-book-late
+          value="${lateMinutes || ""}">
 
-          <div data-service-book-reason-wrap ${status === "absent" ? "" : "hidden"}>
-            <label>Abwesenheitsgrund</label>
-            <input type="text" maxlength="120"
-              placeholder="z. B. Krank oder Urlaub"
-              data-service-book-reason="${esc(member.id)}"
-              value="${esc(reason)}">
-          </div>
-        </div>
+        <input type="hidden"
+          data-service-book-reason
+          value="${esc(reason)}">
       </article>
     `;
   }).join("") || '<p class="muted">Keine Mitglieder vorhanden.</p>';
 
-  const updateEntry = select => {
-    const entry = select.closest("[data-service-book-entry]");
-    if (!entry) return;
-
-    const status = select.value;
-
+  function updateEntry(entry, status) {
     entry.classList.remove(
       "status-present", "status-late", "status-absent"
     );
     entry.classList.add("status-" + status);
 
+    entry.dataset.status = status;
+
     const current = entry.querySelector(".sb-attendance-current");
-    const lateWrap = entry.querySelector("[data-service-book-late-wrap]");
-    const reasonWrap = entry.querySelector("[data-service-book-reason-wrap]");
+    const statusButton = entry.querySelector("[data-service-book-toggle]");
+    const late = Number(
+      entry.querySelector("[data-service-book-late]").value || 0
+    );
 
-    current.textContent = status === "late" ? "Verspätet" :
-      status === "absent" ? "Abwesend" : "Anwesend";
+    current.textContent =
+      status === "absent" ? "Abwesend" :
+      status === "late" ? `Verspätet – ${late} Minuten` :
+      "Anwesend";
 
-    lateWrap.hidden = status !== "late";
-    reasonWrap.hidden = status !== "absent";
+    statusButton.textContent =
+      status === "absent" ? "×" :
+      status === "late" ? "◷" : "✓";
 
     if (status === "present") {
       entry.querySelector("[data-service-book-late]").value = "";
       entry.querySelector("[data-service-book-reason]").value = "";
     }
+  }
 
-    if (status === "late") {
-      entry.querySelector("[data-service-book-reason]").value = "";
+  function openAttendanceDialog(entry) {
+    selectedEntry = entry;
+
+    const name = entry.querySelector(".sb-attendance-person strong");
+    dialogMember.textContent = name.textContent;
+
+    dialogReason.value =
+      entry.querySelector("[data-service-book-reason]").value;
+
+    dialogLate.value =
+      entry.querySelector("[data-service-book-late]").value;
+
+    dialog.showModal();
+  }
+
+  list.querySelectorAll("[data-service-book-toggle]").forEach(button => {
+    button.addEventListener("click", () => {
+      const entry = button.closest("[data-service-book-entry]");
+      const currentStatus = entry.dataset.status ||
+        (entry.classList.contains("status-absent") ? "absent" : "present");
+
+      if (currentStatus === "absent") {
+        updateEntry(entry, "present");
+      } else {
+        updateEntry(entry, "absent");
+        openAttendanceDialog(entry);
+      }
+    });
+  });
+
+  list.querySelectorAll("[data-service-book-clock]").forEach(button => {
+    button.addEventListener("click", () => {
+      openAttendanceDialog(
+        button.closest("[data-service-book-entry]")
+      );
+    });
+  });
+
+  $("serviceBookAttendanceDialogSave").onclick = () => {
+    if (!selectedEntry) return;
+
+    const reason = dialogReason.value.trim();
+    const lateValue = dialogLate.value.trim();
+    const lateMinutes = lateValue === "" ? 0 : Number(lateValue);
+
+    if (
+      lateValue !== "" &&
+      (!Number.isInteger(lateMinutes) || lateMinutes < 1)
+    ) {
+      alert("Bitte gib eine gültige Verspätung in Minuten ein.");
+      return;
     }
 
-    if (status === "absent") {
-      entry.querySelector("[data-service-book-late]").value = "";
+    selectedEntry.querySelector(
+      "[data-service-book-reason]"
+    ).value = reason;
+
+    selectedEntry.querySelector(
+      "[data-service-book-late]"
+    ).value = lateMinutes || "";
+
+    if (lateMinutes > 0) {
+      updateEntry(selectedEntry, "late");
+    } else if (selectedEntry.classList.contains("status-absent")) {
+      updateEntry(selectedEntry, "absent");
     }
+
+    dialog.close();
+    selectedEntry = null;
   };
 
-  list.querySelectorAll("[data-service-book-status]").forEach(select => {
-    select.addEventListener("change", () => updateEntry(select));
-  });
+  const closeDialog = () => {
+    dialog.close();
+    selectedEntry = null;
+  };
+
+  $("serviceBookAttendanceDialogClose").onclick = closeDialog;
+  $("serviceBookAttendanceDialogCancel").onclick = closeDialog;
 
   // Wischen: rechts = anwesend, links = abwesend.
   list.querySelectorAll("[data-service-book-entry]").forEach(entry => {
@@ -1592,7 +1674,7 @@ function renderServiceBookAttendance() {
 
     entry.addEventListener("pointerdown", event => {
       if (event.pointerType !== "touch") return;
-      if (event.target.closest("select, input, button")) return;
+      if (event.target.closest("button, input, textarea")) return;
 
       startX = event.clientX;
       startY = event.clientY;
@@ -1612,11 +1694,12 @@ function renderServiceBookAttendance() {
         Math.abs(deltaX) < Math.abs(deltaY) * 1.3
       ) return;
 
-      const select = entry.querySelector("[data-service-book-status]");
-      if (!select) return;
-
-      select.value = deltaX > 0 ? "present" : "absent";
-      select.dispatchEvent(new Event("change", { bubbles: true }));
+      if (deltaX > 0) {
+        updateEntry(entry, "present");
+      } else {
+        updateEntry(entry, "absent");
+        openAttendanceDialog(entry);
+      }
     });
 
     entry.addEventListener("pointercancel", () => {
