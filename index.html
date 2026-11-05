@@ -1320,51 +1320,60 @@ input[type="time"] {
 
   <div id="serviceBookAttendanceList"></div>
 
-  <dialog id="serviceBookAttendanceDialog" class="juvis-dialog">
-    <div class="juvis-dialog-content">
-      <div class="juvis-dialog-header">
-        <div>
-          <h2 id="serviceBookAttendanceDialogTitle">Anwesenheit bearbeiten</h2>
-          <p id="serviceBookAttendanceDialogMember" class="muted"></p>
-        </div>
-        <button type="button" id="serviceBookAttendanceDialogClose"
-          class="secondary">✕</button>
+  <<dialog id="serviceBookAttendanceDialog" class="juvis-dialog">
+  <div class="juvis-dialog-content">
+    <div class="juvis-dialog-header">
+      <div>
+        <h2 id="serviceBookAttendanceDialogTitle">
+          Angaben bearbeiten
+        </h2>
+        <p id="serviceBookAttendanceDialogMember" class="muted"></p>
       </div>
 
-      <div id="serviceBookAttendanceDialogLate" hidden>
-        <label for="serviceBookAttendanceLateMinutes">Verspätung in Minuten</label>
-        <input id="serviceBookAttendanceLateMinutes" type="number"
-          min="1" step="1" placeholder="z. B. 10">
-      </div>
-
-      <div id="serviceBookAttendanceDialogAbsent" hidden>
-        <label for="serviceBookAttendanceExcuseReason">Abwesenheitsgrund</label>
-        <select id="serviceBookAttendanceExcuseReason">
-          <option value="">Unentschuldigt</option>
-          <option value="Krank">Krank</option>
-          <option value="Urlaub">Urlaub</option>
-          <option value="Feier">Feier</option>
-          <option value="Abwesend">Abwesend</option>
-          <option value="Freitext">Freitext</option>
-        </select>
-
-        <div id="serviceBookAttendanceFreeTextWrap" hidden>
-          <label for="serviceBookAttendanceFreeText">Eigener Grund</label>
-          <textarea id="serviceBookAttendanceFreeText"
-            placeholder="Grund eintragen"></textarea>
-        </div>
-      </div>
-
-      <div class="juvis-dialog-actions">
-        <button type="button" id="serviceBookAttendanceDialogCancel"
-          class="secondary">Abbrechen</button>
-        <button type="button" id="serviceBookAttendanceDialogSave">
-          Übernehmen
-        </button>
-      </div>
+      <button type="button"
+        id="serviceBookAttendanceDialogClose"
+        class="secondary">✕</button>
     </div>
-  </dialog>
 
+    <div>
+      <label for="serviceBookAttendanceExcuseReason">
+        Abwesenheitsgrund / Freitext
+      </label>
+      <textarea
+        id="serviceBookAttendanceExcuseReason"
+        maxlength="300"
+        rows="3"
+        placeholder="z. B. Krank, Urlaub oder eigener Hinweis">
+      </textarea>
+    </div>
+
+    <div>
+      <label for="serviceBookAttendanceLateMinutes">
+        Verspätung in Minuten
+      </label>
+      <input
+        id="serviceBookAttendanceLateMinutes"
+        type="number"
+        min="1"
+        step="1"
+        inputmode="numeric"
+        placeholder="z. B. 10">
+    </div>
+
+    <div class="juvis-dialog-actions">
+      <button type="button"
+        id="serviceBookAttendanceDialogCancel"
+        class="secondary">
+        Abbrechen
+      </button>
+
+      <button type="button"
+        id="serviceBookAttendanceDialogSave">
+        Übernehmen
+      </button>
+    </div>
+  </div>
+</dialog>
   <button type="button" id="saveServiceBookAttendance">
     Anwesenheit speichern
   </button>
