@@ -843,35 +843,39 @@ input[type="time"] {
   }
 }
 
-  /* Dienstbuch: kompakte, farblich erkennbare Anwesenheitskarten */
+  /* JUVIS – Dienstbuch Anwesenheit */
 #serviceBookAttendanceList {
   display: grid;
-  gap: 10px;
+  gap: 9px;
   margin: 14px 0;
 }
 
 #serviceBookAttendanceList .sb-attendance-card {
-  display: block;
-  padding: 13px 14px;
+  padding: 12px 14px;
   border: 1px solid var(--line);
   border-left: 5px solid #22c55e;
-  border-radius: 13px;
+  border-radius: 14px;
   background: var(--panel2);
   touch-action: pan-y;
+  transition: border-color 0.2s ease;
 }
 
-#serviceBookAttendanceList .sb-attendance-card.status-late {
-  border-left-color: #f59e0b;
+#serviceBookAttendanceList .status-present {
+  border-left-color: #22c55e;
 }
 
-#serviceBookAttendanceList .sb-attendance-card.status-absent {
+#serviceBookAttendanceList .status-absent {
   border-left-color: #ef4444;
 }
 
+#serviceBookAttendanceList .status-late {
+  border-left-color: #f59e0b;
+}
+
 .sb-attendance-main {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(130px, 42%);
+  display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
 }
 
@@ -883,6 +887,7 @@ input[type="time"] {
 }
 
 .sb-attendance-person strong {
+  font-size: 15px;
   overflow-wrap: anywhere;
 }
 
@@ -891,40 +896,70 @@ input[type="time"] {
   font-size: 12px;
 }
 
-.sb-attendance-select {
-  margin: 0;
-  min-width: 0;
+.sb-attendance-actions {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  flex-shrink: 0;
 }
 
-.sb-attendance-extra {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-top: 9px;
+.sb-attendance-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 39px;
+  height: 39px;
+  padding: 0;
+  border-radius: 11px;
+  font-size: 19px;
+  font-weight: 700;
 }
 
-.sb-attendance-extra [hidden] {
-  display: none !important;
+.sb-attendance-status {
+  background: #22c55e;
+  color: white;
+  border: none;
 }
 
-.sb-attendance-extra label {
-  display: block;
-  margin-bottom: 3px;
+.status-absent .sb-attendance-status {
+  background: #ef4444;
 }
 
-.sb-attendance-extra input {
-  margin: 0;
-  min-height: 42px;
+.status-late .sb-attendance-status {
+  background: #f59e0b;
+  color: #111;
 }
 
-@media (max-width: 520px) {
-  .sb-attendance-main {
-    grid-template-columns: minmax(0, 1fr) minmax(120px, 44%);
-    gap: 8px;
+.sb-attendance-note {
+  background: var(--panel);
+  color: var(--muted);
+  border: 1px solid var(--line);
+  opacity: 0.65;
+}
+
+.sb-attendance-clock {
+  background: var(--panel);
+  color: var(--text);
+  border: 1px solid var(--line);
+}
+
+.sb-attendance-actions button:active {
+  transform: scale(0.94);
+}
+
+@media (max-width: 420px) {
+  #serviceBookAttendanceList .sb-attendance-card {
+    padding: 10px;
   }
 
-  .sb-attendance-extra {
-    grid-template-columns: 1fr;
+  .sb-attendance-actions {
+    gap: 5px;
+  }
+
+  .sb-attendance-actions button {
+    width: 35px;
+    height: 35px;
+    font-size: 17px;
   }
 }
 </style>
