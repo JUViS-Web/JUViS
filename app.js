@@ -2481,8 +2481,10 @@ $("navToggle").addEventListener("click", () => {
 
 
   // Suche und Anwesenheit
-  $("memberSearch").oninput = render;
-  $if ($("attendanceEvent")) {
+  // Suche und Anwesenheit
+$("memberSearch").oninput = render;
+
+if ($("attendanceEvent")) {
   $("attendanceEvent").onchange = render;
 }
   
