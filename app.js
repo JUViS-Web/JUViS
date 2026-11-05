@@ -2610,6 +2610,96 @@ $("saveAttendance").onclick = async () => {
   }
 };
 
+  // Anwesenheit im Dienstbuch speichern
+$("saveServiceBookAttendance").onclick = async () => {
+  const button = $("saveServiceBookAttendance");
+  const message = $("serviceBookAttendanceMessage");
+  const eventId = window.currentServiceBookEventId;
+
+  if (!admin()) {
+    message.textContent = "Nur Betreuer und Administratoren dürfen Anwesenheit speichern.";
+    return;
+  }
+
+  if (!eventId) {
+    message.textContent = "Kein Dienst ausgewählt.";
+    return;
+  }
+
+  const entries = [
+    ...$("serviceBookAttendanceList").querySelectorAll(
+      "[data-service-book-entry]"
+    )
+  ];
+
+  if (!entries.length) {
+    message.textContent = "Keine Mitglieder zum Speichern gefunden.";
+    return;
+  }
+
+  button.disabled = true;
+  message.textContent = "Anwesenheit wird gespeichert …";
+
+  try {
+    for (const entry of entries) {
+      const status = entry.querySelector(
+        "[data-service-book-status]"
+      ).value;
+
+      const memberId = entry.dataset.serviceBookEntry;
+
+      const lateValue = entry.querySelector(
+        "[data-service-book-late]"
+      ).value.trim();
+
+      const reason = entry.querySelector(
+        "[data-service-book-reason]"
+      ).value.trim();
+
+      const lateMinutes = lateValue === "" ? 0 : Number(lateValue);
+
+      if (
+        status === "late" &&
+        (!Number.isInteger(lateMinutes) || lateMinutes < 1)
+      ) {
+        throw new Error(
+          "Bitte trage für verspätete Mitglieder eine gültige Minutenzahl ein."
+        );
+      }
+
+      const { error } = await sb
+        .from("attendance")
+        .upsert({
+          event_id: eventId,
+          member_id: memberId,
+          status: status,
+          late_minutes: status === "late" ? lateMinutes : 0,
+          excuse_reason: status === "absent"
+            ? (reason || "Unentschuldigt")
+            : null,
+          recorded_by: user.id
+        }, {
+          onConflict: "event_id,member_id"
+        });
+
+      if (error) throw error;
+    }
+
+    await load();
+    await renderServiceBook();
+
+    message.textContent =
+      "Anwesenheit erfolgreich gespeichert.";
+
+  } catch (error) {
+    message.textContent =
+      "Fehler beim Speichern: " + error.message;
+
+  } finally {
+    button.disabled = false;
+  }
+};
+  
   // Bekleidung drucken
   $("printClothing").onclick = () => {
     const rows = cache.clothing.map(item => {
