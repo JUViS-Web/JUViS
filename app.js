@@ -1512,7 +1512,8 @@ function renderServiceBookAttendance() {
 
     return `
       <article class="sb-attendance-card status-${status}"
-        data-service-book-entry="${esc(member.id)}">
+  data-service-book-entry="${esc(member.id)}"
+  data-status="${status}">
 
         <div class="sb-attendance-main">
           <div class="sb-attendance-person">
