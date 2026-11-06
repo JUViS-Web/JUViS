@@ -1561,7 +1561,9 @@ function renderServiceBookAttendance() {
     entry.dataset.status = status;
 
     const current = entry.querySelector(".sb-attendance-current");
-    const statusButton = entry.querySelector("[data-service-book-toggle]");
+    statusButton.textContent =
+  status === "absent" ? "×" :
+  status === "late" ? "◷" : "✓";
     const late = Number(
       entry.querySelector("[data-service-book-late]").value || 0
     );
