@@ -2876,6 +2876,14 @@ $("saveServiceBookAttendance").onclick = async () => {
   };
 
   // Formulare
+  $("memberNoteDialogClose").onclick = () => {
+  $("memberNoteDialog").close();
+};
+
+$("memberNoteDialogCancel").onclick = () => {
+  $("memberNoteDialog").close();
+};
+  
 $("addMemberButton").onclick = openNewMemberForm;
 
   $("showFormerMembersButton").onclick = () => {
