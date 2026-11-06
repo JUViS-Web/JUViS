@@ -1480,6 +1480,49 @@ input[type="time"] {
 
     <p id="serviceBookNoteMessage" class="muted"></p>
   </div>
+  <dialog id="memberNoteDialog" class="juvis-dialog">
+  <div class="juvis-dialog-content">
+
+    <div class="juvis-dialog-header">
+      <div>
+        <h2>Dienstbucheintrag</h2>
+        <p id="memberNoteDialogName" class="muted"></p>
+      </div>
+
+      <button type="button"
+        id="memberNoteDialogClose"
+        class="secondary">✕</button>
+    </div>
+
+    <label for="memberNoteDialogText">
+      Eintrag
+    </label>
+
+    <textarea
+      id="memberNoteDialogText"
+      rows="5"
+      maxlength="2000"
+      placeholder="Dienstbucheintrag für dieses Mitglied verfassen ..."
+      required>
+    </textarea>
+
+    <div class="juvis-dialog-actions">
+      <button type="button"
+        id="memberNoteDialogCancel"
+        class="secondary">
+        Abbrechen
+      </button>
+
+      <button type="button"
+        id="memberNoteDialogSave">
+        Eintrag speichern
+      </button>
+    </div>
+
+    <p id="memberNoteDialogMessage" class="muted"></p>
+
+  </div>
+</dialog>
 </section>
     
 <section id="fegedienst" class="page hidden">
