@@ -1552,7 +1552,7 @@ function renderServiceBookAttendance() {
     `;
   }).join("") || '<p class="muted">Keine Mitglieder vorhanden.</p>';
 
-  llist.querySelectorAll(".sb-attendance-note").forEach(button => {
+  list.querySelectorAll(".sb-attendance-note").forEach(button => {
   button.addEventListener("click", async () => {
     const entry = button.closest("[data-service-book-entry]");
     const memberId = entry.dataset.serviceBookEntry;
