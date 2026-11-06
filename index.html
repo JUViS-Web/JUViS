@@ -1441,6 +1441,22 @@ input[type="time"] {
     <h2>Dienstbucheinträge</h2>
 
     <div id="serviceBookEntries"></div>
+    <form id="serviceBookForm">
+  <label for="serviceBookEntry">Neuer Eintrag</label>
+
+  <textarea
+    id="serviceBookEntry"
+    rows="4"
+    required
+    placeholder="Was ist während des Dienstes passiert?"
+  ></textarea>
+
+  <button type="submit">
+    Eintrag speichern
+  </button>
+</form>
+
+<p id="serviceBookMessage" class="muted"></p>
 
     <form id="serviceBookMemberNoteForm">
   <label for="serviceBookNoteMember">Mitglied</label>
