@@ -1442,40 +1442,25 @@ input[type="time"] {
 
     <div id="serviceBookEntries"></div>
 
-    <form id="serviceBookForm">
-      <label for="serviceBookEntry">Neuer Eintrag</label>
-      <textarea
-        id="serviceBookEntry"
-        rows="4"
-        required
-        placeholder="Was ist während des Dienstes passiert?"
-      ></textarea>
-
-      <button type="submit">Eintrag speichern</button>
-    </form>
-    
-    <p id="serviceBookMessage" class="muted"></p>
-  </div>
-
     <form id="serviceBookMemberNoteForm">
-      <label for="serviceBookNoteMember">Mitglied</label>
-      <select id="serviceBookNoteMember" required>
-        <option value="">Mitglied auswählen</option>
-      </select>
+  <label for="serviceBookNoteMember">Mitglied</label>
+  <select id="serviceBookNoteMember" required>
+    <option value="">Mitglied auswählen</option>
+  </select>
 
-      <label for="serviceBookNoteText">Vermerk</label>
-      <textarea
-        id="serviceBookNoteText"
-        rows="3"
-        required
-        placeholder="Zum Beispiel: Hat besonders gut mitgearbeitet."
-      ></textarea>
+  <label for="serviceBookNoteText">Vermerk</label>
+  <textarea
+    id="serviceBookNoteText"
+    rows="3"
+    required
+    placeholder="Zum Beispiel: Hat besonders gut mitgearbeitet."
+  ></textarea>
 
-      <button type="submit">Vermerk speichern</button>
-    </form>
+  <button type="submit">Vermerk speichern</button>
+</form>
 
-    <p id="serviceBookNoteMessage" class="muted"></p>
-  </div>
+<p id="serviceBookNoteMessage" class="muted"></p>
+</div>
   <h3>Bisherige Einträge zu diesem Dienst</h3>
 <div id="memberNoteDialogEntries">
   <p class="muted">Noch keine Einträge vorhanden.</p>
