@@ -1920,10 +1920,13 @@ async function renderAbsences() {
   }
 
   if (reasonFilter.value) {
-    absences = absences.filter(item =>
-      (item.excuse_reason || "Unentschuldigt") === reasonFilter.value
-    );
-  }
+  absences = absences.filter(item => {
+    const reason = item.excuse_reason || "Unentschuldigt";
+
+    return reason === reasonFilter.value ||
+      reason.startsWith(reasonFilter.value + ": ");
+  });
+}
 
   if (fromFilter.value) {
     absences = absences.filter(item =>
