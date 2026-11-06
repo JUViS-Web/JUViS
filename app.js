@@ -1527,10 +1527,10 @@ function renderServiceBookAttendance() {
 
           <div class="sb-attendance-actions">
             <button type="button"
-              class="sb-attendance-note"
-              aria-label="Notiz – Funktion folgt">
-              ▤
-            </button>
+  class="sb-attendance-note"
+  aria-label="Dienstbucheintrag erstellen">
+  ▤
+</button>
 
             <button type="button"
               class="sb-attendance-clock"
