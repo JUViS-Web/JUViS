@@ -2762,6 +2762,7 @@ $("memberNoteDialogCancel").onclick = () => {
   const memberId = window.currentServiceBookNoteMemberId;
   const eventId = window.currentServiceBookEventId;
   const note = $("memberNoteDialogText").value.trim();
+  const sentiment = $("memberNoteDialogSentiment").value;
   const message = $("memberNoteDialogMessage");
   const button = $("memberNoteDialogSave");
 
