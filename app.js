@@ -2778,12 +2778,13 @@ $("memberNoteDialogCancel").onclick = () => {
     const { error } = await sb
       .from("service_book_member_notes")
       .insert({
-        event_id: eventId,
-        member_id: memberId,
-        note: note,
-        created_by: user.id,
-        updated_by: user.id
-      });
+  event_id: eventId,
+  member_id: memberId,
+  note: note,
+  sentiment: sentiment,
+  created_by: user.id,
+  updated_by: user.id
+});
 
     if (error) throw error;
 
