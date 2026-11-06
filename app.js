@@ -1598,21 +1598,6 @@ function renderServiceBookAttendance() {
     dialog.showModal();
   }
 
-  list.querySelectorAll("[data-service-book-toggle]").forEach(button => {
-    button.addEventListener("click", () => {
-      const entry = button.closest("[data-service-book-entry]");
-      const currentStatus = entry.dataset.status ||
-        (entry.classList.contains("status-absent") ? "absent" : "present");
-
-      if (currentStatus === "absent") {
-        updateEntry(entry, "present");
-      } else {
-        updateEntry(entry, "absent");
-        openAttendanceDialog(entry);
-      }
-    });
-  });
-
   list.querySelectorAll("[data-service-book-clock]").forEach(button => {
     button.addEventListener("click", () => {
       openAttendanceDialog(
