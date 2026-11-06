@@ -1552,6 +1552,24 @@ function renderServiceBookAttendance() {
     `;
   }).join("") || '<p class="muted">Keine Mitglieder vorhanden.</p>';
 
+  list.querySelectorAll(".sb-attendance-note").forEach(button => {
+  button.addEventListener("click", () => {
+    const entry = button.closest("[data-service-book-entry]");
+    const memberId = entry.dataset.serviceBookEntry;
+    const memberName = entry.querySelector(
+      ".sb-attendance-person strong"
+    ).textContent;
+
+    window.currentServiceBookNoteMemberId = memberId;
+
+    $("memberNoteDialogName").textContent = memberName;
+    $("memberNoteDialogText").value = "";
+    $("memberNoteDialogMessage").textContent = "";
+
+    $("memberNoteDialog").showModal();
+  });
+});
+  
   function updateEntry(entry, status) {
     entry.classList.remove(
       "status-present", "status-late", "status-absent"
