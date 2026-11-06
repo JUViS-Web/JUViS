@@ -1527,14 +1527,6 @@ function renderServiceBookAttendance() {
 
           <div class="sb-attendance-actions">
             <button type="button"
-              class="sb-attendance-status"
-              data-service-book-toggle
-              aria-label="Anwesenheitsstatus ändern">
-              ${status === "absent" ? "×" :
-                status === "late" ? "◷" : "✓"}
-            </button>
-
-            <button type="button"
               class="sb-attendance-note"
               aria-label="Notiz – Funktion folgt">
               ▤
