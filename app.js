@@ -1584,19 +1584,43 @@ function renderServiceBookAttendance() {
   }
 
   function openAttendanceDialog(entry) {
-    selectedEntry = entry;
+  selectedEntry = entry;
 
-    const name = entry.querySelector(".sb-attendance-person strong");
-    dialogMember.textContent = name.textContent;
+  const name = entry.querySelector(".sb-attendance-person strong");
+  dialogMember.textContent = name.textContent;
 
-    dialogReason.value =
-      entry.querySelector("[data-service-book-reason]").value;
+  const savedReason = entry.querySelector(
+    "[data-service-book-reason]"
+  ).value.trim();
 
-    dialogLate.value =
-      entry.querySelector("[data-service-book-late]").value;
+  const reasonTypes = [
+    "Krank",
+    "Urlaub",
+    "Feier",
+    "Abwesend",
+    "Unentschuldigt",
+    "Sonstiges"
+  ];
 
-    dialog.showModal();
-  }
+  const reasonType = $("serviceBookAttendanceReasonType");
+
+  const matchedType = reasonTypes.find(type =>
+    savedReason === type || savedReason.startsWith(type + ": ")
+  );
+
+  reasonType.value = matchedType || "";
+
+  dialogReason.value = matchedType
+    ? savedReason === matchedType
+      ? ""
+      : savedReason.slice(matchedType.length + 2)
+    : savedReason;
+
+  dialogLate.value =
+    entry.querySelector("[data-service-book-late]").value;
+
+  dialog.showModal();
+}
 
   list.querySelectorAll("[data-service-book-clock]").forEach(button => {
     button.addEventListener("click", () => {
@@ -1607,38 +1631,50 @@ function renderServiceBookAttendance() {
   });
 
   $("serviceBookAttendanceDialogSave").onclick = () => {
-    if (!selectedEntry) return;
+  if (!selectedEntry) return;
 
-    const reason = dialogReason.value.trim();
-    const lateValue = dialogLate.value.trim();
-    const lateMinutes = lateValue === "" ? 0 : Number(lateValue);
+  const reasonType = $("serviceBookAttendanceReasonType").value;
+  const reasonText = dialogReason.value.trim();
 
-    if (
-      lateValue !== "" &&
-      (!Number.isInteger(lateMinutes) || lateMinutes < 1)
-    ) {
-      alert("Bitte gib eine gültige Verspätung in Minuten ein.");
-      return;
-    }
+  const lateValue = dialogLate.value.trim();
+  const lateMinutes = lateValue === "" ? 0 : Number(lateValue);
 
-    selectedEntry.querySelector(
-      "[data-service-book-reason]"
-    ).value = reason;
+  if (
+    lateValue !== "" &&
+    (!Number.isInteger(lateMinutes) || lateMinutes < 1)
+  ) {
+    alert("Bitte gib eine gültige Verspätung in Minuten ein.");
+    return;
+  }
 
-    selectedEntry.querySelector(
-      "[data-service-book-late]"
-    ).value = lateMinutes || "";
+  let reason = "";
 
-    if (lateMinutes > 0) {
-      updateEntry(selectedEntry, "late");
-    } else if (selectedEntry.classList.contains("status-absent")) {
-      updateEntry(selectedEntry, "absent");
-    }
+  if (reasonType && reasonText) {
+    reason = reasonType + ": " + reasonText;
+  } else if (reasonType) {
+    reason = reasonType;
+  } else if (reasonText) {
+    reason = "Sonstiges: " + reasonText;
+  }
 
-    dialog.close();
-    selectedEntry = null;
-  };
+  selectedEntry.querySelector(
+    "[data-service-book-reason]"
+  ).value = reason;
 
+  selectedEntry.querySelector(
+    "[data-service-book-late]"
+  ).value = lateMinutes || "";
+
+  if (lateMinutes > 0) {
+    updateEntry(selectedEntry, "late");
+  } else if (selectedEntry.classList.contains("status-absent")) {
+    updateEntry(selectedEntry, "absent");
+  }
+
+  dialog.close();
+  selectedEntry = null;
+};
+  
   const closeDialog = () => {
     dialog.close();
     selectedEntry = null;
