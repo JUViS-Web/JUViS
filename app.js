@@ -1815,7 +1815,7 @@ renderServiceBookAttendance();
     </button>
   </div>
 `).join("") || '<p class="muted">Noch keine Einträge vorhanden.</p>';
-
+}
 async function renderAbsences() {
   const list = $("absenceList");
   const summary = $("absenceSummary");
