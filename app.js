@@ -1552,21 +1552,70 @@ function renderServiceBookAttendance() {
     `;
   }).join("") || '<p class="muted">Keine Mitglieder vorhanden.</p>';
 
-  list.querySelectorAll(".sb-attendance-note").forEach(button => {
-  button.addEventListener("click", () => {
+  llist.querySelectorAll(".sb-attendance-note").forEach(button => {
+  button.addEventListener("click", async () => {
     const entry = button.closest("[data-service-book-entry]");
     const memberId = entry.dataset.serviceBookEntry;
     const memberName = entry.querySelector(
       ".sb-attendance-person strong"
     ).textContent;
 
+    const eventId = window.currentServiceBookEventId;
+    const entries = $("memberNoteDialogEntries");
+
     window.currentServiceBookNoteMemberId = memberId;
 
     $("memberNoteDialogName").textContent = memberName;
     $("memberNoteDialogText").value = "";
     $("memberNoteDialogMessage").textContent = "";
+    $("memberNoteDialogSentiment").value = "positive";
 
     $("memberNoteDialog").showModal();
+
+    entries.innerHTML =
+      '<p class="muted">Einträge werden geladen …</p>';
+
+    try {
+      const { data, error } = await sb
+        .from("service_book_member_notes")
+        .select("id, note, sentiment, created_at")
+        .eq("event_id", eventId)
+        .eq("member_id", memberId)
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+
+      if (!data || data.length === 0) {
+        entries.innerHTML =
+          '<p class="muted">Noch keine Einträge zu diesem Dienst vorhanden.</p>';
+        return;
+      }
+
+      entries.innerHTML = data.map(note => {
+        const sentimentLabel =
+          note.sentiment === "positive"
+            ? "Positiv"
+            : note.sentiment === "negative"
+              ? "Negativ"
+              : "Noch nicht kategorisiert";
+
+        const date = note.created_at
+          ? new Date(note.created_at).toLocaleString("de-DE")
+          : "";
+
+        return `
+          <div class="panel">
+            <strong>${sentimentLabel}</strong>
+            <p>${esc(note.note)}</p>
+            <small class="muted">${date}</small>
+          </div>
+        `;
+      }).join("");
+
+    } catch (error) {
+      entries.textContent =
+        "Einträge konnten nicht geladen werden: " + error.message;
+    }
   });
 });
   
