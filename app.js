@@ -1570,10 +1570,6 @@ function renderServiceBookAttendance() {
       status === "late" ? `Verspätet – ${late} Minuten` :
       "Anwesend";
 
-    statusButton.textContent =
-      status === "absent" ? "×" :
-      status === "late" ? "◷" : "✓";
-
     if (status === "present") {
       entry.querySelector("[data-service-book-late]").value = "";
       entry.querySelector("[data-service-book-reason]").value = "";
