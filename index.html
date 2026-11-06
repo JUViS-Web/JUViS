@@ -846,18 +846,21 @@ input[type="time"] {
   /* JUVIS – Dienstbuch Anwesenheit */
 #serviceBookAttendanceList {
   display: grid;
-  gap: 9px;
-  margin: 14px 0;
+  gap: 10px;
+  margin: 16px 0;
 }
 
 #serviceBookAttendanceList .sb-attendance-card {
-  padding: 12px 14px;
+  padding: 15px 16px;
   border: 1px solid var(--line);
   border-left: 5px solid #22c55e;
-  border-radius: 14px;
+  border-radius: 16px;
   background: var(--panel2);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
   touch-action: pan-y;
-  transition: border-color 0.2s ease;
+  transition: border-color 0.2s ease,
+              background 0.2s ease,
+              transform 0.2s ease;
 }
 
 #serviceBookAttendanceList .status-present {
@@ -876,30 +879,44 @@ input[type="time"] {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: 14px;
 }
 
 .sb-attendance-person {
   display: flex;
   flex-direction: column;
-  gap: 5px;
+  gap: 6px;
   min-width: 0;
 }
 
 .sb-attendance-person strong {
-  font-size: 15px;
+  font-size: 16px;
+  font-weight: 700;
   overflow-wrap: anywhere;
 }
 
 .sb-attendance-current {
   color: var(--muted);
-  font-size: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.status-present .sb-attendance-current {
+  color: #22c55e;
+}
+
+.status-absent .sb-attendance-current {
+  color: #ef4444;
+}
+
+.status-late .sb-attendance-current {
+  color: #f59e0b;
 }
 
 .sb-attendance-actions {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
@@ -907,27 +924,13 @@ input[type="time"] {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 39px;
-  height: 39px;
+  width: 40px;
+  height: 40px;
   padding: 0;
-  border-radius: 11px;
+  border-radius: 12px;
   font-size: 19px;
   font-weight: 700;
-}
-
-.sb-attendance-status {
-  background: #22c55e;
-  color: white;
-  border: none;
-}
-
-.status-absent .sb-attendance-status {
-  background: #ef4444;
-}
-
-.status-late .sb-attendance-status {
-  background: #f59e0b;
-  color: #111;
+  transition: transform 0.15s ease;
 }
 
 .sb-attendance-note {
@@ -944,21 +947,21 @@ input[type="time"] {
 }
 
 .sb-attendance-actions button:active {
-  transform: scale(0.94);
+  transform: scale(0.92);
 }
 
 @media (max-width: 420px) {
   #serviceBookAttendanceList .sb-attendance-card {
-    padding: 10px;
+    padding: 12px;
   }
 
   .sb-attendance-actions {
-    gap: 5px;
+    gap: 6px;
   }
 
   .sb-attendance-actions button {
-    width: 35px;
-    height: 35px;
+    width: 36px;
+    height: 36px;
     font-size: 17px;
   }
 }
