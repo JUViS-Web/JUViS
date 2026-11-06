@@ -1461,20 +1461,33 @@ input[type="time"] {
 
 <p id="serviceBookNoteMessage" class="muted"></p>
 </div>
-  <h3>Bisherige Einträge zu diesem Dienst</h3>
-<div id="memberNoteDialogEntries">
-  <p class="muted">Noch keine Einträge vorhanden.</p>
-</div>
-
-<div class="divider"></div>
-
-<label for="memberNoteDialogSentiment">Bewertung</label>
-<select id="memberNoteDialogSentiment" required>
-  <option value="positive">Positiv</option>
-  <option value="negative">Negativ</option>
-</select>
+  
   <dialog id="memberNoteDialog" class="juvis-dialog">
   <div class="juvis-dialog-content">
+
+    <div class="juvis-dialog-header">
+  <div>
+    <h2>Dienstbucheintrag</h2>
+    <p id="memberNoteDialogName" class="muted"></p>
+  </div>
+
+  <button type="button"
+    id="memberNoteDialogClose"
+    class="secondary">✕</button>
+</div>
+
+    <h3>Bisherige Einträge zu diesem Dienst</h3>
+    <div id="memberNoteDialogEntries">
+      <p class="muted">Noch keine Einträge vorhanden.</p>
+    </div>
+
+    <div class="divider"></div>
+
+    <label for="memberNoteDialogSentiment">Bewertung</label>
+    <select id="memberNoteDialogSentiment" required>
+      <option value="positive">Positiv</option>
+      <option value="negative">Negativ</option>
+    </select>
 
     <div class="juvis-dialog-header">
       <div>
