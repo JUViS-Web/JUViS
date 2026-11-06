@@ -2883,6 +2883,49 @@ $("saveServiceBookAttendance").onclick = async () => {
 $("memberNoteDialogCancel").onclick = () => {
   $("memberNoteDialog").close();
 };
+
+  $("memberNoteDialogSave").onclick = async () => {
+  if (!admin()) return;
+
+  const memberId = window.currentServiceBookNoteMemberId;
+  const eventId = window.currentServiceBookEventId;
+  const note = $("memberNoteDialogText").value.trim();
+  const message = $("memberNoteDialogMessage");
+  const button = $("memberNoteDialogSave");
+
+  if (!memberId || !eventId || !note) {
+    message.textContent = "Bitte einen Eintrag verfassen.";
+    return;
+  }
+
+  button.disabled = true;
+  message.textContent = "Eintrag wird gespeichert …";
+
+  try {
+    const { error } = await sb
+      .from("service_book_member_notes")
+      .insert({
+        event_id: eventId,
+        member_id: memberId,
+        note: note,
+        created_by: user.id,
+        updated_by: user.id
+      });
+
+    if (error) throw error;
+
+    $("memberNoteDialog").close();
+    $("memberNoteDialogText").value = "";
+    window.currentServiceBookNoteMemberId = null;
+
+    await renderServiceBook();
+  } catch (error) {
+    message.textContent =
+      "Speichern fehlgeschlagen: " + error.message;
+  } finally {
+    button.disabled = false;
+  }
+};
   
 $("addMemberButton").onclick = openNewMemberForm;
 
