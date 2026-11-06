@@ -1371,16 +1371,33 @@ input[type="time"] {
     </div>
 
     <div>
-      <label for="serviceBookAttendanceExcuseReason">
-        Abwesenheitsgrund / Freitext
-      </label>
-      <textarea
-        id="serviceBookAttendanceExcuseReason"
-        maxlength="300"
-        rows="3"
-        placeholder="z. B. Krank, Urlaub oder eigener Hinweis">
-      </textarea>
-    </div>
+  <label for="serviceBookAttendanceReasonType">
+    Abwesenheitsgrund auswählen
+  </label>
+
+  <select id="serviceBookAttendanceReasonType">
+    <option value="">Bitte auswählen</option>
+    <option value="Krank">Krank</option>
+    <option value="Urlaub">Urlaub</option>
+    <option value="Feier">Feier</option>
+    <option value="Abwesend">Sonstiger Abwesenheitsgrund</option>
+    <option value="Unentschuldigt">Unentschuldigt</option>
+    <option value="Sonstiges">Sonstiges</option>
+  </select>
+</div>
+
+<div>
+  <label for="serviceBookAttendanceExcuseReason">
+    Zusätzliche Angaben / Freitext
+  </label>
+
+  <textarea
+    id="serviceBookAttendanceExcuseReason"
+    maxlength="300"
+    rows="3"
+    placeholder="Hier kannst du weitere Angaben eintragen ...">
+  </textarea>
+</div>
 
     <div>
       <label for="serviceBookAttendanceLateMinutes">
