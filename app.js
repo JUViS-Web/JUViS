@@ -3,52 +3,65 @@ alert("JUVIS app.js wurde gestartet");
   
   const cfg = window.JUVIS_CONFIG || {};
  
-// ==========================================
-// JUVIS – Zentrale Wartungssteuerung
-// ==========================================
 
-const JUVIS_MAINTENANCE = {
-  enabled: false,
+  // ==========================================
+  // JUVIS – Zentrale Wartungssteuerung
+  // ==========================================
 
-  start: "2026-12-01T18:00:00",
-  end: "2026-12-02T08:00:00",
+  const JUVIS_MAINTENANCE = {
+    enabled: false,
 
-  title: "Geplante Wartungsarbeiten",
+    start: "2026-12-01T18:00:00",
+    end: "2026-12-02T08:00:00",
 
-  message:
-    "JUVIS wird aufgrund von Update- und Wartungsarbeiten vorübergehend nicht erreichbar sein."
-};
+    message:
+      "JUVIS wird aufgrund von geplanten Update- und Wartungsarbeiten vorübergehend nicht erreichbar sein."
+  };
 
-function updateMaintenanceNotice() {
-  const notice = document.getElementById("maintenanceNotice");
-  const text = document.getElementById("maintenanceText");
-  const dates = document.getElementById("maintenanceDates");
+  function updateMaintenanceNotice() {
+    const notice = $("maintenanceNotice");
+    const text = $("maintenanceText");
+    const dates = $("maintenanceDates");
 
-  if (!notice || !text || !dates) return;
+    if (!notice || !text || !dates) return;
 
-  const now = new Date();
-  const start = new Date(JUVIS_MAINTENANCE.start);
-  const end = new Date(JUVIS_MAINTENANCE.end);
+    const now = new Date();
+    const start = new Date(JUVIS_MAINTENANCE.start);
+    const end = new Date(JUVIS_MAINTENANCE.end);
 
-  const show =
-    JUVIS_MAINTENANCE.enabled &&
-    now < end;
+    const validDates =
+      !isNaN(start.getTime()) &&
+      !isNaN(end.getTime()) &&
+      end > start;
 
-  notice.classList.toggle("hidden", !show);
+    const show =
+      JUVIS_MAINTENANCE.enabled &&
+      validDates &&
+      now < end;
 
-  if (!show) return;
+    notice.classList.toggle("hidden", !show);
 
-  text.textContent = JUVIS_MAINTENANCE.message;
+    if (!show) return;
 
-  dates.textContent =
-    "Offline ab: " +
-    start.toLocaleString("de-DE") +
-    " Uhr | Wieder verfügbar ab: " +
-    end.toLocaleString("de-DE") +
-    " Uhr";
-}
+    if (now >= start) {
+      notice.querySelector("h2").textContent =
+        "JUVIS befindet sich in Wartungsarbeiten";
+    } else {
+      notice.querySelector("h2").textContent =
+        "Wartungsarbeiten angekündigt";
+    }
 
-updateMaintenanceNotice();
+    text.textContent = JUVIS_MAINTENANCE.message;
+
+    dates.textContent =
+      "Offline ab: " +
+      start.toLocaleString("de-DE") +
+      " Uhr | Wieder verfügbar ab: " +
+      end.toLocaleString("de-DE") +
+      " Uhr";
+  }
+
+  updateMaintenanceNotice();
 
   const configured =
     cfg.SUPABASE_URL?.includes("supabase.co") &&
