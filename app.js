@@ -2,6 +2,54 @@
 alert("JUVIS app.js wurde gestartet");
   
   const cfg = window.JUVIS_CONFIG || {};
+ 
+// ==========================================
+// JUVIS – Zentrale Wartungssteuerung
+// ==========================================
+
+const JUVIS_MAINTENANCE = {
+  enabled: false,
+
+  start: "2026-12-01T18:00:00",
+  end: "2026-12-02T08:00:00",
+
+  title: "Geplante Wartungsarbeiten",
+
+  message:
+    "JUVIS wird aufgrund von Update- und Wartungsarbeiten vorübergehend nicht erreichbar sein."
+};
+
+function updateMaintenanceNotice() {
+  const notice = document.getElementById("maintenanceNotice");
+  const text = document.getElementById("maintenanceText");
+  const dates = document.getElementById("maintenanceDates");
+
+  if (!notice || !text || !dates) return;
+
+  const now = new Date();
+  const start = new Date(JUVIS_MAINTENANCE.start);
+  const end = new Date(JUVIS_MAINTENANCE.end);
+
+  const show =
+    JUVIS_MAINTENANCE.enabled &&
+    now < end;
+
+  notice.classList.toggle("hidden", !show);
+
+  if (!show) return;
+
+  text.textContent = JUVIS_MAINTENANCE.message;
+
+  dates.textContent =
+    "Offline ab: " +
+    start.toLocaleString("de-DE") +
+    " Uhr | Wieder verfügbar ab: " +
+    end.toLocaleString("de-DE") +
+    " Uhr";
+}
+
+updateMaintenanceNotice();
+
   const configured =
     cfg.SUPABASE_URL?.includes("supabase.co") &&
     !cfg.SUPABASE_URL.includes("DEIN-PROJEKT") &&
