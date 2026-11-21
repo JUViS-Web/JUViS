@@ -61,8 +61,6 @@ alert("JUVIS app.js wurde gestartet");
       " Uhr";
   }
 
-  updateMaintenanceNotice();
-
   const configured =
     cfg.SUPABASE_URL?.includes("supabase.co") &&
     !cfg.SUPABASE_URL.includes("DEIN-PROJEKT") &&
