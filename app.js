@@ -69,6 +69,8 @@ alert("JUVIS app.js wurde gestartet");
 
   const $ = id => document.getElementById(id);
 
+    updateMaintenanceNotice();
+  
   let sb = null;
   let user = null;
   let profile = null;
