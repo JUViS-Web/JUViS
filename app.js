@@ -9,7 +9,7 @@ alert("JUVIS app.js wurde gestartet");
   // ==========================================
 
   const JUVIS_MAINTENANCE = {
-    enabled: false,
+    enabled: true,
 
     start: "2026-12-01T18:00:00",
     end: "2026-12-02T08:00:00",
