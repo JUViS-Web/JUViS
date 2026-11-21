@@ -11,11 +11,11 @@ alert("JUVIS app.js wurde gestartet");
   const JUVIS_MAINTENANCE = {
     enabled: true,
 
-    start: "2026-12-01T18:00:00",
-    end: "2026-12-02T08:00:00",
+    start: "2026-11-30T17:00:00",
+    end: "2026-12-18T19:00:00",
 
     message:
-      "JUVIS wird aufgrund von geplanten Update- und Wartungsarbeiten vorübergehend nicht erreichbar sein."
+      "JUVIS wird aufgrund von geplanten Update- und Wartungsarbeiten vorübergehed nicht erreichbar sein. Eitragungen die vorgenommen werden sollen, am den Administrator senden."
   };
 
   function updateMaintenanceNotice() {
